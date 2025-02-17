@@ -114,6 +114,8 @@
         .combat-log {
             font-family: 'Courier New', monospace;
             font-size: 0.9em;
+            display: flex;
+            flex-direction: column-reverse;
         }
         .log-entry {
             margin: 3px 0;
@@ -214,6 +216,7 @@
     </div>
 
     <script>
+
         const game = {
             sword: {
                 energy: 0,
@@ -276,18 +279,29 @@
             document.getElementById('maxEnergy').textContent = game.sword.maxEnergy;
             document.getElementById('totalKills').textContent = game.sword.kills;
 
-            // Upgrades
             const upgradesDiv = document.getElementById('upgrades');
             upgradesDiv.innerHTML = Object.entries(game.sword.upgrades).map(([name, data]) => `
-                <div class="upgrade">
+                <div class="upgrade tooltip">
                     ${name.charAt(0).toUpperCase() + name.slice(1)} (Level ${data.level})
+                    <span class="tooltiptext">${getUpgradeTooltip(name)}</span>
                     <button onclick="buyUpgrade('${name}')" ${game.sword.energy >= data.cost ? '' : 'disabled'}>
                         Upgrade (${Math.round(data.cost)} energy)
                     </button>
                 </div>
             `).join('');
 
-            
+            function getUpgradeTooltip(name) {
+                switch (name) {
+                    case 'capacity': return 'Increases maximum energy';
+                    case 'siphon': return 'Increases energy gained from kills';
+                    case 'senses': return 'Unlocks stronger enemies';
+                    case 'connection': return 'Improves bond with the wielder';
+                    case 'control': return 'Increases wielder stat bonuses';
+                    default: return '';
+                }
+            }
+
+
 
             // Enemies
             const enemiesDiv = document.getElementById('enemies');
