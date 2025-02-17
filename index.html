@@ -201,7 +201,7 @@
                     <span class="tooltiptext">Reduces experience gain but increases control effectiveness</span>
                 </div>
             </div>
-            <button onclick="changeWielder()">Change Wielder (Cost: 100 energy)</button>
+            <button onclick="changeWielder()">Change Wielder (Cost: 10 energy)</button>
         </div>
 
         <div class="section">
@@ -231,11 +231,24 @@
                 }
             },
             wielder: null,
+            zones: [
+        {
+            name: "Haunted Forest",
             enemies: [
-                { name: "Peasant", strength: 5, agility: 5, life: 20, exp: 10 },
-                { name: "Soldier", strength: 15, agility: 10, life: 50, exp: 25 },
-                { name: "Knight", strength: 30, agility: 20, life: 100, exp: 50 }
-            ]
+                { name: "Possessed Villager", strength: 8, agility: 6, life: 25, exp: 15 },
+                { name: "Corrupted Beast", strength: 12, agility: 8, life: 35, exp: 20 }
+            ],
+            unlocked: true
+        },
+        {
+            name: "Cursed Castle",
+            enemies: [
+                { name: "Undead Knight", strength: 18, agility: 10, life: 50, exp: 30 },
+                { name: "Spectral Mage", strength: 15, agility: 12, life: 40, exp: 35 }
+            ],
+            unlocked: false
+        }
+    ]
         };
 
         function generateWielder() {
@@ -305,11 +318,14 @@
 
             // Enemies
             const enemiesDiv = document.getElementById('enemies');
-            enemiesDiv.innerHTML = game.enemies.slice(0, game.sword.upgrades.senses.level).map((enemy, index) => `
-                <div class="enemy">
-                    <button onclick="attackEnemy(${index})">
-                        Attack ${enemy.name} (${enemy.life} HP)
-                    </button>
+            enemiesDiv.innerHTML = game.zones.filter(zone => zone.unlocked).map((zone, index) => `
+                <div class="zone">
+                    <h4>${zone.name}</h4>
+                    ${zone.enemies.map(enemy => `
+                        <button onclick="attackEnemy(${index}, ${zone.enemies.indexOf(enemy)})">
+                            ${enemy.name} (${enemy.life} HP)
+                        </button>
+                    `).join('')}
                 </div>
             `).join('');
         }
@@ -323,8 +339,8 @@
             };
             return descriptions[name] || "Unknown upgrade";
         }
-        async function attackEnemy(enemyIndex) {
-            const enemy = game.enemies[enemyIndex];
+        async function attackEnemy(zoneIndex, enemyIndex) {
+            const enemy = game.zones[zoneIndex].enemies[enemyIndex];
             const wielder = game.wielder;
             
             if (wielder.currentLife <= 0) {
@@ -410,8 +426,8 @@
         }
 
         function changeWielder() {
-            if(game.sword.energy >= 100) {
-                game.sword.energy -= 100;
+            if(game.sword.energy >= 10) {
+                game.sword.energy -= 10;
                 game.wielder = generateWielder();
                 updateDisplay();
             }
@@ -427,6 +443,9 @@
                 if(upgradeName === 'capacity') {
                     game.sword.maxEnergy = 100 * upgrade.level;
                 }
+                if(upgradeName ==='senses') {
+                    game.zones[upgrade.level-1].unlocked = true;
+                }
                 updateDisplay();
             }
         }
@@ -441,7 +460,7 @@
 				game.wielder.currentLife = Math.min(game.wielder.currentLife + 1, game.wielder.life);
 				updateDisplay();
 			}
-			}, 5000); // Regenerate 1 HP every 5 seconds
+			}, 100); // Regenerate 1 HP every 5 seconds
         }
 
         window.onload = initGame;
