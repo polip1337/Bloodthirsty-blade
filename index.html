@@ -412,7 +412,7 @@
 
             const maxControl = game.sword.upgrades.connection.level;
             const controlLevel = Math.min(game.sword.upgrades.control.level, maxControl);
-            game.controlBonus = controlLevel * 0.2 * (1 - game.wielder.willpower/100);
+            game.controlBonus = controlLevel * 0.2 * (1 - game.wielder.willpower/200);
 
             // Calculate damage with siphon
             const baseDamage = game.wielder.strength + game.wielder.swordfighting;
