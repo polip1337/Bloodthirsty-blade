@@ -3,546 +3,725 @@
 <head>
     <title>Cursed Sword Idle</title>
     <style>
-        .zone {
-        background-color: #3d3d3d;
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 6px;
-        }
+            .zone {
+                background-color: #3d3d3d;
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 6px;
+            }
 
-        .zone h4 {
-        margin: 0 0 10px 0;
-        color: #ff6666;
-        }
+            .zone h4 {
+                margin: 0 0 10px 0;
+                color: #ff6666;
+            }
 
-        .zone button {
-        background-color: #4a0000;
-        margin: 5px;
-        }
+            .zone button {
+                background-color: #4a0000;
+                margin: 5px;
+            }
 
-        .zone button:hover {
-        background-color: #5a0000;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #3d3d3d;
-            padding: 20px;
-            border-radius: 8px;
-            z-index: 1000;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
+            .zone button:hover {
+                background-color: #5a0000;
+            }
+            .modal {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: #3d3d3d;
+                padding: 20px;
+                border-radius: 8px;
+                z-index: 1000;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            }
 
-        .stat-choice {
-            margin: 10px;
-            padding: 10px;
-            background: #4a0000;
-            cursor: pointer;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+            .stat-choice {
+                margin: 10px;
+                padding: 10px;
+                background: #4a0000;
+                cursor: pointer;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
 
-        .stat-choice:hover {
-            background: #5a0000;
-        }
+            .stat-choice:hover {
+                background: #5a0000;
+            }
 
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            border-bottom: 1px dotted #666;
-        }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 200px;
-            background-color: #2d2d2d;
-            color: #fff;
-            text-align: center;
-            border-radius: 4px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -100px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
+            .tooltip {
+                position: relative;
+                display: inline-block;
+                border-bottom: 1px dotted #666;
+            }
+            .tooltip .tooltiptext {
+                visibility: hidden;
+                width: 200px;
+                background-color: #2d2d2d;
+                color: #fff;
+                text-align: center;
+                border-radius: 4px;
+                padding: 5px;
+                position: absolute;
+                z-index: 1;
+                bottom: 125%;
+                left: 50%;
+                margin-left: -100px;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+            .tooltip:hover .tooltiptext {
+                visibility: visible;
+                opacity: 1;
+            }
 
-        .stat-points {
-            margin-left: 10px;
-            font-weight: bold;
-            color: #ffcc00;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1a1a1a;
-            color: #ffffff;
-            padding: 20px;
-            margin: 0;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            min-height: 100vh;
-        }
-        .section {
-            background-color: #2d2d2d;
-            padding: 15px;
-            border-radius: 8px;
-            min-height: 200px;
-        }
-        button {
-            background-color: #4a0000;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            margin: 5px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:disabled {
-            background-color: #666;
-            cursor: not-allowed;
-        }
-        .stat {
-            margin: 5px 0;
-        }
-        .upgrade {
-            background-color: #3d3d3d;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 4px;
-        }
-        .combat-window {
-            background-color: #2d2d2d;
-            padding: 15px;
-            border-radius: 8px;
-            grid-column: 1 / -1;
-            height: 200px;
-            overflow-y: auto;
-        }
-        .combat-log {
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            display: flex;
-            flex-direction: column-reverse;
-        }
-        .log-entry {
-            margin: 3px 0;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-        .damage {
-            background-color: #4a000055;
-            color: #ff6666;
-        }
-        .player-stat {
-            background-color: #004a0055;
-            color: #66ff66;
-        }
-        .enemy-defeated {
-            background-color: #4a4a0055;
-            color: #ffff66;
-        }
-    </style>
+            .stat-points {
+                margin-left: 10px;
+                font-weight: bold;
+                color: #ffcc00;
+            }
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #1a1a1a;
+                color: #ffffff;
+                padding: 20px;
+                margin: 0;
+            }
+            .container {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+                min-height: 100vh;
+            }
+            .section {
+                background-color: #2d2d2d;
+                padding: 15px;
+                border-radius: 8px;
+                min-height: 200px;
+            }
+            button {
+                background-color: #4a0000;
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                margin: 5px;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            button:disabled {
+                background-color: #666;
+                cursor: not-allowed;
+            }
+            .stat {
+                margin: 5px 0;
+            }
+            .upgrade {
+                background-color: #3d3d3d;
+                padding: 10px;
+                margin: 5px 0;
+                border-radius: 4px;
+            }
+            .combat-window {
+                background-color: #2d2d2d;
+                padding: 15px;
+                border-radius: 8px;
+                grid-column: 1 / -1;
+                height: 200px;
+                overflow-y: auto;
+            }
+            .combat-log {
+                font-family: "Courier New", monospace;
+                font-size: 0.9em;
+                display: flex;
+                flex-direction: column-reverse;
+            }
+            .log-entry {
+                margin: 3px 0;
+                padding: 2px 5px;
+                border-radius: 3px;
+            }
+            .damage {
+                background-color: #4a000055;
+                color: #ff6666;
+            }
+            .player-stat {
+                background-color: #004a0055;
+                color: #66ff66;
+            }
+            .enemy-defeated {
+                background-color: #4a4a0055;
+                color: #ffff66;
+            }
+            footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 10px;
+                background: #2d2d2d;
+                text-align: center;
+            }
+            footer a {
+                color: white;
+                font-size: 24px;
+                margin: 0 15px;
+                text-decoration: none;
+            }
+        </style>
 </head>
 <body>
-
-    <div id="levelUpModal" class="modal">
-        <h3>Level Up! Choose a stat to improve:</h3>
-        <div class="stat-choice tooltip" onclick="allocatePoint('strength')">
-            [+] Strength
-            <span class="tooltiptext">Increase physical attack power</span>
-        </div>
-
-        <div class="stat-choice tooltip" onclick="allocatePoint('swordfighting')">
-            [+] Swordfighting
-            <span class="tooltiptext">Enhance defensive capabilities</span>
-        </div>
-        <div class="stat-choice tooltip" onclick="allocatePoint('life')">
-            [+] Life
-            <span class="tooltiptext">Increase maximum health</span>
-        </div>
-        <div class="stat-choice tooltip" onclick="allocatePoint('willpower')">
-            [+] Willpower
-            <span class="tooltiptext">Resist sword's control but gain better bonuses</span>
-        </div>
-    </div>
-    <div class="container">
-        <div class="section">
-            <h2>Sword</h2>
-            <div id="swordStats">
-                <div class="stat tooltip">
-                    Energy: <span id="energy">0</span>/<span id="maxEnergy">100</span>
-                    <span class="tooltiptext">Current/Maximum energy stored in the sword</span>
-                </div>
-                <div class="stat tooltip">
-                    Total Kills: <span id="totalKills">0</span>
-                    <span class="tooltiptext">Total number of enemies defeated</span>
-                </div>
-            </div>
-            <h3>Upgrades</h3>
-            <div id="upgrades"></div>
-        </div>
-
-        <div class="section">
-            <h2>Wielder</h2>
-            <div id="wielderStats">
-                <div class="stat tooltip">
-                    Strength: <span id="wielderStrength">0</span>
-                    <span class="tooltiptext">Increases damage dealt per strike</span>
-                </div>
-
-                <div class="stat tooltip">
-                    Swordfighting: <span id="wielderSwordfighting">0</span>
-                    <span class="tooltiptext">Reduces incoming damage from enemies</span>
-                </div>
-                <div class="stat tooltip">
-                    HP: <span id="wielderCurrentLife">0</span>/<span id="wielderMaxLife">0</span>
-                    <span class="tooltiptext">Current/Maximum health points (Regenerates 1 HP every 5 seconds)</span>
-                </div>
-                <div class="stat tooltip">
-                    Willpower: <span id="wielderWillpower">0</span>
-                    <span class="tooltiptext">Reduces experience gain but increases control effectiveness</span>
-                </div>
-            </div>
-            <button id="restButton" onclick="toggleRest()">Rest (Toggle)</button>
-            <button onclick="healWielder()">Heal (10 Energy)</button>
-            <button onclick="changeWielder()">Change Wielder (Cost: 10 energy)</button>
-        </div>
-
-        <div class="section">
-            <h2>Zones</h2>
-            <div id="enemies"></div>
-            <button id="autoBattleButton" onclick="toggleAutoBattle()">Auto Battle: Off</button>
-        </div>
-
-        <div class="section combat-window">
-            <h2>Combat Log</h2>
-            <div id="combat-log" class="combat-log"></div>
-        </div>
+<div id="changelogModal" class="modal">
+    <h3>Changelog</h3>
+    <div id="changelogContent"></div>
+    <button onclick="document.getElementById('changelogModal').style.display='none'">Close</button>
+</div>
+<div id="levelUpModal" class="modal">
+    <h3>Level Up! Choose a stat to improve:</h3>
+    <div class="stat-choice tooltip" onclick="allocatePoint('strength')">
+        [+] Strength
+        <span class="tooltiptext">Increase physical attack power</span>
     </div>
 
-    <script>
+    <div class="stat-choice tooltip" onclick="allocatePoint('swordfighting')">
+        [+] Swordfighting
+        <span class="tooltiptext">Enhance defensive capabilities</span>
+    </div>
+    <div class="stat-choice tooltip" onclick="allocatePoint('life')">
+        [+] Life
+        <span class="tooltiptext">Increase maximum health</span>
+    </div>
+    <div class="stat-choice tooltip" onclick="allocatePoint('willpower')">
+        [+] Willpower
+        <span class="tooltiptext">Resist sword's control but gain better bonuses</span>
+    </div>
+</div>
+<div class="container">
+    <div class="section">
+        <h2>Sword</h2>
+        <div id="swordStats">
+            <div class="stat tooltip">
+                Energy: <span id="energy">0</span>/<span id="maxEnergy">100</span>
+                <span class="tooltiptext">Current/Maximum energy stored in the sword</span>
+            </div>
+            <div class="stat tooltip">
+                Total Kills: <span id="totalKills">0</span>
+                <span class="tooltiptext">Total number of enemies defeated</span>
+            </div>
+        </div>
+        <h3>Upgrades</h3>
+        <div id="upgrades"></div>
+    </div>
 
-        const game = {
-            isFighting: false,
-            autoBattle: false,
-            currentEnemy: null,
-            controlBonus: 0,
-            sword: {
-                energy: 0,
-                maxEnergy: 100,
-                kills: 0,
-                upgrades: {
-                    capacity: { level: 1, cost: 50 },
-                    siphon: { level: 1, cost: 100 },
-                    senses: { level: 1, cost: 200 },
-                    connection: { level: 1, cost: 150 },
-                    control: { level: 1, cost: 300 }
-                }
-            },
-            wielder: null,
-            zones: [
-                {
-            name: "Kaladian Plains",
-            enemies: [
-            { name: "Wild Beast", strength: 8, life: 25, exp: 10 },
-            { name: "Bandit", strength: 10, life: 35, exp: 15 },
-                { name: "A Group of Bandits", strength: 12, life: 70, exp: 20 }
-                           ],
-                                unlocked: true
+    <div class="section">
+        <h2>Wielder</h2>
+        <div id="wielderStats">
+            <div class="stat tooltip">
+                Strength: <span id="wielderStrength">0</span>
+                <span class="tooltiptext">Increases damage dealt per strike</span>
+            </div>
+
+            <div class="stat tooltip">
+                Swordfighting: <span id="wielderSwordfighting">0</span>
+                <span class="tooltiptext">Reduces incoming damage from enemies</span>
+            </div>
+            <div class="stat tooltip">
+                HP: <span id="wielderCurrentLife">0</span>/<span id="wielderMaxLife">0</span>
+                <span class="tooltiptext">Current/Maximum health points (Regenerates 1 HP every 5 seconds)</span>
+            </div>
+            <div class="stat tooltip">
+                Willpower: <span id="wielderWillpower">0</span>
+                <span class="tooltiptext">Reduces experience gain but increases control effectiveness</span>
+            </div>
+        </div>
+        <button id="restButton" onclick="toggleRest()">Rest (Toggle)</button>
+        <button onclick="healWielder()">Heal (10 Energy)</button>
+        <button onclick="changeWielder()">Change Wielder (Cost: 10 energy)</button>
+            <button id="trainButton" onclick="toggleTraining()">Train (Off)</button>
+
+    </div>
+
+    <div class="section">
+        <h2>Zones</h2>
+        <div id="enemies"></div>
+        <button id="autoBattleButton" onclick="toggleAutoBattle()">Auto Battle: Off</button>
+    </div>
+
+    <div class="section combat-window">
+        <h2>Combat Log</h2>
+        <div id="combat-log" class="combat-log"></div>
+    </div>
+    <footer>
+        <a href="#" onclick="showChangelog()" title="View Changelog">📜</a>
+        <a href="#" onclick="wipeSave()" title="Delete Save">❌</a>
+        <a href="https://caffeineforge.com" target="_blank" title="Author's page">🐙</a>
+        <a href="https://royalroad.com" target="_blank" title="Story">🐦</a>
+    </footer>
+</div>
+
+<script>
+            const game = {
+                isFighting: false,
+                autoBattle: false,
+                currentEnemy: null,
+                controlBonus: 0,
+                sword: {
+                    energy: 0,
+                    maxEnergy: 100,
+                    kills: 0,
+                    upgrades: {
+                        capacity: { level: 1, cost: 50 },
+                        siphon: { level: 1, cost: 100 },
+                        senses: { level: 1, cost: 200 },
+                        connection: { level: 1, cost: 150 },
+                        control: { level: 1, cost: 300 },
+                    },
+                },
+                wielder: null,
+                zones: [
+                    {
+                        name: "Kaladian Plains",
+                        enemies: [
+                            { name: "Wild Beast", strength: 8, life: 25, exp: 10 },
+                            { name: "Bandit", strength: 10, life: 35, exp: 15 },
+                            { name: "A Group of Bandits", strength: 12, life: 70, exp: 20 },
+                        ],
+                        unlocked: true,
                     },
                     {
-            name: "Rocky Foothills",
-            enemies: [
-            { name: "A Sneak Goblin", strength: 10, life: 30, exp: 20 },
-            { name: "A Wild Beastman", strength: 12, life: 50, exp: 30 },
-            { name: "A Goblin Hunting Party", strength: 14, life: 70, exp: 40 },
-                { name: "A Pack of Beastmen", strength: 16, life: 100, exp: 50 }
-                           ],
-                                unlocked: false
-                    }
-    ]
-        };
-
-        function generateWielder() {
-            const newWielder = {
-                level: 1,
-                statPoints: 0,
-                strength: Math.floor(Math.random() * 5 + 1),
-                swordfighting: Math.floor(Math.random() * 5 + 1),
-                life: Math.floor(Math.random() * 10 + 20),
-                willpower: Math.floor(Math.random() * 50 + 50),
-                exp: 0,
-                resting: false,
+                        name: "Rocky Foothills",
+                        enemies: [
+                            { name: "A Sneak Goblin", strength: 10, life: 30, exp: 20 },
+                            { name: "A Wild Beastman", strength: 12, life: 50, exp: 30 },
+                            { name: "A Goblin Hunting Party", strength: 14, life: 70, exp: 40 },
+                            { name: "A Pack of Beastmen", strength: 16, life: 100, exp: 50 },
+                        ],
+                        unlocked: false,
+                    },
+                ],
             };
-            newWielder.currentLife = newWielder.life;
-            return newWielder;
-        }
-        function toggleRest() {
-            game.wielder.resting = !game.wielder.resting;
-            game.isFighting = game.wielder.resting
-            updateDisplay();
+            const races = {
+                Human: {
+                    unlocked: true,
+                    names: ["Aldric", "Elara", "Gareth", "Liora"],
+                    stats: { strength: +1, agility: +0, swordfighting: +1 },
+                },
+                Elf: {
+                    unlocked: false,
+                    names: ["Aelar", "Lyria", "Thalorin", "Faelwen"],
+                    stats: { agility: +2, willpower: +20 },
+                },
+                Dwarf: {
+                    unlocked: false,
+                    names: ["Thrain", "Hilda", "Borin", "Freyja"],
+                    stats: { strength: +2, swordfighting: +1, agility: -1 },
+                },
+            };
+            function generateWielder() {
+                const availableRaces = Object.keys(races).filter(r => races[r].unlocked);
+                const race = availableRaces[Math.floor(Math.random() * availableRaces.length)];
+                const raceData = races[race];
 
-            document.getElementById('restButton').textContent =
-                `Rest (${game.wielder.resting ? 'On' : 'Off'})`;
-            updateDisplay();
-        }
+                const baseStats = {
+                    strength: Math.floor(Math.random() * 5 + 1) + (raceData.stats.strength || 0),
+                    agility: Math.floor(Math.random() * 5 + 1) + (raceData.stats.agility || 0),
+                    swordfighting: Math.floor(Math.random() * 5 + 1) + (raceData.stats.swordfighting || 0),
+                    life: Math.floor(Math.random() * 10 + 20) + (raceData.stats.life || 0),
+                    willpower: Math.floor(Math.random() * 50 + 50) + (raceData.stats.willpower || 0)
+                };
 
-        function toggleAutoBattle() {
-            game.autoBattle = !game.autoBattle;
-            document.getElementById('autoBattleButton').textContent =
-                `Auto Battle: ${game.autoBattle ? 'On' : 'Off'}`;
-            if (game.autoBattle && game.currentEnemy) startAutoBattle();
-        }
-
-        async function startAutoBattle() {
-            while (game.autoBattle && game.wielder.currentLife > 0 && !game.wielder.resting) {
-                await attackEnemy(game.currentEnemy.zoneIndex, game.currentEnemy.enemyIndex);
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                return {
+                    name: raceData.names[Math.floor(Math.random() * raceData.names.length)],
+                    race,
+                    baseStats: {...baseStats},
+                    currentStats: {...baseStats},
+                    wounds: [],
+                    level: 1,
+                    statPoints: 0,
+                    exp: 0,
+                    currentLife: baseStats.life,
+                    resting: false,
+                    training: false,
+                    defeated: false
+                };
             }
-        }
-        function healWielder() {
-            if (game.sword.energy >= 10 && game.wielder.currentLife < game.wielder.life) {
-                game.sword.energy -= 10;
-                game.wielder.currentLife = Math.min(game.wielder.currentLife +
-                    Math.floor(game.wielder.life * 0.25), game.wielder.life);
+            game.currentAction = null; // 'fighting' | 'resting' | 'training'
+
+            // Modified toggle functions
+            function toggleRest() {
+                if (game.currentAction && game.currentAction !== 'resting') return;
+
+                game.wielder.resting = !game.wielder.resting;
+                game.currentAction = game.wielder.resting ? 'resting' : null;
+                document.getElementById('restButton').textContent = `Rest (${game.wielder.resting ? 'On' : 'Off'})`;
                 updateDisplay();
             }
-        }
-        function updateDisplay() {
-		 // Add to wielder stats display:
-            const wielderStats = document.getElementById('wielderStats');
+
+            function toggleTraining() {
+                if (game.currentAction && game.currentAction !== 'training') return;
+
+                game.wielder.training = !game.wielder.training;
+                game.currentAction = game.wielder.training ? 'training' : null;
+                document.getElementById('trainButton').textContent = `Train (${game.wielder.training ? 'On' : 'Off'})`;
+                updateDisplay();
+            }
+
+            function toggleAutoBattle() {
+                game.autoBattle = !game.autoBattle;
+                document.getElementById("autoBattleButton").textContent = `Auto Battle: ${game.autoBattle ? "On" : "Off"}`;
+                if (game.autoBattle && game.currentEnemy) startAutoBattle();
+            }
+            function setAutoBattle(value) {
+                game.autoBattle = value;
+                document.getElementById("autoBattleButton").textContent = `Auto Battle: ${game.autoBattle ? "On ${game.currentEnemy}" : "Off"}`;
+                if (game.autoBattle && game.currentEnemy) startAutoBattle();
+            }
+            async function startAutoBattle() {
+                while (game.autoBattle && game.wielder.currentLife > 0 && !game.wielder.resting) {
+                    await attackEnemy(game.currentEnemy.zoneIndex, game.currentEnemy.enemyIndex);
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
+                }
+            }
+            function healWielder() {
+                if (game.sword.energy >= 10 && game.wielder.currentLife < game.wielder.currentStats.life) {
+                    game.sword.energy -= 10;
+                    game.wielder.currentLife = Math.min(game.wielder.currentLife + Math.floor(game.wielder.currentStats.life * 0.25), game.wielder.currentStats.life);
+                    updateDisplay();
+                }
+            }
+            function getWoundText(stat) {
+                const count = game.wielder.wounds.filter((w) => w === stat).length;
+                return count > 0 ? `\n(Wounded: -${count})` : "";
+            }
+            function updateDisplay() {
+                // Add to wielder stats display:
+                const wielderStats = document.getElementById("wielderStats");
+                wielder = game.wielder;
                 wielderStats.innerHTML = `
-        <div class="stat tooltip" title="Increases damage dealt">Strength: ${Math.round(game.wielder.strength)}
-        <span class="tooltiptext">Increases damage dealt per strike (+2 Damage)</span></div><br>
-        <div class="stat tooltip" title="Reduces incoming damage (+0.5 damage, +1 damage resistance">Swordfighting: ${Math.round(game.wielder.swordfighting)}
-        <span class="tooltiptext">Reduces incoming damage from enemies</span></div><br>
-        <div class="stat tooltip" title="Total health points">HP: ${Math.round(Math.max(game.wielder.currentLife, 0))}/${game.wielder.life}
-        <span class="tooltiptext">Current/Maximum health points (Regenerates 1 HP every 5 seconds)</span></div><br>
-        <div class="stat tooltip" title="Reduces experience gain but increases control bonuses">Willpower: ${game.wielder.willpower}
-        <span class="tooltiptext">Increases experience gain but decreases control effectiveness (up to 100% at 200 willpower) </span></div><br>
+                <div class="stat">Name: <span id="wielderName">${game.wielder.name}</span></div>
+            <div class="stat">Race: <span id="wielderRace">${game.wielder.race}</span></div>
+        <div class="stat tooltip" title="Physical attack power${getWoundText("strength")}">
+        <span class="tooltiptext">Increases damage dealt per strike (+2 Damage)</span>
+            Strength: ${wielder.currentStats.strength}${wielder.baseStats.strength > wielder.currentStats.strength ? "⚠" : ""}
+        </div><br>
+        <div class="stat tooltip" title="Damage reduction${getWoundText("swordfighting")}">
+        <span class="tooltiptext">Reduces incoming damage from enemies (+ 1 Damage resistance) Increases damage dealt (+1 damage)</span>
+            Swordfighting: ${wielder.currentStats.swordfighting}${wielder.baseStats.swordfighting > wielder.currentStats.swordfighting ? "⚠" : ""}
+        </div><br>
+        <div class="stat tooltip" title="Health points">
+            HP: ${Math.max(wielder.currentLife, 0)}/${wielder.currentStats.life}
+            <span class="tooltiptext">Current/Maximum health points (Regenerates 1 HP every 5 seconds)</span>
+        </div><br>
+        <div class="stat tooltip" title="Resistance to control${getWoundText("willpower")}">
+            Willpower: ${wielder.currentStats.willpower}${wielder.baseStats.willpower > wielder.currentStats.willpower ? "⚠" : ""}
+             <span class="tooltiptext">Increases experience gain but decreases control effectiveness (up to 100% at 200 willpower) </span>
+        </div><br>
         <div class="stat tooltip" title="Experience points">EXP: ${Math.round(game.wielder.exp)}/100
         <span class="tooltiptext">Gain a level every 100 exp points</span></div><br>
         <div class="stat tooltip" title="Current level">Level: ${game.wielder.level}</div><br>
         <div class="stat tooltip" title="Unused stat points">Stat Points: ${game.wielder.statPoints}
         <span class="tooltiptext">Spend them to increase wielder strength</span></div><br>
-
     `;
-            // Sword stats
-            document.getElementById('energy').textContent = Math.floor(game.sword.energy);
-            document.getElementById('maxEnergy').textContent = game.sword.maxEnergy;
-            document.getElementById('totalKills').textContent = game.sword.kills;
+                // Sword stats
+                document.getElementById("energy").textContent = Math.floor(game.sword.energy);
+                document.getElementById("maxEnergy").textContent = game.sword.maxEnergy;
+                document.getElementById("totalKills").textContent = game.sword.kills;
 
-            const upgradesDiv = document.getElementById('upgrades');
-            upgradesDiv.innerHTML = Object.entries(game.sword.upgrades).map(([name, data]) => `
+                const upgradesDiv = document.getElementById("upgrades");
+                upgradesDiv.innerHTML = Object.entries(game.sword.upgrades)
+                    .map(
+                        ([name, data]) => `
                 <div class="upgrade tooltip">
                     ${name.charAt(0).toUpperCase() + name.slice(1)} (Level ${data.level})
                     <span class="tooltiptext">${getUpgradeTooltip(name)}</span>
-                    <button onclick="buyUpgrade('${name}')" ${game.sword.energy >= data.cost ? '' : 'disabled'}>
+                    <button onclick="buyUpgrade('${name}')" ${game.sword.energy >= data.cost ? "" : "disabled"}>
                         Upgrade (${Math.round(data.cost)} energy)
                     </button>
                 </div>
-            `).join('');
+            `
+                    )
+                    .join("");
 
-            function getUpgradeTooltip(name) {
-                switch (name) {
-                    case 'capacity': return 'Increases maximum energy';
-                    case 'siphon': return 'Increases energy gained from kills';
-                    case 'senses': return 'Unlocks stronger enemies';
-                    case 'connection': return 'Improves bond with the wielder';
-                    case 'control': return 'Increases wielder stat bonuses (Each level is a 20% increase, reduced by willpower)';
-                    default: return '';
+                function getUpgradeTooltip(name) {
+                    switch (name) {
+                        case "capacity":
+                            return "Increases maximum energy";
+                        case "siphon":
+                            return "Increases energy gained from kills";
+                        case "senses":
+                            return "Unlocks stronger enemies";
+                        case "connection":
+                            return "Improves bond with the wielder";
+                        case "control":
+                            return "Increases wielder stat bonuses (Each level is a 20% increase, reduced by willpower)";
+                        default:
+                            return "";
+                    }
                 }
-            }
 
-
-
-            // Enemies
-            const enemiesDiv = document.getElementById('enemies');
-            enemiesDiv.innerHTML = game.zones.filter(zone => zone.unlocked).map((zone, zi) => `
+                // Enemies
+                const enemiesDiv = document.getElementById("enemies");
+                enemiesDiv.innerHTML = game.zones
+                    .filter((zone) => zone.unlocked)
+                    .map(
+                        (zone, zi) => `
                 <div class="zone">
                     <h4>${zone.name}</h4>
-                    ${zone.enemies.map((enemy, ei) => `
+                    ${zone.enemies
+                        .map(
+                            (enemy, ei) => `
                         <button onclick="attackEnemy(${zi}, ${ei})"
-                            ${game.isFighting ? 'disabled' : ''}>
+                            ${game.isFighting ? "disabled" : ""}>
                             ${enemy.name} (${enemy.life} HP)
                         </button>
-                    `).join('')}
+                    `
+                        )
+                        .join("")}
                 </div>
-            `).join('');
-        }
-        function getUpgradeDescription(name) {
-            const descriptions = {
-                capacity: "Increases maximum energy storage",
-                siphon: "Increases energy gained from each kill",
-                senses: "Unlocks stronger enemies at higher levels",
-                connection: "Improves bond with the wielder, enhancing stat bonuses",
-                control: "Increases percentage bonus to wielder stats"
-            };
-            return descriptions[name] || "Unknown upgrade";
-        }
-        async function attackEnemy(zoneIndex, enemyIndex) {
-            if (game.isFighting || game.wielder.resting) return;
+            `
+                    )
+                    .join("");
 
-            wielder = game.wielder;
-            game.isFighting = true;
-            updateDisplay();
-            game.currentEnemy = { zoneIndex, enemyIndex };
-            const enemy = game.zones[zoneIndex].enemies[enemyIndex];
-            let enemyLife = enemy.life;
+                    const actionInProgress = !!game.currentAction;
 
-            if (wielder.currentLife <= 0) {
-                addCombatMessage("Wielder is too injured to fight!", 'damage');
-                game.isFighting = false;
+                document.getElementById('restButton').disabled =
+                    actionInProgress && game.currentAction !== 'resting';
+                document.getElementById('trainButton').disabled =
+                    actionInProgress && game.currentAction !== 'training';
+                document.querySelectorAll('#enemies button').forEach(btn => {
+                    btn.disabled = actionInProgress || game.wielder.defeated;
+                });
+
+                // Add visual feedback
+                const actionButtons = ['rest', 'train'];
+                actionButtons.forEach(action => {
+                    const btn = document.getElementById(`${action}Button`);
+                    btn.style.backgroundColor = game.currentAction === action ? '#3a3a3a' : '#4a0000';
+                });
+            }
+            function getUpgradeDescription(name) {
+                const descriptions = {
+                    capacity: "Increases maximum energy storage",
+                    siphon: "Increases energy gained from each kill",
+                    senses: "Unlocks stronger enemies at higher levels",
+                    connection: "Improves bond with the wielder, enhancing stat bonuses",
+                    control: "Increases percentage bonus to wielder stats",
+                };
+                return descriptions[name] || "Unknown upgrade";
+            }
+            async function attackEnemy(zoneIndex, enemyIndex) {
+                if (game.isFighting || game.wielder.resting) return;
+
+                wielder = game.wielder;
+                game.isFighting = true;
                 updateDisplay();
-                return;
-            }
+                game.currentEnemy = { zoneIndex, enemyIndex };
+                const enemy = game.zones[zoneIndex].enemies[enemyIndex];
+                let enemyLife = enemy.life;
 
-            const maxControl = game.sword.upgrades.connection.level;
-            const controlLevel = Math.min(game.sword.upgrades.control.level, maxControl);
-            game.controlBonus = controlLevel * 0.2 * (1 - game.wielder.willpower/200);
-
-            // Calculate damage with siphon
-            const baseDamage = game.wielder.strength + game.wielder.swordfighting;
-            const siphonBonus = game.sword.upgrades.siphon.level;
-            const totalDamage = Math.floor(baseDamage * (1 + game.controlBonus)) + siphonBonus;
-
-            addCombatMessage(`Engaging ${enemy.name} (${enemy.life} HP)`, 'player-stat');
-
-            while (enemyLife > 0 && wielder.currentLife > 0) {
-                // Damage calculation
-                const damageDealt = Math.min(totalDamage, enemyLife);
-                enemyLife -= damageDealt;
-
-                addCombatMessage(`Dealt ${damageDealt} damage ` +
-                    `(Base: ${baseDamage}, Siphon: ${siphonBonus}, Control: ` +
-                    `${Math.round(game.controlBonus * 100)}%)` +
-                    ` Enemy Hp left: ${enemyLife}`, 'damage');
-
-                // Enemy counterattack
-                const enemyDamage = Math.max(enemy.strength -
-                    Math.floor(game.wielder.swordfighting * (1 + game.controlBonus)), 1);
-                game.wielder.currentLife -= enemyDamage;
-
-                addCombatMessage(`Took ${enemyDamage} damage ` +
-                    `(Base: ${enemy.strength}, Defense: ` +
-                    `${Math.floor(game.wielder.swordfighting * (1 + game.controlBonus))})` +
-                    `Player Hp left: ${game.wielder.currentLife}`, 'damage');
-
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-
-            if (enemyLife <= 0) {
-                const energyGain = enemy.life * (1 + game.sword.upgrades.siphon.level * 0.1);
-                game.sword.energy = Math.min(game.sword.energy + energyGain, game.sword.maxEnergy);
-                const expGained = enemy.exp * (1 + wielder.willpower / 200);
-                wielder.exp += expGained;
-
-                addCombatMessage(`${enemy.name} defeated! +${energyGain.toFixed(1)} energy`, 'enemy-defeated');
-                addCombatMessage(`Gained ${expGained.toFixed(1)} experience`, 'player-stat');
-
-                // Check for level up
-                while (wielder.exp >= 100) {
-                    wielder.exp -= 100;
-                    wielder.level++;
-                    wielder.statPoints++;
-                    showLevelUpModal();
+                if (wielder.currentLife <= 0) {
+                    addCombatMessage("Wielder is too injured to fight!", "damage");
+                    game.isFighting = false;
+                    updateDisplay();
+                    return;
                 }
-                game.isFighting = false;
-                if (game.autoBattle) startAutoBattle();
-            }
-             if (wielder.currentLife <= 0) {
-                addCombatMessage("Lost the fight! Disengaging. Rest or heal.", 'damage');
-                toggleAutoBattle();
-                game.isFighting = false;
-                return;
-            }
-            updateDisplay();
-        }
-		// Level up system
-        function showLevelUpModal() {
-            document.getElementById('levelUpModal').style.display = 'block';
-        }
-		function allocatePoint(stat) {
-            const wielder = game.wielder;
-            wielder[stat]++;
-            wielder.statPoints--;
-            
-            if (stat === 'life') {
-                wielder.currentLife += 5; // Add bonus HP when increasing life
-            }
-            
-            if (wielder.statPoints <= 0) {
-                document.getElementById('levelUpModal').style.display = 'none';
-            }
-            updateDisplay();
-        }
-        function addCombatMessage(text, className) {
-            const logElement = document.createElement('div');
-            logElement.className = `log-entry ${className}`;
-            logElement.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
-            
-            const combatLog = document.getElementById('combat-log');
-            combatLog.appendChild(logElement);
-            
-            if(combatLog.children.length > 50) {
-                combatLog.removeChild(combatLog.firstChild);
-            }
-            combatLog.scrollTop = combatLog.scrollHeight;
-        }
 
-        function changeWielder() {
-            if(game.sword.energy >= 10) {
-                game.sword.energy -= 10;
-                game.wielder = generateWielder();
-                updateDisplay();
-            }
-        }
+                const maxControl = game.sword.upgrades.connection.level;
+                const controlLevel = Math.min(game.sword.upgrades.control.level, maxControl);
+                game.controlBonus = controlLevel * 0.2 * (1 - game.wielder.currentStats.willpower / 200);
 
-        function buyUpgrade(upgradeName) {
-            const upgrade = game.sword.upgrades[upgradeName];
-            if(game.sword.energy >= upgrade.cost) {
-                game.sword.energy -= upgrade.cost;
-                upgrade.level++;
-                upgrade.cost *= 2.5;
-                
-                if(upgradeName === 'capacity') {
-                    game.sword.maxEnergy = 100 * upgrade.level;
+                // Calculate damage with siphon
+                const baseDamage = game.wielder.currentStats.strength*2 + game.wielder.currentStats.swordfighting;
+                const siphonBonus = game.sword.upgrades.siphon.level;
+                const totalDamage = Math.floor(baseDamage * (1 + game.controlBonus)) + siphonBonus;
+
+                addCombatMessage(`Engaging ${enemy.name} (${enemy.life} HP)`, "player-stat");
+
+                while (enemyLife > 0 && wielder.currentLife > 0) {
+                    // Damage calculation
+                    const damageDealt = Math.min(totalDamage, enemyLife);
+                    enemyLife -= damageDealt;
+
+                    addCombatMessage(`Dealt ${damageDealt} damage ` + `(Base: ${baseDamage}, Siphon: ${siphonBonus}, Control: ` + `${Math.round(game.controlBonus * 100)}%)` + ` Enemy Hp left: ${enemyLife}`, "damage");
+
+                    // Enemy counterattack
+                    const enemyDamage = Math.max(enemy.strength - Math.floor(game.wielder.currentStats.swordfighting * (1 + game.controlBonus)), 1);
+                    game.wielder.currentLife -= enemyDamage;
+
+                    addCombatMessage(
+                        `Took ${enemyDamage} damage ` + `(Base: ${enemy.strength}, Defense: ` + `${Math.floor(game.wielder.currentStats.swordfighting * (1 + game.controlBonus))})` + `Player Hp left: ${game.wielder.currentLife}`,
+                        "damage"
+                    );
+
+                    await new Promise((resolve) => setTimeout(resolve, 500));
                 }
-                if(upgradeName ==='senses') {
-                    game.zones[upgrade.level-1].unlocked = true;
+
+                if (enemyLife <= 0) {
+                    const energyGain = enemy.life * (1 + game.sword.upgrades.siphon.level * 0.1);
+                    game.sword.energy = Math.min(game.sword.energy + energyGain, game.sword.maxEnergy);
+                    const expGained = enemy.exp * (1 + wielder.currentStats.willpower / 200);
+                    wielder.exp += expGained;
+
+                    addCombatMessage(`${enemy.name} defeated! +${energyGain.toFixed(1)} energy`, "enemy-defeated");
+                    addCombatMessage(`Gained ${expGained.toFixed(1)} experience`, "player-stat");
+
+                    // Check for level up
+                    while (wielder.exp >= 100) {
+                        wielder.exp -= 100;
+                        wielder.level++;
+                        wielder.statPoints++;
+                        showLevelUpModal();
+                    }
+                    game.isFighting = false;
+                    if (game.autoBattle) startAutoBattle();
+                }
+                if (wielder.currentLife <= 0) {
+                    addCombatMessage("Lost the fight! Disengaging. Rest or heal.", "damage");
+                    applyHeavyWound();
+                    setAutoBattle(false);
+                    game.isFighting = false;
+                    return;
                 }
                 updateDisplay();
             }
-        }
+            // Level up system
+            function showLevelUpModal() {
+                document.getElementById("levelUpModal").style.display = "block";
+            }
+            function allocatePoint(stat) {
+                const wielder = game.wielder;
+                wielder.currentStats[stat]++;
+                wielder.statPoints--;
 
-        // Initialize game
-        function initGame() {
-            game.wielder = generateWielder();
-            updateDisplay();
-			
-			setInterval(() => {
-            if (game.wielder.currentLife < game.wielder.life) {
-                const regenRate = game.wielder.resting ? 5 : 1;
-                game.wielder.currentLife = Math.min(game.wielder.currentLife + regenRate, game.wielder.life);
+                if (stat === "life") {
+                    wielder.currentStats.life +=4;
+                    wielder.currentLife += 5; // Add bonus HP when increasing life
+                }
+                if (stat === "willpower") {
+                    wielder.currentStats.willpower +=4;
+                }
+                if (wielder.statPoints <= 0) {
+                    document.getElementById("levelUpModal").style.display = "none";
+                }
                 updateDisplay();
             }
-        }, 5000);
-        }
+            function addCombatMessage(text, className) {
+                const logElement = document.createElement("div");
+                logElement.className = `log-entry ${className}`;
+                logElement.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
 
-        window.onload = initGame;
-    </script>
+                const combatLog = document.getElementById("combat-log");
+                combatLog.appendChild(logElement);
+
+                if (combatLog.children.length > 50) {
+                    combatLog.removeChild(combatLog.firstChild);
+                }
+                combatLog.scrollTop = combatLog.scrollHeight;
+            }
+
+            function changeWielder() {
+                if (game.sword.energy >= 10) {
+                    game.sword.energy -= 10;
+                    game.wielder = generateWielder();
+                    updateDisplay();
+                }
+            }
+
+            function buyUpgrade(upgradeName) {
+                const upgrade = game.sword.upgrades[upgradeName];
+                if (game.sword.energy >= upgrade.cost) {
+                    game.sword.energy -= upgrade.cost;
+                    upgrade.level++;
+                    upgrade.cost *= 2.5;
+
+                    if (upgradeName === "capacity") {
+                        game.sword.maxEnergy = 100 * upgrade.level;
+                    }
+                    if (upgradeName === "senses") {
+                        game.zones[upgrade.level - 1].unlocked = true;
+                    }
+                    updateDisplay();
+                }
+            }
+            // Save System
+            function saveGame() {
+                const saveData = {
+                    game: game,
+                    wielder: game.wielder,
+                    timestamp: Date.now(),
+                };
+                localStorage.setItem("cursedSwordSave", JSON.stringify(saveData));
+            }
+
+            function loadGame() {
+                const saved = localStorage.getItem("cursedSwordSave");
+                if (saved) {
+                    const saveData = JSON.parse(saved);
+                    game.currentAction = null;
+                    Object.assign(game, saveData.game);
+                    game.wielder = saveData.wielder;
+                } else {
+                    game.wielder = generateWielder();
+                }
+            }
+
+            // Auto-save every 30 seconds and on important actions
+            setInterval(saveGame, 30000);
+
+            // Heavy Wound System
+            function applyHeavyWound() {
+                const stats = ["strength", "agility", "swordfighting", "willpower"];
+                const affectedStat = stats[Math.floor(Math.random() * stats.length)];
+
+                game.wielder.wounds.push(affectedStat);
+                game.wielder.currentStats[affectedStat] = Math.max(game.wielder.baseStats[affectedStat] - game.wielder.wounds.filter((w) => w === affectedStat).length, 1);
+
+                addCombatMessage(`Heavy wound inflicted! Permanent -1 to ${affectedStat}`, "damage");
+                updateDisplay();
+            }
+            // Footer Functions
+            function showChangelog() {
+                document.getElementById("changelogContent").innerHTML = `
+        <p>v1.2 - Added Save System & Wounds</p>
+        <p>v1.1 - Zone Combat System</p>
+        <p>v1.0 - Base Game</p>
+    `;
+                document.getElementById("changelogModal").style.display = "block";
+            }
+
+            function wipeSave() {
+                if (confirm("Permanently delete all progress?")) {
+                    localStorage.removeItem("cursedSwordSave");
+                    location.reload();
+                }
+            }
+            // Initialize game
+            function initGame() {
+                loadGame();
+                saveGame();
+                updateDisplay();
+                setInterval(() => {
+                    if (game.wielder.currentLife < game.wielder.life) {
+                        const regenRate = game.currentAction =="resting" ? 5 : 1;
+
+                        game.wielder.currentLife = Math.min(game.wielder.currentLife + regenRate, game.wielder.life);
+                        updateDisplay();
+                    }
+                    if(game.currentAction == "training"){
+                            game.wielder.exp += 5;
+                            if (wielder.exp >= 100) {
+                                wielder.exp -= 100;
+                                wielder.level++;
+                                wielder.statPoints++;
+                                showLevelUpModal();
+                                }
+                    }
+                    updateDisplay();
+                }, 5000);
+            }
+
+            window.onload = initGame;
+        </script>
 </body>
 </html>
