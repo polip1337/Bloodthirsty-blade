@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cursed Sword Idle</title>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #3d3d3d;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .stat-choice {
+            margin: 10px;
+            padding: 10px;
+            background: #4a0000;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-choice:hover {
+            background: #5a0000;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted #666;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #2d2d2d;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .stat-points {
+            margin-left: 10px;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            min-height: 100vh;
+        }
+        .section {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 200px;
+        }
+        button {
+            background-color: #4a0000;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+        .stat {
+            margin: 5px 0;
+        }
+        .upgrade {
+            background-color: #3d3d3d;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .combat-window {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            grid-column: 1 / -1;
+            height: 200px;
+            overflow-y: auto;
+        }
+        .combat-log {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .log-entry {
+            margin: 3px 0;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .damage {
+            background-color: #4a000055;
+            color: #ff6666;
+        }
+        .player-stat {
+            background-color: #004a0055;
+            color: #66ff66;
+        }
+        .enemy-defeated {
+            background-color: #4a4a0055;
+            color: #ffff66;
+        }
+    </style>
+</head>
+<body>
+    <div id="levelUpModal" class="modal">
+        <h3>Level Up! Choose a stat to improve:</h3>
+        <div class="stat-choice tooltip" onclick="allocatePoint('strength')">
+            [+] Strength
+            <span class="tooltiptext">Increase physical attack power</span>
+        </div>
+        <div class="stat-choice tooltip" onclick="allocatePoint('agility')">
+            [+] Agility
+            <span class="tooltiptext">Improve dodging and attack speed</span>
+        </div>
+        <div class="stat-choice tooltip" onclick="allocatePoint('swordfighting')">
+            [+] Swordfighting
+            <span class="tooltiptext">Enhance defensive capabilities</span>
+        </div>
+        <div class="stat-choice tooltip" onclick="allocatePoint('life')">
+            [+] Life
+            <span class="tooltiptext">Increase maximum health</span>
+        </div>
+        <div class="stat-choice tooltip" onclick="allocatePoint('willpower')">
+            [+] Willpower
+            <span class="tooltiptext">Resist sword's control but gain better bonuses</span>
+        </div>
+    </div>
+    <div class="container">
+        <div class="section">
+            <h2>Cursed Sword</h2>
+            <div id="swordStats">
+                <div class="stat tooltip">
+                    Energy: <span id="energy">0</span>/<span id="maxEnergy">100</span>
+                    <span class="tooltiptext">Current/Maximum energy stored in the sword</span>
+                </div>
+                <div class="stat tooltip">
+                    Total Kills: <span id="totalKills">0</span>
+                    <span class="tooltiptext">Total number of enemies defeated</span>
+                </div>
+            </div>
+            <h3>Upgrades</h3>
+            <div id="upgrades"></div>
+        </div>
+
+        <div class="section">
+            <h2>Current Wielder</h2>
+            <div id="wielderStats">
+                <div class="stat tooltip">
+                    Strength: <span id="wielderStrength">0</span>
+                    <span class="tooltiptext">Increases damage dealt per strike</span>
+                </div>
+                <div class="stat tooltip">
+                    Agility: <span id="wielderAgility">0</span>
+                    <span class="tooltiptext">Increases dodge chance and attack speed</span>
+                </div>
+                <div class="stat tooltip">
+                    Swordfighting: <span id="wielderSwordfighting">0</span>
+                    <span class="tooltiptext">Reduces incoming damage from enemies</span>
+                </div>
+                <div class="stat tooltip">
+                    HP: <span id="wielderCurrentLife">0</span>/<span id="wielderMaxLife">0</span>
+                    <span class="tooltiptext">Current/Maximum health points (Regenerates 1 HP every 5 seconds)</span>
+                </div>
+                <div class="stat tooltip">
+                    Willpower: <span id="wielderWillpower">0</span>
+                    <span class="tooltiptext">Reduces experience gain but increases control effectiveness</span>
+                </div>
+            </div>
+            <button onclick="changeWielder()">Change Wielder (Cost: 100 energy)</button>
+        </div>
+
+        <div class="section">
+            <h2>Enemies</h2>
+            <div id="enemies"></div>
+        </div>
+
+        <div class="section combat-window">
+            <h2>Combat Log</h2>
+            <div id="combat-log" class="combat-log"></div>
+        </div>
+    </div>
+
+    <script>
+        const game = {
+            sword: {
+                energy: 0,
+                maxEnergy: 100,
+                kills: 0,
+                upgrades: {
+                    capacity: { level: 1, cost: 50 },
+                    siphon: { level: 1, cost: 100 },
+                    senses: { level: 1, cost: 200 },
+                    connection: { level: 1, cost: 150 },
+                    control: { level: 1, cost: 300 }
+                }
+            },
+            wielder: null,
+            enemies: [
+                { name: "Peasant", strength: 5, agility: 5, life: 20, exp: 10 },
+                { name: "Soldier", strength: 15, agility: 10, life: 50, exp: 25 },
+                { name: "Knight", strength: 30, agility: 20, life: 100, exp: 50 }
+            ]
+        };
+
+        function generateWielder() {
+            const newWielder = {
+                level: 1,
+                statPoints: 0,
+                strength: Math.floor(Math.random() * 5 + 1),
+                agility: Math.floor(Math.random() * 5 + 1),
+                swordfighting: Math.floor(Math.random() * 5 + 1),
+                life: Math.floor(Math.random() * 10 + 20),
+                willpower: Math.floor(Math.random() * 50 + 50),
+                exp: 0
+            };
+            newWielder.currentLife = newWielder.life;
+            return newWielder;
+        }
+
+        function updateDisplay() {
+		 // Add to wielder stats display:
+            const wielderStats = document.getElementById('wielderStats');
+                wielderStats.innerHTML = `
+        <div class="stat tooltip" title="Increases damage dealt">Strength: ${Math.round(game.wielder.strength)}
+        <span class="tooltiptext">Increases damage dealt per strike</span></div><br>
+        <div class="stat tooltip" title="Increases chance to dodge attacks">Agility: ${Math.round(game.wielder.agility)}
+        <span class="tooltiptext">Increases dodge chance and attack speed</span></div><br>
+        <div class="stat tooltip" title="Reduces incoming damage">Swordfighting: ${Math.round(game.wielder.swordfighting)}
+        <span class="tooltiptext">Reduces incoming damage from enemies</span></div><br>
+        <div class="stat tooltip" title="Total health points">HP: ${Math.round(Math.max(game.wielder.currentLife, 0))}/${game.wielder.life}
+        <span class="tooltiptext">Current/Maximum health points (Regenerates 1 HP every 5 seconds)</span></div><br>
+        <div class="stat tooltip" title="Reduces experience gain but increases control bonuses">Willpower: ${game.wielder.willpower}
+        <span class="tooltiptext">Reduces experience gain but increases control effectiveness</span></div><br>
+        <div class="stat tooltip" title="Experience points">EXP: ${Math.round(game.wielder.exp)}/100
+        <span class="tooltiptext">Gain a level every 100 exp points</span></div><br>
+        <div class="stat tooltip" title="Current level">Level: ${game.wielder.level}</div><br>
+        <div class="stat tooltip" title="Unused stat points">Stat Points: ${game.wielder.statPoints}
+        <span class="tooltiptext">Spend them to increase wielder strength</span></div><br>
+
+    `;
+            // Sword stats
+            document.getElementById('energy').textContent = Math.floor(game.sword.energy);
+            document.getElementById('maxEnergy').textContent = game.sword.maxEnergy;
+            document.getElementById('totalKills').textContent = game.sword.kills;
+
+            // Upgrades
+            const upgradesDiv = document.getElementById('upgrades');
+            upgradesDiv.innerHTML = Object.entries(game.sword.upgrades).map(([name, data]) => `
+                <div class="upgrade">
+                    ${name.charAt(0).toUpperCase() + name.slice(1)} (Level ${data.level})
+                    <button onclick="buyUpgrade('${name}')" ${game.sword.energy >= data.cost ? '' : 'disabled'}>
+                        Upgrade (${Math.round(data.cost)} energy)
+                    </button>
+                </div>
+            `).join('');
+
+            
+
+            // Enemies
+            const enemiesDiv = document.getElementById('enemies');
+            enemiesDiv.innerHTML = game.enemies.slice(0, game.sword.upgrades.senses.level).map((enemy, index) => `
+                <div class="enemy">
+                    <button onclick="attackEnemy(${index})">
+                        Attack ${enemy.name} (${enemy.life} HP)
+                    </button>
+                </div>
+            `).join('');
+        }
+        function getUpgradeDescription(name) {
+            const descriptions = {
+                capacity: "Increases maximum energy storage",
+                siphon: "Increases energy gained from each kill",
+                senses: "Unlocks stronger enemies at higher levels",
+                connection: "Improves bond with the wielder, enhancing stat bonuses",
+                control: "Increases percentage bonus to wielder stats"
+            };
+            return descriptions[name] || "Unknown upgrade";
+        }
+        async function attackEnemy(enemyIndex) {
+            const enemy = game.enemies[enemyIndex];
+            const wielder = game.wielder;
+            
+            if (wielder.currentLife <= 0) {
+                addCombatMessage("Wielder is too injured to fight!", 'damage');
+                return;
+            }
+
+            let enemyLife = enemy.life;
+            const damagePerHit = wielder.strength + wielder.swordfighting;
+            const enemyDamage = Math.max(enemy.strength - wielder.swordfighting, 1);
+
+            addCombatMessage(`Engaging ${enemy.name} (${enemy.life} HP)`, 'player-stat');
+
+            while (enemyLife > 0 && wielder.currentLife > 0) {
+                // Player attack
+                enemyLife -= damagePerHit;
+                const currentEnemyLife = Math.max(enemyLife, 0);
+                
+                // Enemy counterattack
+                wielder.currentLife -= enemyDamage;
+                const currentWielderLife = Math.max(wielder.currentLife, 0);
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+                addCombatMessage(`Dealt ${damagePerHit} damage (${currentEnemyLife} HP remaining)`, 'damage');
+                addCombatMessage(`Took ${enemyDamage} damage (${currentWielderLife} HP remaining)`, 'damage');
+
+                if (wielder.currentLife <= 0) {
+                    addCombatMessage("Wielder has been defeated!", 'enemy-defeated');
+                    break;
+                }
+            }
+
+            if (enemyLife <= 0) {
+                const energyGain = enemy.life * (1 + game.sword.upgrades.siphon.level * 0.1);
+                game.sword.energy = Math.min(game.sword.energy + energyGain, game.sword.maxEnergy);
+                const expGained = enemy.exp * (1 - wielder.willpower / 200);
+                wielder.exp += expGained;
+
+                addCombatMessage(`${enemy.name} defeated! +${energyGain.toFixed(1)} energy`, 'enemy-defeated');
+                addCombatMessage(`Gained ${expGained.toFixed(1)} experience`, 'player-stat');
+
+                // Check for level up
+                while (wielder.exp >= 100) {
+                    wielder.exp -= 100;
+                    wielder.level++;
+                    wielder.statPoints++;
+                    showLevelUpModal();
+                }
+            }
+            
+            updateDisplay();
+        }
+		// Level up system
+        function showLevelUpModal() {
+            document.getElementById('levelUpModal').style.display = 'block';
+        }
+		function allocatePoint(stat) {
+            const wielder = game.wielder;
+            wielder[stat]++;
+            wielder.statPoints--;
+            
+            if (stat === 'life') {
+                wielder.currentLife += 5; // Add bonus HP when increasing life
+            }
+            
+            if (wielder.statPoints <= 0) {
+                document.getElementById('levelUpModal').style.display = 'none';
+            }
+            updateDisplay();
+        }
+        function addCombatMessage(text, className) {
+            const logElement = document.createElement('div');
+            logElement.className = `log-entry ${className}`;
+            logElement.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+            
+            const combatLog = document.getElementById('combat-log');
+            combatLog.appendChild(logElement);
+            
+            if(combatLog.children.length > 50) {
+                combatLog.removeChild(combatLog.firstChild);
+            }
+            combatLog.scrollTop = combatLog.scrollHeight;
+        }
+
+        function changeWielder() {
+            if(game.sword.energy >= 100) {
+                game.sword.energy -= 100;
+                game.wielder = generateWielder();
+                updateDisplay();
+            }
+        }
+
+        function buyUpgrade(upgradeName) {
+            const upgrade = game.sword.upgrades[upgradeName];
+            if(game.sword.energy >= upgrade.cost) {
+                game.sword.energy -= upgrade.cost;
+                upgrade.level++;
+                upgrade.cost *= 2.5;
+                
+                if(upgradeName === 'capacity') {
+                    game.sword.maxEnergy = 100 * upgrade.level;
+                }
+                updateDisplay();
+            }
+        }
+
+        // Initialize game
+        function initGame() {
+            game.wielder = generateWielder();
+            updateDisplay();
+			
+			setInterval(() => {
+			if (game.wielder.currentLife < game.wielder.life) {
+				game.wielder.currentLife = Math.min(game.wielder.currentLife + 1, game.wielder.life);
+				updateDisplay();
+			}
+			}, 5000); // Regenerate 1 HP every 5 seconds
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>
