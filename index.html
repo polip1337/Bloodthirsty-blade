@@ -332,8 +332,9 @@
     </div>
 
     <div id="swordSection" class="game-section">
-        <h2>Sword</h2>
+
         <div id="swordStats">
+            <h2>Sword Upgrades</h2>
             <div class="stat tooltip">
                 Energy: <span id="energy">0</span>/<span id="maxEnergy">100</span>
                 <span class="tooltiptext">Current/Maximum energy stored in the sword</span>
@@ -343,7 +344,6 @@
                 <span class="tooltiptext">Total number of enemies defeated</span>
             </div>
         </div>
-        <h3>Upgrades</h3>
         <div id="upgrades"></div>
     </div>
 
@@ -354,7 +354,6 @@
         </div>
     </div>
     <div id="wielderSection" class="game-section">
-        <h2>🗺️ Zones</h2>
         <h2>Wielder</h2>
         <div id="wielderStats">
             <div class="stat tooltip">
@@ -384,9 +383,9 @@
         <h2>🎮 Actions</h2>
         <!-- Compact action buttons -->
         <div class="action-buttons">
-            <button id="restButton">Rest</button>
-            <button id="trainButton">Train</button>
-            <button id="autoBattleButton">Auto</button>
+            <button id="restButton" onclick="onActionButtonClick('resting')">Rest</button>
+            <button id="trainButton" onclick="onActionButtonClick('training')">Train</button>
+            <button id="autoBattleButton" onclick="onActionButtonClick('autoFighting')">Auto Battle: Off</button>
         </div>
     </div>
 
@@ -504,36 +503,51 @@
             game.currentAction = null; // 'fighting' | 'resting' | 'training'
 
             // Modified toggle functions
-            function toggleRest() {
-                if (game.currentAction && game.currentAction !== 'resting') return;
+            function onActionButtonClick(actionType) {
+                ['restButton', 'trainButton', 'autoBattleButton'].forEach(id => {
+                    document.getElementById(id).classList.remove('active-action');
+                });
 
-                game.wielder.resting = !game.wielder.resting;
-                game.currentAction = game.wielder.resting ? 'resting' : null;
-                document.getElementById('restButton').textContent = `Rest (${game.wielder.resting ? 'On' : 'Off'})`;
+                // Handle action-specific logic
+                switch(actionType) {
+                    case 'resting':
+                        if(game.currentAction == "resting")
+                            game.currentAction = null;
+                        else{
+                            game.currentAction = "resting";
+                            document.getElementById("restButton").classList.add('active-action');
+                        }
+                        break;
+                    case 'training':
+                        if(game.currentAction == "training")
+                            game.currentAction = null;
+                        else{
+                            game.currentAction = "training"
+                            document.getElementById("trainButton").classList.add('active-action');
+                        }
+                        break;
+
+                    case 'autoFighting':
+
+                        if(game.currentAction == "autoFighting")
+                            game.currentAction = null;
+                        else{
+                            game.currentAction = "autoFighting"
+                            const autoButton = document.getElementById('autoBattleButton');
+                            autoButton.textContent = `Auto Battle: On}`;
+
+                            autoButton.classList.add('active-action');
+                            if (game.currentEnemy) startAutoBattle();
+                            }
+
+                        break;
+                }
+
                 updateDisplay();
             }
 
-            function toggleTraining() {
-                if (game.currentAction && game.currentAction !== 'training') return;
-
-                game.wielder.training = !game.wielder.training;
-                game.currentAction = game.wielder.training ? 'training' : null;
-                document.getElementById('trainButton').textContent = `Train (${game.wielder.training ? 'On' : 'Off'})`;
-                updateDisplay();
-            }
-
-            function toggleAutoBattle() {
-                game.autoBattle = !game.autoBattle;
-                document.getElementById("autoBattleButton").textContent = `Auto Battle: ${game.autoBattle ? "On" : "Off"}`;
-                if (game.autoBattle && game.currentEnemy) startAutoBattle();
-            }
-            function setAutoBattle(value) {
-                game.autoBattle = value;
-                document.getElementById("autoBattleButton").textContent = `Auto Battle: ${game.autoBattle ? "On ${game.currentEnemy}" : "Off"}`;
-                if (game.autoBattle && game.currentEnemy) startAutoBattle();
-            }
             async function startAutoBattle() {
-                while (game.autoBattle && game.wielder.currentLife > 0 && !game.wielder.resting) {
+                while (game.currentAction == "autoFighting" && game.wielder.currentLife > 0 && !game.wielder.resting) {
                     await attackEnemy(game.currentEnemy.zoneIndex, game.currentEnemy.enemyIndex);
                     await new Promise((resolve) => setTimeout(resolve, 1000));
                 }
@@ -654,10 +668,7 @@
 
                     const actionInProgress = !!game.currentAction;
 
-                document.getElementById('restButton').disabled =
-                    actionInProgress && game.currentAction !== 'resting';
-                document.getElementById('trainButton').disabled =
-                    actionInProgress && game.currentAction !== 'training';
+
                 document.querySelectorAll('#enemies button').forEach(btn => {
                     btn.disabled = actionInProgress || game.wielder.defeated;
                 });
@@ -734,7 +745,7 @@
                         showLevelUpModal();
                     }
                     game.isFighting = false;
-                    if (game.autoBattle) startAutoBattle();
+                    if (game.currentAction == "autoFighting") startAutoBattle();
                 }
                 if (wielder.currentLife <= 0) {
                     addCombatMessage("Lost the fight! Disengaging. Rest or heal.", "damage");
@@ -855,9 +866,13 @@
                 const saved = localStorage.getItem("cursedSwordSave");
                 if (saved) {
                     const saveData = JSON.parse(saved);
-                    game.currentAction = null;
                     Object.assign(game, saveData.game);
                     game.wielder = saveData.wielder;
+
+                    let temp = game.currentAction;
+                    game.currentAction = null;
+                    onActionButtonClick(temp);
+                    game.currentAction = temp;
                 } else {
                     game.wielder = generateWielder();
                 }
@@ -967,7 +982,7 @@ function importSave() {
                 saveGame();
                 updateDisplay();
                 setInterval(() => {
-                    if (game.wielder.currentLife < game.wielder.life) {
+                    if (game.wielder.currentLife < game.wielder.currentStats.life) {
                         const regenRate = game.currentAction =="resting" ? 5 : 1;
 
                         game.wielder.currentLife = Math.min(game.wielder.currentLife + regenRate, game.wielder.life);
@@ -983,6 +998,7 @@ function importSave() {
                                 }
                     }
                     updateDisplay();
+                    saveGame();
                 }, 5000);
             }
 
