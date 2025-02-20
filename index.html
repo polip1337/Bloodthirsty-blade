@@ -3,6 +3,103 @@
 <head>
     <title>Cursed Sword Idle</title>
     <style>
+        /* Fixed Grid Layout */
+        body {
+            display: grid;
+            grid-template:
+                "logo    wielder     zones"       auto
+                "sword   wielder  zones"      minmax(200px, 0.7fr)
+                "sword   actions  zones"      auto
+                "combat  combat   combat"     20%
+                / 33%     33%      auto;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            gap: 15px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .game-section {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            overflow: auto;
+        }
+
+        #gameLogo {
+            grid-area: logo;
+            text-align: center;
+        }
+
+        #swordSection {
+            grid-area: sword;
+        }
+
+        #wielderSection {
+            grid-area: wielder;
+        }
+
+        #zonesSection {
+            grid-area: zones;
+        }
+
+        #actionsSection {
+            grid-area: actions;
+        }
+
+        #combatLog {
+            grid-area: combat;
+        }
+
+
+/* Visual Style Additions */
+
+
+.logo-img {
+    height: 80px;
+    margin-bottom: 10px;
+}
+    #optionsModal textarea {
+    width: 100%;
+    background: #2d2d2d;
+    color: white;
+    border: 1px solid #444;
+    margin: 10px 0;
+}
+
+.story-entry {
+    border-left: 3px solid #4a0000;
+    padding-left: 10px;
+    margin: 10px 0;
+}
+
+#unlockList p {
+    margin: 5px 0;
+    padding: 5px;
+    background: #3d3d3d;
+}
+    #actionPanel {
+    grid-column: 2;
+    text-align: center;
+}
+
+#actionPanel button {
+    margin: 5px;
+    width: 120px;
+}
+
+.active-action {
+    border: 2px solid #00ff00;
+    box-shadow: 0 0 10px #00ff00;
+}
+
+.race-option {
+    border: 1px solid #444;
+    padding: 10px;
+    margin: 10px 0;
+    cursor: pointer;
+}
             .zone {
                 background-color: #3d3d3d;
                 padding: 10px;
@@ -89,12 +186,7 @@
                 padding: 20px;
                 margin: 0;
             }
-            .container {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
-                min-height: 100vh;
-            }
+
             .section {
                 background-color: #2d2d2d;
                 padding: 15px;
@@ -172,6 +264,42 @@
         </style>
 </head>
 <body>
+
+<div id="raceSelectionModal" class="modal">
+    <h3>Choose Your Wielder's Race</h3>
+    <div id="raceOptions"></div>
+    <button onclick="this.parentElement.style.display='none'">Close</button>
+</div>
+
+<div id="unlocksModal" class="modal">
+    <h3>Next Unlocks</h3>
+    <div id="unlockList"></div>
+    <button onclick="this.parentElement.style.display='none'">Close</button>
+
+</div>
+
+<div id="statsModal" class="modal">
+    <h3>Game Statistics</h3>
+    <div id="statisticsContent"></div>
+    <button onclick="this.parentElement.style.display='none'">Close</button>
+
+</div>
+
+<div id="optionsModal" class="modal">
+    <h3>Game Options</h3>
+    <textarea id="saveData" rows="5"></textarea>
+    <button onclick="exportSave()">Export Save</button>
+    <button onclick="importSave()">Import Save</button>
+    <button onclick="this.parentElement.style.display='none'">Close</button>
+
+</div>
+
+<div id="storyModal" class="modal">
+    <h3>Sword's Legacy</h3>
+    <div id="storyContent"></div>
+    <button onclick="this.parentElement.style.display='none'">Close</button>
+
+</div>
 <div id="changelogModal" class="modal">
     <h3>Changelog</h3>
     <div id="changelogContent"></div>
@@ -197,8 +325,13 @@
         <span class="tooltiptext">Resist sword's control but gain better bonuses</span>
     </div>
 </div>
-<div class="container">
-    <div class="section">
+
+    <div id="gameLogo" class="game-section">
+        <img src="logo.png" class="logo-img" alt="Cursed Sword Legacy">
+        <h1>Cursed Sword Legacy</h1>
+    </div>
+
+    <div id="swordSection" class="game-section">
         <h2>Sword</h2>
         <div id="swordStats">
             <div class="stat tooltip">
@@ -214,7 +347,14 @@
         <div id="upgrades"></div>
     </div>
 
-    <div class="section">
+    <div id="zonesSection" class="game-section">
+        <div class="section">
+            <h2>Zones</h2>
+            <div id="enemies"></div>
+        </div>
+    </div>
+    <div id="wielderSection" class="game-section">
+        <h2>🗺️ Zones</h2>
         <h2>Wielder</h2>
         <div id="wielderStats">
             <div class="stat tooltip">
@@ -235,26 +375,33 @@
                 <span class="tooltiptext">Reduces experience gain but increases control effectiveness</span>
             </div>
         </div>
-        <button id="restButton" onclick="toggleRest()">Rest (Toggle)</button>
         <button onclick="healWielder()">Heal (10 Energy)</button>
         <button onclick="changeWielder()">Change Wielder (Cost: 10 energy)</button>
-            <button id="trainButton" onclick="toggleTraining()">Train (Off)</button>
 
     </div>
 
-    <div class="section">
-        <h2>Zones</h2>
-        <div id="enemies"></div>
-        <button id="autoBattleButton" onclick="toggleAutoBattle()">Auto Battle: Off</button>
+    <div id="actionsSection" class="game-section">
+        <h2>🎮 Actions</h2>
+        <!-- Compact action buttons -->
+        <div class="action-buttons">
+            <button id="restButton">Rest</button>
+            <button id="trainButton">Train</button>
+            <button id="autoBattleButton">Auto</button>
+        </div>
     </div>
 
-    <div class="section combat-window">
+
+    <div id="combatLog" class="section combat-window">
         <h2>Combat Log</h2>
         <div id="combat-log" class="combat-log"></div>
     </div>
     <footer>
+        <a href="#" onclick="showStory()" title="Sword's Story">📖</a>
+        <a href="#" onclick="showUnlocks()" title="Upcoming Unlocks">🔓</a>
+        <a href="#" onclick="showStatistics()" title="Statistics">📊</a>
         <a href="#" onclick="showChangelog()" title="View Changelog">📜</a>
         <a href="#" onclick="wipeSave()" title="Delete Save">❌</a>
+        <a href="#" onclick="showOptions()" title="Options">⚙️</a>
         <a href="https://caffeineforge.com" target="_blank" title="Author's page">🐙</a>
         <a href="https://royalroad.com" target="_blank" title="Story">🐦</a>
     </footer>
@@ -300,6 +447,14 @@
                         unlocked: false,
                     },
                 ],
+                statistics: {
+                    totalKills: 0,
+                    wieldersUsed: 0,
+                    mobKills: {},
+                    zoneKills: {}
+                },
+                story: [],
+                unlockedUpgrades: []
             };
             const races = {
                 Human: {
@@ -394,6 +549,20 @@
                 const count = game.wielder.wounds.filter((w) => w === stat).length;
                 return count > 0 ? `\n(Wounded: -${count})` : "";
             }
+            // Modified Experience Calculation
+            function calculateExpGain(enemyLevel) {
+                const levelDiff = enemyLevel - game.wielder.level;
+                const expMultiplier = 1 + (levelDiff * 0.2);
+                return Math.floor(baseExp * expMultiplier);
+            }
+
+            // New Auto Battle Logic
+            function startAutoBattle() {
+                const zone = game.zones[Math.floor(Math.random() * game.zones.length)];
+                const enemyIndex = Math.floor(Math.random() * zone.enemies.length);
+                attackEnemy(zone.index, enemyIndex);
+            }
+
             function updateDisplay() {
                 // Add to wielder stats display:
                 const wielderStats = document.getElementById("wielderStats");
@@ -438,7 +607,7 @@
                     <button onclick="buyUpgrade('${name}')" ${game.sword.energy >= data.cost ? "" : "disabled"}>
                         Upgrade (${Math.round(data.cost)} energy)
                     </button>
-                </div>
+                </div><br>
             `
                     )
                     .join("");
@@ -500,16 +669,7 @@
                     btn.style.backgroundColor = game.currentAction === action ? '#3a3a3a' : '#4a0000';
                 });
             }
-            function getUpgradeDescription(name) {
-                const descriptions = {
-                    capacity: "Increases maximum energy storage",
-                    siphon: "Increases energy gained from each kill",
-                    senses: "Unlocks stronger enemies at higher levels",
-                    connection: "Improves bond with the wielder, enhancing stat bonuses",
-                    control: "Increases percentage bonus to wielder stats",
-                };
-                return descriptions[name] || "Unknown upgrade";
-            }
+
             async function attackEnemy(zoneIndex, enemyIndex) {
                 if (game.isFighting || game.wielder.resting) return;
 
@@ -606,6 +766,43 @@
                 }
                 updateDisplay();
             }
+                        // New UI Functions
+            function showRaceSelection() {
+                const modal = document.getElementById('raceSelectionModal');
+                modal.style.display = 'block';
+                document.getElementById('raceOptions').innerHTML = Object.entries(races)
+                    .filter(([_,r]) => r.unlocked)
+                    .map(([race, data]) => `
+                        <div class="race-option" onclick="selectRace('${race}')">
+                            <h4>${race.toUpperCase()}</h4>
+                            <p>${data.description}</p>
+                            <p>${data.stats}</p>
+                        </div>
+                    `).join('');
+            }
+
+            function showStatistics() {
+                const stats = game.statistics;
+                document.getElementById('statisticsContent').innerHTML = `
+                    <p>Total Kills: ${stats.totalKills}</p>
+                    <p>Wielders Used: ${stats.wieldersUsed}</p>
+                    <h4>Kills by Enemy:</h4>
+                    ${Object.entries(stats.mobKills).map(([mob, count]) => `
+                        <p>${mob}: ${count}</p>
+                    `).join('')}
+                `;
+                document.getElementById('statsModal').style.display = 'block';
+            }
+            function getUpgradeDescription(name) {
+                const descriptions = {
+                    capacity: "Increases maximum energy storage",
+                    siphon: "Increases energy gained from each kill",
+                    senses: "Unlocks stronger enemies at higher levels",
+                    connection: "Improves bond with the wielder, enhancing stat bonuses",
+                    control: "Increases percentage bonus to wielder stats",
+                };
+                return descriptions[name] || "Unknown upgrade";
+            }
             function addCombatMessage(text, className) {
                 const logElement = document.createElement("div");
                 logElement.className = `log-entry ${className}`;
@@ -696,6 +893,74 @@
                     location.reload();
                 }
             }
+            // Modal Control Functions
+function showStory() {
+    const content = game.story.length > 0
+        ? game.story.map(entry => `<p class="story-entry">${entry}</p>`).join('')
+        : "<p>The sword's history remains shrouded in mystery...</p>";
+
+    document.getElementById('storyContent').innerHTML = content;
+    document.getElementById('storyModal').style.display = 'block';
+}
+
+function showOptions() {
+    const modal = document.getElementById('optionsModal');
+    modal.style.display = 'block';
+    document.getElementById('saveData').value = '';
+}
+
+function showUnlocks() {
+    const unlocks = [];
+
+    // Zone unlocks
+    game.zones.forEach((zone, index) => {
+        if (!zone.unlocked && game.statistics.zoneKills[index] >= 10) {
+            unlocks.push(`Zone: ${zone.name} (${game.statistics.zoneKills[index]}/10 kills)`);
+        }
+    });
+
+    // Race unlocks
+    Object.entries(races).forEach(([race, data]) => {
+        if (!data.unlocked) {
+            unlocks.push(`Race: ${race} (Complete 10 kills in associated zone)`);
+        }
+    });
+
+
+
+    document.getElementById('unlockList').innerHTML = unlocks.length > 0
+        ? unlocks.map(u => `<p>🔓 ${u}</p>`).join('')
+        : "<p>All current content unlocked!</p>";
+    document.getElementById('unlocksModal').style.display = 'block';
+}
+
+// Enhanced Import/Export
+function exportSave() {
+    const saveData = {
+        game: game,
+        timestamp: Date.now(),
+        version: 1.2
+    };
+    const exportString = JSON.stringify(saveData, null, 2);
+    document.getElementById('saveData').value = exportString;
+}
+
+function importSave() {
+    try {
+        const importData = JSON.parse(document.getElementById('saveData').value);
+        if (importData.version !== 1.2) throw new Error("Invalid version");
+
+        Object.keys(game).forEach(key => {
+            if (importData.game[key]) {
+                game[key] = importData.game[key];
+            }
+        });
+        updateDisplay();
+        alert("Save imported successfully!");
+    } catch (e) {
+        alert(`Import failed: ${e.message}`);
+    }
+}
             // Initialize game
             function initGame() {
                 loadGame();
