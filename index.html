@@ -3,14 +3,18 @@
 <head>
     <title>Cursed Sword Idle</title>
     <style>
+        :root {
+            --logo-row-height: auto;
+            --combat-row-height: 25%;
+        }
         /* Fixed Grid Layout */
         body {
             display: grid;
             grid-template:
-                "logo    wielder     zones"       auto
-                "sword   wielder  zones"      minmax(200px, 0.7fr)
-                "sword   actions  zones"      auto
-                "combat  combat   combat"     20%
+                "logo    wielder  zones"       var(--logo-row-height)
+                "sword   wielder  zones"      0.8fr
+                "sword   actions  zones"      0.7fr
+                "combat  combat   combat"     var(--combat-row-height)
                 / 33%     33%      auto;
             height: 100vh;
             margin: 0;
@@ -52,8 +56,27 @@
             grid-area: combat;
         }
 
+    /* Minimize Button */
+    .minimize-button {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        padding: 2px 5px;
+        font-size: 0.8em;
+        background: #4a0000;
+        border: 1px solid #ff6666;
+        border-radius: 3px;
+        cursor: pointer;
+    }
 
+    .minimized {
+        display: none;
+    }
 /* Visual Style Additions */
+.current-enemy {
+    border: 2px solid #ff6666 !important;
+    box-shadow: 0 0 8px rgba(255, 102, 102, 0.5);
+}
 
 
 .logo-img {
@@ -280,6 +303,7 @@ footer .tooltip .tooltiptext {
                 margin: 0 15px;
                 text-decoration: none;
             }
+
         </style>
 </head>
 <body>
@@ -344,6 +368,7 @@ footer .tooltip .tooltiptext {
         <span class="tooltiptext">Resist sword's control but gain better bonuses</span>
     </div>
 </div>
+<!--<button class="minimize-button" onclick="toggleLogo()">⬆️</button>-->
 
     <div id="gameLogo" class="game-section">
         <img src="logo.png" class="logo-img" alt="Cursed Sword Legacy">
@@ -401,11 +426,31 @@ footer .tooltip .tooltiptext {
         <h2>🎮 Actions</h2>
         <!-- Compact action buttons -->
         <div class="action-buttons">
+        <span class="tooltip">
             <button id="restButton" onclick="onActionButtonClick('resting')">Rest</button>
+            <span class="tooltiptext">Recover health faster (disables other actions)</span>
+        </span>
+
+        <span class="tooltip">
             <button id="trainButton" onclick="onActionButtonClick('training')">Train</button>
-            <button onclick="healWielder()">Heal (10 Energy)</button>
-            <button onclick="changeWielder()">Change Wielder (Cost: 10 energy)</button>
+            <span class="tooltiptext">Gain 2 EXP/second (disables other actions)</span>
+        </span>
+
+        <span class="tooltip">
+            <button onclick="healWielder()">Heal wielder (10 energy)</button>
+            <span class="tooltiptext">Restore 25% health for 10 energy</span>
+        </span><br>
+        <span class="tooltip">
+            <button onclick="showRaceSelection()">Change Wielder (Cost: 10 energy)</button>
+            <span class="tooltiptext">Loose your current wielder permanently. Pick the race of a new one.</span>
+        </span>
+        <span class="tooltip">
             <button id="autoBattleButton" onclick="onActionButtonClick('autoFighting')">Auto Battle: Off</button>
+            <span class="tooltiptext">Start automatically fighting in the latest are you fought in</span>
+        </span>
+
+
+
         </div>
     </div>
 
@@ -459,6 +504,7 @@ footer .tooltip .tooltiptext {
 </div>
 
 <script>
+let lastUsedZoneIndex = 0;
             const game = {
                 isFighting: false,
                 autoBattle: false,
@@ -478,25 +524,83 @@ footer .tooltip .tooltiptext {
                 },
                 wielder: null,
                 zones: [
-                    {
-                        name: "Kaladian Plains",
-                        enemies: [
-                            { name: "Wild Beast", strength: 8, life: 25, exp: 10 },
-                            { name: "Bandit", strength: 10, life: 35, exp: 15 },
-                            { name: "A Group of Bandits", strength: 12, life: 70, exp: 20 },
-                        ],
-                        unlocked: true,
-                    },
-                    {
-                        name: "Rocky Foothills",
-                        enemies: [
-                            { name: "A Sneak Goblin", strength: 10, life: 30, exp: 20 },
-                            { name: "A Wild Beastman", strength: 12, life: 50, exp: 30 },
-                            { name: "A Goblin Hunting Party", strength: 14, life: 70, exp: 40 },
-                            { name: "A Pack of Beastmen", strength: 16, life: 100, exp: 50 },
-                        ],
-                        unlocked: false,
-                    },
+        {
+name: "Kaladian Plains",
+enemies: [
+{ name: "Wild Beast", level: 1, strength: 7, defense: 0, life: 25, exp: 10 },
+{ name: "Bandit", level: 1, strength: 7, defense: 0, life: 35, exp: 15 },
+	{ name: "A Group of Bandits", level: 2, strength: 9, defense: 1, life: 70, exp: 20 }
+               ],
+            		unlocked: true
+        },
+        {
+name: "Rocky Foothills",
+enemies: [
+{ name: "A Sneak Goblin", level: 2, strength: 8, defense: 1, life: 30, exp: 20 },
+{ name: "A Wild Beastman", level: 2, strength: 8, defense: 1, life: 50, exp: 20 },
+{ name: "A Goblin Hunting Party", level: 3, strength: 10, defense: 2, life: 70, exp: 30 },
+	{ name: "A Pack of Beastmen", level: 3, strength: 10, defense: 2, life: 100, exp: 30 }
+               ],
+            		unlocked: false
+        },
+        {
+name: "Ancient Ruins",
+enemies: [
+{ name: "Ghost of the Past", level: 3, strength: 9, defense: 2, life: 40, exp: 20 },
+{ name: "Painful Memory", level: 3, strength: 9, defense: 1, life: 60, exp: 20 },
+{ name: "Corpse of a Former Wielder", level: 4, strength: 11, defense: 3, life: 80, exp: 30 },
+               ],
+            		unlocked: false
+        },
+        {
+name: "The City of Kalraka",
+enemies: [
+{ name: "A fearful Guardsman", level: 4, strength: 10, defense: 2, life: 30, exp: 20 },
+{ name: "A Prepared Knight", level: 4, strength: 10, defense: 3, life: 50, exp: 20 },
+{ name: "A Pack of Goat Men", level: 5, strength: 12, defense: 1, life: 100, exp: 30 },
+               ],
+            		unlocked: false
+        },
+        {
+name: "High Mountains",
+enemies: [
+{ name: "A Minotaur", level: 2, strength: 11, defense: 1, life: 50, exp: 20 },
+{ name: "An Orc", level: 2, strength: 11, defense: 1, life: 50, exp: 20 },
+{ name: "An Orcish Hunting Party", level: 3, strength: 13, defense: 2, life: 80, exp: 30 },
+	{ name: "A Young Dragon", level: 3, strength: 13, defense: 2, life: 150, exp: 30 }
+               ],
+            		unlocked: false
+        },
+        {
+name: "Far Valleys",
+enemies: [
+{ name: "An Orcish Hunting Party", level: 2, strength: 12, defense: 1, life: 80, exp: 20 },
+{ name: "An Owlbear", level: 2, strength: 12, defense: 1, life: 80, exp: 20 },
+{ name: "A Griffon", level: 3, strength: 14, defense: 2, life: 90, exp: 30 },
+	{ name: "A Wyvern", level: 3, strength: 14, defense: 2, life: 100, exp: 30 }
+               ],
+            		unlocked: false
+        },
+        {
+name: "Inner Kingdoms",
+enemies: [
+{ name: "A Guard Patrol", level: 2, strength: 13, defense: 1, life: 50, exp: 20 },
+{ name: "A Witch Hunter", level: 2, strength: 13, defense: 1, life: 50, exp: 20 },
+{ name: "An Elven Mage", level: 3, strength: 15, defense: 2, life: 40, exp: 30 },
+               ],
+            		unlocked: false
+        },
+        {
+name: "The Fortress City",
+enemies: [
+{ name: "A Brave Knight", level: 2, strength: 14, defense: 5, life: 40, exp: 20 },
+{ name: "An Archmage", level: 2, strength: 14, defense: 1, life: 40, exp: 20 },
+{ name: "The Royal Guard", level: 3, strength: 16, defense: 10, life: 60, exp: 30 },
+               ],
+            		unlocked: false
+        }
+
+
                 ],
                 statistics: {
                     totalKills: 0,
@@ -553,7 +657,23 @@ footer .tooltip .tooltiptext {
                 };
             }
             game.currentAction = null; // 'fighting' | 'resting' | 'training'
+            function toggleLogo() {
 
+                    const logoSection = document.getElementById('gameLogo');
+                    logoSection.classList.toggle('minimized');
+
+                    const minimizeBtn = document.querySelector('.minimize-button');
+                    let minimized = logoSection.classList.contains('minimized');
+
+
+                    document.documentElement.style.setProperty(
+                            '--logo-row-height',minimized ? '1px' : 'auto'
+                        );
+                    document.documentElement.style.setProperty(
+                        '--combat-row-height',minimized ? '20%' : '25%'
+                    );
+                    minimizeBtn.textContent = logoSection.classList.contains('minimized') ? '⬇️':'⬆️' ;
+                }
             // Modified toggle functions
             function onActionButtonClick(actionType) {
                 ['restButton', 'trainButton', 'autoBattleButton'].forEach(id => {
@@ -598,12 +718,21 @@ footer .tooltip .tooltiptext {
                 updateDisplay();
             }
 
-            async function startAutoBattle() {
-                while (game.currentAction == "autoFighting" && game.wielder.currentLife > 0 && !game.wielder.resting) {
-                    await attackEnemy(game.currentEnemy.zoneIndex, game.currentEnemy.enemyIndex);
-                    await new Promise((resolve) => setTimeout(resolve, 1000));
+            function startAutoBattle() {
+                if (!game.zones[lastUsedZoneIndex]) {
+                    lastUsedZoneIndex = 0; // Fallback to first zone
                 }
+
+                const zone = game.zones[lastUsedZoneIndex];
+                const enemyIndex = Math.floor(Math.random() * zone.enemies.length);
+
+                // Update button text with zone name
+                const autoButton = document.getElementById('autoBattleButton');
+                autoButton.innerHTML = `⚔ ${zone.name}<br><small>Auto Combat</small>`;
+
+                attackEnemy(lastUsedZoneIndex, enemyIndex);
             }
+
             function healWielder() {
                 if (game.sword.energy >= 10 && game.wielder.currentLife < game.wielder.currentStats.life) {
                     game.sword.energy -= 10;
@@ -623,11 +752,7 @@ footer .tooltip .tooltiptext {
             }
 
             // New Auto Battle Logic
-            function startAutoBattle() {
-                const zone = game.zones[Math.floor(Math.random() * game.zones.length)];
-                const enemyIndex = Math.floor(Math.random() * zone.enemies.length);
-                attackEnemy(zone.index, enemyIndex);
-            }
+
 
             function updateDisplay() {
                 // Add to wielder stats display:
@@ -697,26 +822,19 @@ footer .tooltip .tooltiptext {
 
                 // Enemies
                 const enemiesDiv = document.getElementById("enemies");
-                enemiesDiv.innerHTML = game.zones
-                    .filter((zone) => zone.unlocked)
-                    .map(
-                        (zone, zi) => `
-                <div class="zone">
-                    <h4>${zone.name}</h4>
-                    ${zone.enemies
-                        .map(
-                            (enemy, ei) => `
-                        <button onclick="attackEnemy(${zi}, ${ei})"
-                            ${game.isFighting ? "disabled" : ""}>
-                            ${enemy.name} (${enemy.life} HP)
-                        </button>
-                    `
-                        )
-                        .join("")}
-                </div>
-            `
-                    )
-                    .join("");
+                enemiesDiv.innerHTML = enemiesDiv.innerHTML = game.zones.filter(zone => zone.unlocked).map((zone, zi) => `
+    <div class="zone">
+        <h4>${zone.name}</h4>
+        ${zone.enemies.map((enemy, ei) => `
+            <button class="enemy-button"
+                    data-zone="${zi}"
+                    data-enemy="${ei}"
+                    onclick="attackEnemy(${zi}, ${ei})">
+                ${enemy.name} (Lv. ${enemy.level})
+            </button>
+        `).join('')}
+    </div>
+`).join('');
 
                     const actionInProgress = !!game.currentAction;
 
@@ -734,8 +852,8 @@ footer .tooltip .tooltiptext {
             }
 
             async function attackEnemy(zoneIndex, enemyIndex) {
-                if (game.isFighting || game.wielder.resting) return;
-
+                if (game.currentAction != null && game.currentAction != "autoFighting") return;
+                    lastUsedZoneIndex = zoneIndex;
                 wielder = game.wielder;
                 game.isFighting = true;
                 updateDisplay();
@@ -778,6 +896,9 @@ footer .tooltip .tooltiptext {
                     );
 
                     await new Promise((resolve) => setTimeout(resolve, 500));
+                        document.querySelectorAll('.enemy-button').forEach(btn => btn.classList.remove('current-enemy'));
+    document.querySelector(`[data-zone="${zoneIndex}"][data-enemy="${enemyIndex}"]`)
+        .classList.add('current-enemy');
                 }
 
                 if (enemyLife <= 0) {
@@ -1037,7 +1158,7 @@ function importSave() {
                     if (game.wielder.currentLife < game.wielder.currentStats.life) {
                         const regenRate = game.currentAction =="resting" ? 5 : 1;
 
-                        game.wielder.currentLife = Math.min(game.wielder.currentLife + regenRate, game.wielder.life);
+                        game.wielder.currentLife = Math.min(game.wielder.currentLife + regenRate, game.wielder.currentStats.life);
                         updateDisplay();
                     }
                     if(game.currentAction == "training"){
