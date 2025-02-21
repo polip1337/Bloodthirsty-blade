@@ -148,31 +148,50 @@
                 background: #5a0000;
             }
 
-            .tooltip {
-                position: relative;
-                display: inline-block;
-                border-bottom: 1px dotted #666;
-            }
-            .tooltip .tooltiptext {
-                visibility: hidden;
-                width: 200px;
-                background-color: #2d2d2d;
-                color: #fff;
-                text-align: center;
-                border-radius: 4px;
-                padding: 5px;
-                position: absolute;
-                z-index: 1;
-                bottom: 125%;
-                left: 50%;
-                margin-left: -100px;
-                opacity: 0;
-                transition: opacity 0.3s;
-            }
-            .tooltip:hover .tooltiptext {
-                visibility: visible;
-                opacity: 1;
-            }
+ .tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    max-width: 200px;
+    background-color: #2d2d2d;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 5px 8px;
+    position: absolute;
+    z-index: 1002;
+    border: 1px solid #ff6666;
+    box-shadow: 0 0 5px rgba(255, 102, 102, 0.3);
+
+    /* Default positioning */
+    bottom: 125%;
+    left: 50%;
+    //transform: translateX(-30%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Footer-specific tooltip positioning */
+footer .tooltip .tooltiptext {
+    bottom: auto;
+    top: -10px;
+    transform: translate(-50%, -100%);
+}
+
+/* Keep tooltips within viewport */
+.tooltip .tooltiptext {
+    left: clamp(10px, 50%, calc(100vw - 10px));
+}
 
             .stat-points {
                 margin-left: 10px;
@@ -374,8 +393,7 @@
                 <span class="tooltiptext">Reduces experience gain but increases control effectiveness</span>
             </div>
         </div>
-        <button onclick="healWielder()">Heal (10 Energy)</button>
-        <button onclick="changeWielder()">Change Wielder (Cost: 10 energy)</button>
+
 
     </div>
 
@@ -385,6 +403,8 @@
         <div class="action-buttons">
             <button id="restButton" onclick="onActionButtonClick('resting')">Rest</button>
             <button id="trainButton" onclick="onActionButtonClick('training')">Train</button>
+            <button onclick="healWielder()">Heal (10 Energy)</button>
+            <button onclick="changeWielder()">Change Wielder (Cost: 10 energy)</button>
             <button id="autoBattleButton" onclick="onActionButtonClick('autoFighting')">Auto Battle: Off</button>
         </div>
     </div>
@@ -395,14 +415,46 @@
         <div id="combat-log" class="combat-log"></div>
     </div>
     <footer>
-        <a href="#" onclick="showStory()" title="Sword's Story">📖</a>
-        <a href="#" onclick="showUnlocks()" title="Upcoming Unlocks">🔓</a>
-        <a href="#" onclick="showStatistics()" title="Statistics">📊</a>
-        <a href="#" onclick="showChangelog()" title="View Changelog">📜</a>
-        <a href="#" onclick="wipeSave()" title="Delete Save">❌</a>
-        <a href="#" onclick="showOptions()" title="Options">⚙️</a>
-        <a href="https://caffeineforge.com" target="_blank" title="Author's page">🐙</a>
-        <a href="https://royalroad.com" target="_blank" title="Story">🐦</a>
+    <span class="tooltip">
+        <a href="#" onclick="showStory()">📖</a>
+        <span class="tooltiptext">View Sword's Story</span>
+    </span>
+
+        <span class="tooltip">
+        <a href="#" onclick="showUnlocks()">🔓</a>
+        <span class="tooltiptext">Upcoming Unlocks</span>
+    </span>
+
+        <span class="tooltip">
+        <a href="#" onclick="showStatistics()">📊</a>
+        <span class="tooltiptext">Game Statistics</span>
+    </span>
+
+        <!-- Add similar tooltips for other icons -->
+        <span class="tooltip">
+        <a href="#" onclick="showChangelog()">📜</a>
+        <span class="tooltiptext">View Changelog</span>
+    </span>
+
+        <span class="tooltip">
+        <a href="#" onclick="wipeSave()">❌</a>
+        <span class="tooltiptext">Delete Save File</span>
+    </span>
+
+        <span class="tooltip">
+        <a href="#" onclick="showOptions()">⚙️</a>
+        <span class="tooltiptext">Game Options</span>
+    </span>
+
+        <span class="tooltip">
+        <a href="https://caffeineforge.com" target="_blank">🐙</a>
+        <span class="tooltiptext">Visit Developer's Site</span>
+    </span>
+
+        <span class="tooltip">
+        <a href="https://royalroad.com" target="_blank">🐦</a>
+        <span class="tooltiptext">Read the Story</span>
+    </span>
     </footer>
 </div>
 
