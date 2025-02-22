@@ -55,7 +55,35 @@
         #combatLog {
             grid-area: combat;
         }
+.race-list {
+    display: grid;
+    gap: 15px;
+}
 
+.locked {
+    opacity: 0.6;
+    filter: grayscale(0.8);
+}
+
+.unlock-requirement {
+    font-size: 0.9em;
+    color: #ff6666;
+    margin-top: 8px;
+}
+
+.stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 5px 0;
+}
+
+.race-option .stat {
+    background: #3d3d3d;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid #4a0000;
+}
     /* Minimize Button */
     .minimize-button {
         position: absolute;
@@ -611,26 +639,31 @@ enemies: [
                 story: [],
                 unlockedUpgrades: []
             };
-            const races = {
-                Human: {
-                    unlocked: true,
-                    names: ["Aldric", "Elara", "Gareth", "Liora"],
-                    stats: { strength: +1, agility: +0, swordfighting: +1 },
-                },
-                Elf: {
-                    unlocked: false,
-                    names: ["Aelar", "Lyria", "Thalorin", "Faelwen"],
-                    stats: { agility: +2, willpower: +20 },
-                },
-                Dwarf: {
-                    unlocked: false,
-                    names: ["Thrain", "Hilda", "Borin", "Freyja"],
-                    stats: { strength: +2, swordfighting: +1, agility: -1 },
-                },
-            };
-            function generateWielder() {
-                const availableRaces = Object.keys(races).filter(r => races[r].unlocked);
-                const race = availableRaces[Math.floor(Math.random() * availableRaces.length)];
+    const races = {
+        human: {
+            stats: { strength: 1, agility: 0, swordfighting: 1 },
+            unlocked: true,
+            names: ["Aldric", "Elara", "Gareth", "Liora"],
+            unlockRequirement: null
+        },
+        elf: {
+            stats: { agility: 2, willpower: 20 },
+            unlocked: false,
+            names: ["Aelar", "Lyria", "Thalorin", "Faelwen"],
+            unlockRequirement: { zone: 0, kills: 10 }
+        },
+        dwarf: {
+            stats: { strength: 2, swordfighting: 1, agility: -1 },
+            unlocked: false,
+            names: ["Thrain", "Hilda", "Borin", "Freyja"],
+            unlockRequirement: { zone: 1, kills: 15 }
+        }
+    };
+            function generateWielder(race) {
+                if(!race){
+                    const availableRaces = Object.keys(races).filter(r => races[r].unlocked);
+                    race = availableRaces[Math.floor(Math.random() * availableRaces.length)];
+                }
                 const raceData = races[race];
 
                 const baseStats = {
@@ -909,7 +942,7 @@ enemies: [
 
                     addCombatMessage(`${enemy.name} defeated! +${energyGain.toFixed(1)} energy`, "enemy-defeated");
                     addCombatMessage(`Gained ${expGained.toFixed(1)} experience`, "player-stat");
-
+                    game.statistics.zoneKills[zoneIndex] = (game.statistics.zoneKills[zoneIndex] ?? 0) + 1;
                     // Check for level up
                     while (wielder.exp >= 100) {
                         wielder.exp -= 100;
@@ -952,19 +985,77 @@ enemies: [
             }
                         // New UI Functions
             function showRaceSelection() {
-                const modal = document.getElementById('raceSelectionModal');
-                modal.style.display = 'block';
-                document.getElementById('raceOptions').innerHTML = Object.entries(races)
-                    .filter(([_,r]) => r.unlocked)
-                    .map(([race, data]) => `
-                        <div class="race-option" onclick="selectRace('${race}')">
-                            <h4>${race.toUpperCase()}</h4>
-                            <p>${data.description}</p>
-                            <p>${data.stats}</p>
-                        </div>
-                    `).join('');
-            }
+    const modal = document.getElementById('raceSelectionModal');
 
+
+    // Link zones to race unlocks
+    game.zones = game.zones.map((zone, index) => ({
+        ...zone,
+        unlockRace: Object.keys(races).find(race =>
+            races[race].unlockRequirement?.zone === index
+        )
+    }));
+
+    let content = `<div class="race-list">`;
+
+    Object.entries(races).forEach(([raceKey, raceData]) => {
+        const zone = game.zones[raceData.unlockRequirement?.zone];
+        const kills = raceData.unlockRequirement ?
+        game.statistics.zoneKills[raceData.unlockRequirement.zone] || 0 : 0;
+        const required = raceData.unlockRequirement?.kills || 0;
+        const baseRanges = {
+        strength: { min: 1, max: 6 },
+        agility: { min: 1, max: 6 },
+        swordfighting: { min: 1, max: 6 },
+        life: { min: 10, max: 20 },
+        willpower: { min: 75, max: 125 }
+    };
+        const allStats = ['strength', 'agility', 'swordfighting', 'life', 'willpower'];
+    const statRanges = allStats.map(stat => {
+        const bonus = raceData.stats[stat] || 0;
+        const base = baseRanges[stat];
+        return {
+            stat,
+            min: base.min + bonus,
+            max: base.max + bonus,
+            baseText: `${base.min}-${base.max}`
+        };
+    });
+ content += `
+            <div onClick="selectRace('${raceKey}')" class="race-option ${raceData.unlocked ? '' : 'locked'}">
+                <h4>${raceKey.toUpperCase()}</h4>
+                <div class="stats">
+                    ${statRanges.map(({stat, min, max,baseText}) => `
+                        <div class="stat tooltip">
+                            ${stat}: ${min}-${max}
+                                <span class="tooltiptext">
+                                    Base: ${baseText}<br>
+                                    ${raceData.stats[stat] ? `Race bonus: ${raceData.stats[stat]}` : 'No racial bonus'}
+                                </span>
+                        </div>
+                    `).join('')}
+                </div>
+                ${!raceData.unlocked ? `
+                    <div class="unlock-requirement">
+                        Unlock by killing ${required} ${zone?.name} enemies
+                        (${kills}/${required})
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    });
+
+    content += `</div>`;
+    document.getElementById('raceOptions').innerHTML = content;
+    modal.style.display = 'block';
+}
+            function selectRace(race) {
+                if (game.sword.energy >= 10) {
+                    game.sword.energy -= 10;
+                    game.wielder = generateWielder(race);
+                    updateDisplay();
+                }
+            }
             function showStatistics() {
                 const stats = game.statistics;
                 document.getElementById('statisticsContent').innerHTML = `
@@ -1001,23 +1092,17 @@ enemies: [
                 combatLog.scrollTop = combatLog.scrollHeight;
             }
 
-            function changeWielder() {
-                if (game.sword.energy >= 10) {
-                    game.sword.energy -= 10;
-                    game.wielder = generateWielder();
-                    updateDisplay();
-                }
-            }
+
 
             function buyUpgrade(upgradeName) {
                 const upgrade = game.sword.upgrades[upgradeName];
                 if (game.sword.energy >= upgrade.cost) {
                     game.sword.energy -= upgrade.cost;
                     upgrade.level++;
-                    upgrade.cost *= 2.5;
+                    upgrade.cost *= 2;
 
                     if (upgradeName === "capacity") {
-                        game.sword.maxEnergy = 100 * upgrade.level;
+                        game.sword.maxEnergy *=2;
                     }
                     if (upgradeName === "senses") {
                         game.zones[upgrade.level - 1].unlocked = true;
@@ -1047,7 +1132,7 @@ enemies: [
                     onActionButtonClick(temp);
                     game.currentAction = temp;
                 } else {
-                    game.wielder = generateWielder();
+                    game.wielder = generateWielder(null);
                 }
             }
 
