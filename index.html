@@ -331,7 +331,48 @@ footer .tooltip .tooltiptext {
                 margin: 0 15px;
                 text-decoration: none;
             }
+.library-container {
+    display: flex;
+    height: 100%; /* Adjust as needed */
+    width: 100%;
+}
 
+.title-column {
+    width: 30%;
+    overflow-y: auto;
+    border-right: 1px solid #ddd;
+}
+
+.story-title {
+    cursor: pointer;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 4px;
+}
+
+.story-title:hover {
+    background: #e0e0e0;
+}
+
+.content-column {
+    width: 70%;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.story-entries {
+    margin-top: 0;
+}
+
+.story-entry {
+    margin-bottom: 15px;
+}
+
+/* Optional: Active title styling */
+.story-title.active {
+    background: #d0d0d0;
+    font-weight: bold;
+}
         </style>
 </head>
 <body>
@@ -371,6 +412,7 @@ footer .tooltip .tooltiptext {
     <button onclick="this.parentElement.style.display='none'">Close</button>
 
 </div>
+
 <div id="changelogModal" class="modal">
     <h3>Changelog</h3>
     <div id="changelogContent"></div>
@@ -493,10 +535,10 @@ footer .tooltip .tooltiptext {
         <span class="tooltiptext">View Sword's Story</span>
     </span>
 
-        <span class="tooltip">
-        <a href="#" onclick="showUnlocks()">🔓</a>
-        <span class="tooltiptext">Upcoming Unlocks</span>
-    </span>
+<!--        <span class="tooltip">-->
+<!--        <a href="#" onclick="showUnlocks()">🔓</a>-->
+<!--        <span class="tooltiptext">Upcoming Unlocks</span>-->
+<!--    </span>-->
 
         <span class="tooltip">
         <a href="#" onclick="showStatistics()">📊</a>
@@ -548,88 +590,11 @@ let lastUsedZoneIndex = 0;
                         senses: { level: 1, cost: 200 },
                         connection: { level: 1, cost: 150 },
                         control: { level: 1, cost: 300 },
+                        soul: { level: 1, cost: 500 }
                     },
                 },
                 wielder: null,
-                zones: [
-        {
-name: "Kaladian Plains",
-enemies: [
-{ name: "Wild Beast", level: 1, strength: 7, defense: 0, life: 25, exp: 10 },
-{ name: "Bandit", level: 1, strength: 7, defense: 0, life: 35, exp: 15 },
-	{ name: "A Group of Bandits", level: 2, strength: 9, defense: 1, life: 70, exp: 20 }
-               ],
-            		unlocked: true
-        },
-        {
-name: "Rocky Foothills",
-enemies: [
-{ name: "A Sneak Goblin", level: 2, strength: 8, defense: 1, life: 30, exp: 20 },
-{ name: "A Wild Beastman", level: 2, strength: 8, defense: 1, life: 50, exp: 20 },
-{ name: "A Goblin Hunting Party", level: 3, strength: 10, defense: 2, life: 70, exp: 30 },
-	{ name: "A Pack of Beastmen", level: 3, strength: 10, defense: 2, life: 100, exp: 30 }
-               ],
-            		unlocked: false
-        },
-        {
-name: "Ancient Ruins",
-enemies: [
-{ name: "Ghost of the Past", level: 3, strength: 9, defense: 2, life: 40, exp: 20 },
-{ name: "Painful Memory", level: 3, strength: 9, defense: 1, life: 60, exp: 20 },
-{ name: "Corpse of a Former Wielder", level: 4, strength: 11, defense: 3, life: 80, exp: 30 },
-               ],
-            		unlocked: false
-        },
-        {
-name: "The City of Kalraka",
-enemies: [
-{ name: "A fearful Guardsman", level: 4, strength: 10, defense: 2, life: 30, exp: 20 },
-{ name: "A Prepared Knight", level: 4, strength: 10, defense: 3, life: 50, exp: 20 },
-{ name: "A Pack of Goat Men", level: 5, strength: 12, defense: 1, life: 100, exp: 30 },
-               ],
-            		unlocked: false
-        },
-        {
-name: "High Mountains",
-enemies: [
-{ name: "A Minotaur", level: 2, strength: 11, defense: 1, life: 50, exp: 20 },
-{ name: "An Orc", level: 2, strength: 11, defense: 1, life: 50, exp: 20 },
-{ name: "An Orcish Hunting Party", level: 3, strength: 13, defense: 2, life: 80, exp: 30 },
-	{ name: "A Young Dragon", level: 3, strength: 13, defense: 2, life: 150, exp: 30 }
-               ],
-            		unlocked: false
-        },
-        {
-name: "Far Valleys",
-enemies: [
-{ name: "An Orcish Hunting Party", level: 2, strength: 12, defense: 1, life: 80, exp: 20 },
-{ name: "An Owlbear", level: 2, strength: 12, defense: 1, life: 80, exp: 20 },
-{ name: "A Griffon", level: 3, strength: 14, defense: 2, life: 90, exp: 30 },
-	{ name: "A Wyvern", level: 3, strength: 14, defense: 2, life: 100, exp: 30 }
-               ],
-            		unlocked: false
-        },
-        {
-name: "Inner Kingdoms",
-enemies: [
-{ name: "A Guard Patrol", level: 2, strength: 13, defense: 1, life: 50, exp: 20 },
-{ name: "A Witch Hunter", level: 2, strength: 13, defense: 1, life: 50, exp: 20 },
-{ name: "An Elven Mage", level: 3, strength: 15, defense: 2, life: 40, exp: 30 },
-               ],
-            		unlocked: false
-        },
-        {
-name: "The Fortress City",
-enemies: [
-{ name: "A Brave Knight", level: 2, strength: 14, defense: 5, life: 40, exp: 20 },
-{ name: "An Archmage", level: 2, strength: 14, defense: 1, life: 40, exp: 20 },
-{ name: "The Royal Guard", level: 3, strength: 16, defense: 10, life: 60, exp: 30 },
-               ],
-            		unlocked: false
-        }
 
-
-                ],
                 statistics: {
                     totalKills: 0,
                     wieldersUsed: 0,
@@ -639,27 +604,10 @@ enemies: [
                 story: [],
                 unlockedUpgrades: []
             };
-    const races = {
-        human: {
-            stats: { strength: 1, agility: 0, swordfighting: 1 },
-            unlocked: true,
-            names: ["Aldric", "Elara", "Gareth", "Liora"],
-            unlockRequirement: null
-        },
-        elf: {
-            stats: { agility: 2, willpower: 20 },
-            unlocked: false,
-            names: ["Aelar", "Lyria", "Thalorin", "Faelwen"],
-            unlockRequirement: { zone: 0, kills: 10 }
-        },
-        dwarf: {
-            stats: { strength: 2, swordfighting: 1, agility: -1 },
-            unlocked: false,
-            names: ["Thrain", "Hilda", "Borin", "Freyja"],
-            unlockRequirement: { zone: 1, kills: 15 }
-        }
-    };
+
             function generateWielder(race) {
+                game.statistics.wieldersUsed = (game.statistics.wieldersUsed ?? 0) + 1;
+
                 if(!race){
                     const availableRaces = Object.keys(races).filter(r => races[r].unlocked);
                     race = availableRaces[Math.floor(Math.random() * availableRaces.length)];
@@ -742,7 +690,7 @@ enemies: [
                             autoButton.textContent = `Auto Battle: On}`;
 
                             autoButton.classList.add('active-action');
-                            if (game.currentEnemy) startAutoBattle();
+                             startAutoBattle();
                             }
 
                         break;
@@ -752,11 +700,11 @@ enemies: [
             }
 
             function startAutoBattle() {
-                if (!game.zones[lastUsedZoneIndex]) {
+                if (!gameData.zones[lastUsedZoneIndex]) {
                     lastUsedZoneIndex = 0; // Fallback to first zone
                 }
 
-                const zone = game.zones[lastUsedZoneIndex];
+                const zone = gameData.zones[lastUsedZoneIndex];
                 const enemyIndex = Math.floor(Math.random() * zone.enemies.length);
 
                 // Update button text with zone name
@@ -778,10 +726,14 @@ enemies: [
                 return count > 0 ? `\n(Wounded: -${count})` : "";
             }
             // Modified Experience Calculation
-            function calculateExpGain(enemyLevel) {
-                const levelDiff = enemyLevel - game.wielder.level;
+            function calculateExpGain(baseExp) {
+                let enemy = gameData.zones[game.currentEnemy.zoneIndex].enemies[game.currentEnemy.enemyIndex];
+                const levelDiff = enemy.level - game.wielder.level;
                 const expMultiplier = 1 + (levelDiff * 0.2);
-                return Math.floor(baseExp * expMultiplier);
+                let expGained = Math.floor((baseExp * expMultiplier)*(1 + wielder.currentStats.willpower / 200));
+                addCombatMessage(`Gained ${expGained.toFixed(1)} experience. ${expMultiplier*100}% of base due to wielder / enemy level gap.`, "player-stat");
+
+                return expGained;
             }
 
             // New Auto Battle Logic
@@ -810,7 +762,7 @@ enemies: [
             Willpower: ${wielder.currentStats.willpower}${wielder.baseStats.willpower > wielder.currentStats.willpower ? "⚠" : ""}
              <span class="tooltiptext">Increases experience gain but decreases control effectiveness (up to 100% at 200 willpower) </span>
         </div><br>
-        <div class="stat tooltip" title="Experience points">EXP: ${Math.round(game.wielder.exp)}/100
+        <div class="stat tooltip" title="Experience points">EXP: ${Math.round(game.wielder.exp)}/${game.wielder.level*100}
         <span class="tooltiptext">Gain a level every 100 exp points</span></div><br>
         <div class="stat tooltip" title="Current level">Level: ${game.wielder.level}</div><br>
         <div class="stat tooltip" title="Unused stat points">Stat Points: ${game.wielder.statPoints}
@@ -819,7 +771,7 @@ enemies: [
                 // Sword stats
                 document.getElementById("energy").textContent = Math.floor(game.sword.energy);
                 document.getElementById("maxEnergy").textContent = game.sword.maxEnergy;
-                document.getElementById("totalKills").textContent = game.sword.kills;
+                document.getElementById("totalKills").textContent = game.statistics.totalKills;
 
                 const upgradesDiv = document.getElementById("upgrades");
                 upgradesDiv.innerHTML = Object.entries(game.sword.upgrades)
@@ -848,6 +800,8 @@ enemies: [
                             return "Improves bond with the wielder";
                         case "control":
                             return "Increases wielder stat bonuses (Each level is a 20% increase, reduced by willpower)";
+                        case "soul":
+                            return "Discover more of your history";
                         default:
                             return "";
                     }
@@ -855,7 +809,7 @@ enemies: [
 
                 // Enemies
                 const enemiesDiv = document.getElementById("enemies");
-                enemiesDiv.innerHTML = enemiesDiv.innerHTML = game.zones.filter(zone => zone.unlocked).map((zone, zi) => `
+                enemiesDiv.innerHTML = enemiesDiv.innerHTML = gameData.zones.filter(zone => zone.unlocked).map((zone, zi) => `
     <div class="zone">
         <h4>${zone.name}</h4>
         ${zone.enemies.map((enemy, ei) => `
@@ -891,7 +845,7 @@ enemies: [
                 game.isFighting = true;
                 updateDisplay();
                 game.currentEnemy = { zoneIndex, enemyIndex };
-                const enemy = game.zones[zoneIndex].enemies[enemyIndex];
+                const enemy = gameData.zones[zoneIndex].enemies[enemyIndex];
                 let enemyLife = enemy.life;
 
                 if (wielder.currentLife <= 0) {
@@ -937,15 +891,17 @@ enemies: [
                 if (enemyLife <= 0) {
                     const energyGain = enemy.life * (1 + game.sword.upgrades.siphon.level * 0.1);
                     game.sword.energy = Math.min(game.sword.energy + energyGain, game.sword.maxEnergy);
-                    const expGained = enemy.exp * (1 + wielder.currentStats.willpower / 200);
+                    addCombatMessage(`${enemy.name} defeated! +${energyGain.toFixed(1)} energy`, "enemy-defeated");
+
+                    const expGained = calculateExpGain(enemy.exp);
                     wielder.exp += expGained;
 
-                    addCombatMessage(`${enemy.name} defeated! +${energyGain.toFixed(1)} energy`, "enemy-defeated");
-                    addCombatMessage(`Gained ${expGained.toFixed(1)} experience`, "player-stat");
                     game.statistics.zoneKills[zoneIndex] = (game.statistics.zoneKills[zoneIndex] ?? 0) + 1;
+                    game.statistics.totalKills = (game.statistics.totalKills ?? 0) + 1;
+                    game.statistics.mobKills[enemy.name] = (game.statistics.mobKills[enemy.name] ?? 0) + 1;
                     // Check for level up
-                    while (wielder.exp >= 100) {
-                        wielder.exp -= 100;
+                    while (wielder.exp >= wielder.level * 100) {
+                        wielder.exp -= wielder.level * 100;
                         wielder.level++;
                         wielder.statPoints++;
                         showLevelUpModal();
@@ -956,7 +912,8 @@ enemies: [
                 if (wielder.currentLife <= 0) {
                     addCombatMessage("Lost the fight! Disengaging. Rest or heal.", "damage");
                     applyHeavyWound();
-                    setAutoBattle(false);
+                    if(game.currentAction == "autoFighting")
+                        onActionButtonClick('autoFighting')
                     game.isFighting = false;
                     return;
                 }
@@ -989,7 +946,7 @@ enemies: [
 
 
     // Link zones to race unlocks
-    game.zones = game.zones.map((zone, index) => ({
+    gameData.zones = gameData.zones.map((zone, index) => ({
         ...zone,
         unlockRace: Object.keys(races).find(race =>
             races[race].unlockRequirement?.zone === index
@@ -999,7 +956,7 @@ enemies: [
     let content = `<div class="race-list">`;
 
     Object.entries(races).forEach(([raceKey, raceData]) => {
-        const zone = game.zones[raceData.unlockRequirement?.zone];
+        const zone = gameData.zones[raceData.unlockRequirement?.zone];
         const kills = raceData.unlockRequirement ?
         game.statistics.zoneKills[raceData.unlockRequirement.zone] || 0 : 0;
         const required = raceData.unlockRequirement?.kills || 0;
@@ -1059,10 +1016,10 @@ enemies: [
             function showStatistics() {
                 const stats = game.statistics;
                 document.getElementById('statisticsContent').innerHTML = `
-                    <p>Total Kills: ${stats.totalKills}</p>
-                    <p>Wielders Used: ${stats.wieldersUsed}</p>
+                    <p>Total Kills: ${game.statistics.totalKills}</p>
+                    <p>Wielders Used: ${game.statistics.wieldersUsed}</p>
                     <h4>Kills by Enemy:</h4>
-                    ${Object.entries(stats.mobKills).map(([mob, count]) => `
+                    ${Object.entries(game.statistics.mobKills).map(([mob, count]) => `
                         <p>${mob}: ${count}</p>
                     `).join('')}
                 `;
@@ -1075,6 +1032,7 @@ enemies: [
                     senses: "Unlocks stronger enemies at higher levels",
                     connection: "Improves bond with the wielder, enhancing stat bonuses",
                     control: "Increases percentage bonus to wielder stats",
+                    soul: "Increases percentage bonus to wielder stats",
                 };
                 return descriptions[name] || "Unknown upgrade";
             }
@@ -1101,15 +1059,42 @@ enemies: [
                     upgrade.level++;
                     upgrade.cost *= 2;
 
+                    const cap = gameData.upgradeCaps[upgradeName];
+
+                  if (upgrade.level >= cap) {
+                    addCombatMessage(`Maximum ${upgradeName} level reached!`, 'damage');
+                    return;
+                  }
+
                     if (upgradeName === "capacity") {
                         game.sword.maxEnergy *=2;
                     }
                     if (upgradeName === "senses") {
-                        game.zones[upgrade.level - 1].unlocked = true;
+                        gameData.zones[upgrade.level - 1].unlocked = true;
+                    }
+                    if (upgradeName === "soul") {
+                        gameData.zones[upgrade.level - 1].unlocked = true;
                     }
                     updateDisplay();
                 }
             }
+            function unlockNextStory() {
+    const stories = gameData.story;
+
+    // Find the first locked story
+    const nextLockedStory = Object.entries(stories).find(([_, story]) => !story.unlocked);
+
+    // If a locked story is found, unlock it
+    if (nextLockedStory) {
+        const [storyKey] = nextLockedStory;
+        stories[storyKey].unlocked = true;
+        console.log(`Unlocked story: ${stories[storyKey].title}`);
+        return true; // Indicate success
+    } else {
+        console.log("No more stories to unlock");
+        return false; // Indicate no more stories available
+    }
+}
             // Save System
             function saveGame() {
                 const saveData = {
@@ -1168,12 +1153,47 @@ enemies: [
             }
             // Modal Control Functions
 function showStory() {
-    const content = game.story.length > 0
-        ? game.story.map(entry => `<p class="story-entry">${entry}</p>`).join('')
-        : "<p>The sword's history remains shrouded in mystery...</p>";
+const stories = Object.values(gameData.story).filter(story => story.unlocked);
+    const storyModal = document.getElementById('storyModal');
 
-    document.getElementById('storyContent').innerHTML = content;
-    document.getElementById('storyModal').style.display = 'block';
+    // Create the library layout structure
+    const libraryHTML = `
+        <div class="library-container">
+            <div class="title-column">
+                ${stories.map((story, index) => `
+                    <h3 class="story-title" onclick="showContent(${index})">${story.title}</h3>
+                `).join('')}
+            </div>
+            <div class="content-column" id="contentDisplay">
+                ${stories.length > 0
+                    ? `<div class="story-entries">${stories[0].entry.map(text => `
+                        <div class="story-entry">
+                            <p>${text}</p>
+                        </div>
+                    `).join('')}</div>`
+                    : '<p>No story fragments unlocked yet</p>'
+                }
+            </div>
+        </div>
+    `;
+
+    // Add content switching function
+    window.showContent = function(index) {
+        const selectedStory = stories[index];
+        const contentHTML = `
+            <div class="story-entries">
+                ${selectedStory.entry.map(text => `
+                    <div class="story-entry">
+                        <p>${text}</p>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        document.getElementById('contentDisplay').innerHTML = contentHTML;
+    };
+
+    document.getElementById('storyContent').innerHTML = libraryHTML;
+    storyModal.style.display = 'block';
 }
 
 function showOptions() {
@@ -1186,7 +1206,7 @@ function showUnlocks() {
     const unlocks = [];
 
     // Zone unlocks
-    game.zones.forEach((zone, index) => {
+    gameData.zones.forEach((zone, index) => {
         if (!zone.unlocked && game.statistics.zoneKills[index] >= 10) {
             unlocks.push(`Zone: ${zone.name} (${game.statistics.zoneKills[index]}/10 kills)`);
         }
@@ -1235,7 +1255,11 @@ function importSave() {
     }
 }
             // Initialize game
-            function initGame() {
+            async function initGame() {
+              gameData = await fetch('gameData.json').then(r => r.json());
+                races = gameData.races;
+                zones = gameData.zones;
+                upgradeCaps = gameData.upgradeCaps;
                 loadGame();
                 saveGame();
                 updateDisplay();
