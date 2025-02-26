@@ -1,30 +1,31 @@
 {
   "races": {
     "human": {
-      "stats": { "strength": 1, "agility": 0, "swordfighting": 1 },
+      "stats": { "strength": 1,  "swordfighting": 1 },
       "unlocked": true,
       "names": ["Aldric", "Elara", "Gareth", "Liora"],
       "unlockRequirement": null
     },
     "elf": {
-      "stats": { "agility": 2, "willpower": 20 },
+      "stats": {  "strength": -1,"swordfighting": 1,"willpower": 20 },
       "unlocked": false,
       "names": ["Aelar", "Lyria", "Thalorin", "Faelwen"],
       "unlockRequirement": { "zone": 0, "kills": 10 }
     },
     "dwarf": {
-      "stats": { "strength": 2, "swordfighting": 1, "agility": -1 },
+      "stats": { "strength": 2, "swordfighting": 1, "life": 20  },
       "unlocked": false,
       "names": ["Thrain", "Hilda", "Borin", "Freyja"],
       "unlockRequirement": { "zone": 1, "kills": 15 }
     }
   },
   "upgradeCaps": {
-    "capacity": 10,
-    "siphon": 5,
-    "senses": 3,
+    "capacity": 15,
+    "siphon": 10,
+    "senses": 8,
     "connection": 7,
-    "control": 5
+    "control": 7,
+    "soul":8
   },
   "story": {
     "story1":{
