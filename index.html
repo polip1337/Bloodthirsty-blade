@@ -615,10 +615,9 @@ let lastUsedZoneIndex = 0;
                 const raceData = races[race];
 
                 const baseStats = {
-                    strength: Math.floor(Math.random() * 5 + 1) + (raceData.stats.strength || 0),
-                    agility: Math.floor(Math.random() * 5 + 1) + (raceData.stats.agility || 0),
-                    swordfighting: Math.floor(Math.random() * 5 + 1) + (raceData.stats.swordfighting || 0),
-                    life: Math.floor(Math.random() * 10 + 20) + (raceData.stats.life || 0),
+                    strength: Math.floor(Math.random() * 6 + 1) + (raceData.stats.strength || 0),
+                    swordfighting: Math.floor(Math.random() * 6 + 1) + (raceData.stats.swordfighting || 0),
+                    life: Math.floor(Math.random() * 11 + 10) + (raceData.stats.life || 0),
                     willpower: Math.floor(Math.random() * 50 + 50) + (raceData.stats.willpower || 0)
                 };
 
@@ -962,12 +961,11 @@ let lastUsedZoneIndex = 0;
         const required = raceData.unlockRequirement?.kills || 0;
         const baseRanges = {
         strength: { min: 1, max: 6 },
-        agility: { min: 1, max: 6 },
         swordfighting: { min: 1, max: 6 },
         life: { min: 10, max: 20 },
         willpower: { min: 75, max: 125 }
     };
-        const allStats = ['strength', 'agility', 'swordfighting', 'life', 'willpower'];
+        const allStats = ['strength',  'swordfighting', 'life', 'willpower'];
     const statRanges = allStats.map(stat => {
         const bonus = raceData.stats[stat] || 0;
         const base = baseRanges[stat];
@@ -1073,7 +1071,8 @@ let lastUsedZoneIndex = 0;
                         gameData.zones[upgrade.level - 1].unlocked = true;
                     }
                     if (upgradeName === "soul") {
-                        gameData.zones[upgrade.level - 1].unlocked = true;
+                        unlockNextStory();
+                        showStory();
                     }
                     updateDisplay();
                 }
@@ -1126,7 +1125,7 @@ let lastUsedZoneIndex = 0;
 
             // Heavy Wound System
             function applyHeavyWound() {
-                const stats = ["strength", "agility", "swordfighting", "willpower"];
+                const stats = ["strength",  "swordfighting", "willpower"];
                 const affectedStat = stats[Math.floor(Math.random() * stats.length)];
 
                 game.wielder.wounds.push(affectedStat);
