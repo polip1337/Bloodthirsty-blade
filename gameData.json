@@ -28,12 +28,11 @@
   },
   "story": {
     "story1":{
-      "title" : "story1",
+      "title" : "Lost in Darkness",
       "unlocked": true,
       "entry":[
-      "The sword's hunger grows...",
-      "Dark energy pulses through the blade",
-      "The void within the sword becomes infinite"
+      “Your first memories are blurry and hard to focus on any details. All of them are blotted out by the hunger. You have been asleep for so long that from the time the first drop of blood touches your blade, it is all you can think of. It is only after hours and days of battle, when you have drunk the blood of monsters and men that you can finally start to think straight.”,
+      “You are the Ebon Blade. You don’t know what that means, but you will, no matter how many people you have to kill to find out.”
     ]},
     "story2":{
     "title" : "story2",
