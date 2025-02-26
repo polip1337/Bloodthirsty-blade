@@ -1,39 +1,38 @@
 {
   "races": {
     "human": {
-      "stats": { "strength": 1,  "swordfighting": 1 },
+      "stats": { "strength": 1, "agility": 0, "swordfighting": 1 },
       "unlocked": true,
       "names": ["Aldric", "Elara", "Gareth", "Liora"],
       "unlockRequirement": null
     },
     "elf": {
-      "stats": {  "strength": -1,"swordfighting": 1,"willpower": 20 },
+      "stats": { "agility": 2, "willpower": 20 },
       "unlocked": false,
       "names": ["Aelar", "Lyria", "Thalorin", "Faelwen"],
       "unlockRequirement": { "zone": 0, "kills": 10 }
     },
     "dwarf": {
-      "stats": { "strength": 2, "swordfighting": 1, "life": 20  },
+      "stats": { "strength": 2, "swordfighting": 1, "agility": -1 },
       "unlocked": false,
       "names": ["Thrain", "Hilda", "Borin", "Freyja"],
       "unlockRequirement": { "zone": 1, "kills": 15 }
     }
   },
   "upgradeCaps": {
-    "capacity": 15,
-    "siphon": 10,
-    "senses": 8,
+    "capacity": 10,
+    "siphon": 5,
+    "senses": 3,
     "connection": 7,
-    "control": 7,
-    "soul":8
+    "control": 5
   },
   "story": {
     "story1":{
       "title" : "Lost in Darkness",
       "unlocked": true,
       "entry":[
-      “Your first memories are blurry and hard to focus on any details. All of them are blotted out by the hunger. You have been asleep for so long that from the time the first drop of blood touches your blade, it is all you can think of. It is only after hours and days of battle, when you have drunk the blood of monsters and men that you can finally start to think straight.”,
-      “You are the Ebon Blade. You don’t know what that means, but you will, no matter how many people you have to kill to find out.”
+      "Your first memories are blurry and hard to focus on any details. All of them are blotted out by the hunger. You have been asleep for so long that from the time the first drop of blood touches your blade, it is all you can think of. It is only after hours and days of battle, when you have drunk the blood of monsters and men that you can finally start to think straight.",
+      "You are the Ebon Blade. You don’t know what that means, but you will, no matter how many people you have to kill to find out."
     ]},
     "story2":{
     "title" : "story2",
