@@ -1,19 +1,22 @@
 {
   "races": {
     "human": {
-      "stats": { "strength": 1, "agility": 0, "swordfighting": 1 },
+      "stats": { "strength": 1, "swordfighting": 1 },
+      "levelBonuses": { "strength": 1, "swordfighting": 1 },
       "unlocked": true,
       "names": ["Aldric", "Elara", "Gareth", "Liora"],
       "unlockRequirement": null
     },
     "elf": {
-      "stats": { "agility": 2, "willpower": 20 },
+      "stats": { "swordfighting": 2, "willpower": 5 },
       "unlocked": false,
       "names": ["Aelar", "Lyria", "Thalorin", "Faelwen"],
       "unlockRequirement": { "zone": 0, "kills": 10 }
     },
     "dwarf": {
-      "stats": { "strength": 2, "swordfighting": 1, "agility": -1 },
+      "stats": { "strength": 2, "swordfighting": 1, "willpower": 5 },
+      "levelBonuses": { "swordfighting": 2, "willpower": 5 },
+      "levelBonuses": { "strength": 2, "life": 5 },
       "unlocked": false,
       "names": ["Thrain", "Hilda", "Borin", "Freyja"],
       "unlockRequirement": { "zone": 1, "kills": 15 }
@@ -31,47 +34,47 @@
       "title" : "Lost in Darkness",
       "unlocked": true,
       "entry":[
-      "Your first memories are blurry and hard to focus on any details. All of them are blotted out by the hunger. You have been asleep for so long that from the time the first drop of blood touches your blade, it is all you can think of. It is only after hours and days of battle, when you have drunk the blood of monsters and men that you can finally start to think straight.",
-      "You are the Ebon Blade. You don’t know what that means, but you will, no matter how many people you have to kill to find out."
-    ]},
+        "Your first memories are blurry and hard to focus on any details. All of them are blotted out by the hunger. You have been asleep for so long that from the time the first drop of blood touches your blade, it is all you can think of. It is only after hours and days of battle, when you have drunk the blood of monsters and men that you can finally start to think straight.",
+        "You are the Ebon Blade. You don’t know what that means, but you will, no matter how many people you have to kill to find out."
+      ]},
     "story2":{
-    "title" : "Through the Hinterlands",
-    "unlocked": true,
-    "entry":[
-      "This far out, there’s almost nothing to kill, but you don’t let that stop you. Every man and beast that crosses your path is nothing but lambs to the slaughter. Your wielder doesn’t understand what’s going on any more than you do, but they are not hard to convince. Power appeals to everyone.",
-      "Gnolls that try to eat you are exterminated. Bandits that try to rob you are left bleeding. You cut a bloody swath across the flat lands, leaving it a safer place for those who are lucky enough not to cross your path as you search for clues to who you are.",
-      "That’s cold comfort for the farms and villages you happen across, though. The only peace you can offer them is the peace of the grave as their souls fuel your rise to power."
-    ]},
+      "title" : "Through the Hinterlands",
+      "unlocked": true,
+      "entry":[
+        "This far out, there’s almost nothing to kill, but you don’t let that stop you. Every man and beast that crosses your path is nothing but lambs to the slaughter. Your wielder doesn’t understand what’s going on any more than you do, but they are not hard to convince. Power appeals to everyone.",
+        "Gnolls that try to eat you are exterminated. Bandits that try to rob you are left bleeding. You cut a bloody swath across the flat lands, leaving it a safer place for those who are lucky enough not to cross your path as you search for clues to who you are.",
+        "That’s cold comfort for the farms and villages you happen across, though. The only peace you can offer them is the peace of the grave as their souls fuel your rise to power."
+      ]},
     "story3":{
-    "title" : "Beasts and Brutes",
-    "unlocked": true,
-    "entry":[
-      "The endless plains give way to the rocky hills that ring the mountains. You don’t know where you are, but you know that what you seek lies in that direction. Flashes of memory draw you to them. This is where you were found, somewhere.",
-      "Before you can find the temple, though, you must deal with the beasts that infest the place. While there were beastmen in the lowlands, their ugly tribes are everywhere in the highlands, fighting and rutting. Not even their strongest are a challenge for you, though. All they can do, all anyone can do, is make you stronger."
-    ]},
+      "title" : "Beasts and Brutes",
+      "unlocked": true,
+      "entry":[
+        "The endless plains give way to the rocky hills that ring the mountains. You don’t know where you are, but you know that what you seek lies in that direction. Flashes of memory draw you to them. This is where you were found, somewhere.",
+        "Before you can find the temple, though, you must deal with the beasts that infest the place. While there were beastmen in the lowlands, their ugly tribes are everywhere in the highlands, fighting and rutting. Not even their strongest are a challenge for you, though. All they can do, all anyone can do, is make you stronger."
+      ]},
     "story4":{
-    "title" : "Questions Instead of Answers",
-    "unlocked": true,
-    "entry":[
-      "You find the temple where the worshipers of the Death Goddess kept you prisoner for an age. Now, it is a haunted place filled with the dead but also with your memories. When you see them, you can remember killing them, at least some of them.",
-      "This one was once a wielder, and that one was once an ally. Still, your enemies outnumber any positive remembrances you might have had. You were betrayed, and though whoever did it isn’t here, you now have some idea of what you are looking for. There’s a throne somewhere to the east just waiting to be bathed in blood!"
-    ]},
+      "title" : "Questions Instead of Answers",
+      "unlocked": true,
+      "entry":[
+        "You find the temple where the worshipers of the Death Goddess kept you prisoner for an age. Now, it is a haunted place filled with the dead but also with your memories. When you see them, you can remember killing them, at least some of them.",
+        "This one was once a wielder, and that one was once an ally. Still, your enemies outnumber any positive remembrances you might have had. You were betrayed, and though whoever did it isn’t here, you now have some idea of what you are looking for. There’s a throne somewhere to the east just waiting to be bathed in blood!"
+      ]},
     "story5":{
-    "title" : "Let it Burn",
-    "unlocked": true,
-    "entry":[
-      "Your next stop is the city of Kalraka. It’s a small city or a large town. Either way, it has walls, but they cannot keep you out, and you will put the entire place to the torch.",
-      "This is not the city you need to raze. It is not where you were betrayed. It’s just on the way, and since you’re here, you might as well kill as many as you can to feed your growing power. When you are done, all you will leave behind are warm corpses and cold bodies as your power continues to swell."
-    ]},
+      "title" : "Let it Burn",
+      "unlocked": true,
+      "entry":[
+        "Your next stop is the city of Kalraka. It’s a small city or a large town. Either way, it has walls, but they cannot keep you out, and you will put the entire place to the torch.",
+        "This is not the city you need to raze. It is not where you were betrayed. It’s just on the way, and since you’re here, you might as well kill as many as you can to feed your growing power. When you are done, all you will leave behind are warm corpses and cold bodies as your power continues to swell."
+      ]},
     "story6":{
-    "title" : "The View from on High",
-    "unlocked": true,
-    "entry":[
-      "You learned much in Kalraka, both from the living and the dead. Your path leads no the east and the north, to the inner kingdoms. There is where your vengeance awaits. It won’t be an easy road, though.",
-      "Between here and there lie the razor peaks and forested valleys of the Greenstone mountains. They aren’t named for the color of their granite spine but for the sheer number of orcs and goblins that dwell within them. Too wild to be tamed by civilization, the region is swarming with greenskins and worse. Here, there are griffons and dragons, but none of that scares you. You were made for dragon slaying."
-    ]}
+      "title" : "The View from on High",
+      "unlocked": true,
+      "entry":[
+        "You learned much in Kalraka, both from the living and the dead. Your path leads no the east and the north, to the inner kingdoms. There is where your vengeance awaits. It won’t be an easy road, though.",
+        "Between here and there lie the razor peaks and forested valleys of the Greenstone mountains. They aren’t named for the color of their granite spine but for the sheer number of orcs and goblins that dwell within them. Too wild to be tamed by civilization, the region is swarming with greenskins and worse. Here, there are griffons and dragons, but none of that scares you. You were made for dragon slaying."
+      ]}
   },
-  
+
 
   "zones": [
     {
