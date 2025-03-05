@@ -25,7 +25,7 @@
   "upgradeCaps": {
     "capacity": 10,
     "siphon": 5,
-    "senses": 3,
+    "senses": 8,
     "connection": 7,
     "control": 5
   },
