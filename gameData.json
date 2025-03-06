@@ -20,6 +20,13 @@
       "unlocked": false,
       "names": ["Thrain", "Hilda", "Borin", "Freyja"],
       "unlockRequirement": { "zone": 1, "kills": 15 }
+    },
+    "New Race": {
+      "stats": { "strength": 2, "swordfighting": 1, "willpower": 5 },
+      "levelBonuses": { "strength": 2, "life": 5 },
+      "unlocked": false,
+      "names": ["Thrain", "Hilda", "Borin", "Freyja"],
+      "unlockRequirement": { "zone": 1, "kills": 15 }
     }
   },
   "upgradeCaps": {
