@@ -9,13 +9,13 @@
     },
     "elf": {
       "stats": { "swordfighting": 2, "willpower": 5 },
+      "levelBonuses": { "swordfighting": 2, "willpower": 5 },
       "unlocked": false,
       "names": ["Aelar", "Lyria", "Thalorin", "Faelwen"],
       "unlockRequirement": { "zone": 0, "kills": 10 }
     },
     "dwarf": {
       "stats": { "strength": 2, "swordfighting": 1, "willpower": 5 },
-      "levelBonuses": { "swordfighting": 2, "willpower": 5 },
       "levelBonuses": { "strength": 2, "life": 5 },
       "unlocked": false,
       "names": ["Thrain", "Hilda", "Borin", "Freyja"],
