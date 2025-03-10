@@ -4,373 +4,427 @@
     <meta charset="UTF-8">
     <title>Cursed Sword Idle</title>
     <style>
-        :root {
-            --logo-row-height: auto;
-            --combat-row-height: 25%;
-        }
+       :root {
+    --logo-row-height: auto;
+    --combat-row-height: 25%;
+}
 
-        /* Grid Layout */
-        body {
-            display: grid;
-            grid-template:
-                "logo    wielder  zones"    var(--logo-row-height)
-                "sword   wielder  zones"    0.8fr
-                "sword   actions  zones"    0.7fr
-                "combat  combat   combat"   var(--combat-row-height)
-                / 33%    33%      auto;
-            height: 100vh;
-            margin: 0;
-            padding: 20px;
-            gap: 15px;
-            background-color: #1a1a1a;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-        }
+/* Grid Layout */
+body {
+    display: grid;
+    grid-template:
+        "logo    wielder  zones"    var(--logo-row-height)
+        "sword   wielder  zones"    0.8fr
+        "sword   actions  zones"    0.7fr
+        "combat  combat   combat"   var(--combat-row-height)
+        / 33%    33%      auto;
+    height: 100vh;
+    margin: 0;
+    padding: 20px;
+    gap: 15px;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+}
 
-        /* General Styling */
-        .game-section {
-            background-color: #2d2d2d;
-            padding: 15px;
-            border-radius: 8px;
-            overflow: auto;
-        }
+/* General Styling */
+.game-section {
+    background-color: #2d2d2d;
+    padding: 15px;
+    border-radius: 8px;
+    overflow: auto;
+}
 
-        button {
-            background-color: #4a0000;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            margin: 5px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:disabled {
-            background-color: #666;
-            cursor: not-allowed;
-        }
-
-        /* Grid Sections */
-        #gameLogo {
-            grid-area: logo;
-            text-align: center;
-        }
-
-        #swordSection {
-            grid-area: sword;
-        }
-
-        #wielderSection {
-            grid-area: wielder;
-        }
-
-        #zonesSection {
-            grid-area: zones;
-        }
-
-        #actionsSection {
-            grid-area: actions;
-        }
-
-        #combatLog {
-            grid-area: combat;
-        }
-
-        /* Specific Components */
-        .logo-img {
-            height: 80px;
-            margin-bottom: 10px;
-        }
-
-        .stat {
-            margin: 5px 0;
-        }
-
-        .upgrade button{
-            order: 2; /* Move button to right side */
-            min-width: 120px;
-        }
-        .upgrade {
-            display: flex !important;
-            justify-content: space-between;
-            align-items: center;
-            width:330px;
-            background-color: #3d3d3d;
-            padding: 6px;
-            margin: 5px 0;
-            border-radius: 4px;
-        }
-        .zone {
-            background-color: #3d3d3d;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 6px;
-        }
-
-        .zone h4 {
-            margin: 0 0 10px 0;
-            color: #ff6666;
-        }
-
-        .zone button:hover {
-            background-color: #5a0000;
-        }
-
-        .combat-log {
-            font-family: "Courier New", monospace;
-            font-size: 0.9em;
-            display: flex;
-            flex-direction: column-reverse;
-        }
-
-        .log-entry {
-            margin: 3px 0;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-
-        .damage {
-            background-color: #4a000055;
-            color: #ff6666;
-        }
-
-        .player-stat {
-            background-color: #004a0055;
-            color: #66ff66;
-        }
-
-        .enemy-defeated {
-            background-color: #4a4a0055;
-            color: #ffff66;
-        }
-
-        /* Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #3d3d3d;
-            padding: 20px;
-            border-radius: 8px;
-            z-index: 1000;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .stat-choice {
-            margin: 10px;
-            padding: 10px;
-            background: #4a0000;
-            cursor: pointer;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .stat-choice:hover {
-            background: #5a0000;
-        }
-
-        /* Tooltips */
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: help;
-        }
 .game-section, .modal {
-            overflow: visible; /* Prevent clipping of tooltips */
-        }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: max-content;
-            max-width: 200px;
-            background-color: #2d2d2d;
-            color: #fff;
-            text-align: center;
-            border-radius: 4px;
-            padding: 5px 8px;
-            position: absolute;
-            z-index: 1002;
-            border: 1px solid #ff6666;
-            box-shadow: 0 0 5px rgba(255, 102, 102, 0.3);
-            bottom: 100%;
-            left: 0%;
-            right:0%;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
+    overflow: visible; /* Prevent clipping of tooltips */
+}
 
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
+button {
+    background-color: #4a0000;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+}
 
-        /* Footer */
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 10px;
-            background: #2d2d2d;
-            text-align: center;
-        }
+button:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+}
 
-        footer a {
-            color: white;
-            font-size: 24px;
-            margin: 0 15px;
-            text-decoration: none;
-        }
+/* Grid Sections */
+#gameLogo {
+    grid-area: logo;
+    text-align: center;
+}
 
-        footer .tooltip .tooltiptext {
-            bottom: auto;
-            top: -10px;
-            transform: translate(-50%, -100%);
-        }
+#swordSection {
+    grid-area: sword;
+}
 
-        /* Race Selection */
-        .race-list {
-            display: grid;
-            gap: 15px;
-        }
+#wielderSection {
+    grid-area: wielder;
+}
 
-        .race-option {
-            border: 1px solid #444;
-            padding: 10px;
-            margin: 10px 0;
-            cursor: pointer;
-        }
+#zonesSection {
+    grid-area: zones;
+}
 
-        .locked {
-            opacity: 0.6;
-            filter: grayscale(0.8);
-        }
+#actionsSection {
+    grid-area: actions;
+}
 
-        .unlock-requirement {
-            font-size: 0.9em;
-            color: #ff6666;
-            margin-top: 8px;
-        }
+#combatLog {
+    grid-area: combat;
+}
 
-        .stats {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin: 5px 0;
-        }
+/* Specific Components */
+.logo-img {
+    height: 80px;
+    margin-bottom: 10px;
+}
 
-        .race-option .stat {
-            background: #3d3d3d;
-            padding: 3px 8px;
-            border-radius: 4px;
-            border: 1px solid #4a0000;
-        }
+.stat {
+    margin: 5px 0;
+}
 
-        /* Action Buttons */
-        .active-action {
-            border: 2px solid #00ff00;
-            box-shadow: 0 0 10px #00ff00;
-        }
+.upgrade {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    width: 330px;
+    background-color: #3d3d3d;
+    padding: 6px;
+    margin: 5px 0;
+    border-radius: 4px;
+}
 
-        /* Story Modal */
-        .story-entry {
-            border-left: 3px solid #4a0000;
-            padding-left: 10px;
-            margin: 10px 0;
-        }
-        .race-option {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            margin: 5px 0;
-            cursor: pointer;
-            border: 1px solid #444;
-        }
-        .race-option .stats {
-            flex-grow: 1;
-            margin-left: 10px;
-        }
-        .zone {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .zone .explore-btn {
-            flex-grow: 0;
-        }
-        .zone .autofight {
-            margin-left: 10px;
-        }
+.upgrade button {
+    order: 2;
+    min-width: 120px;
+}
 
+.zone {
+    background-color: #3d3d3d;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-        /* Tooltip container */
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: help;
-        }
+.zone h4 {
+    margin: 0 0 10px 0;
+    color: #ff6666;
+}
 
-        /* Tooltip text */
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: max-content;
-            max-width: 300px; /* Increased from 200px to allow more content */
-            background-color: #2d2d2d;
-            color: #fff;
-            text-align: left;
-            border-radius: 4px;
-            padding: 8px 12px;
-            position: absolute;
-            z-index: 1002; /* Already high, but ensure it’s above everything */
-            border: 1px solid #ff6666;
-            box-shadow: 0 0 5px rgba(255, 102, 102, 0.3);
-            opacity: 0;
-            transition: opacity 0.3s;
-            white-space: normal; /* Allow text to wrap */
-            pointer-events: none; /* Prevent tooltip from interfering with clicks */
-        }
+.zone button:hover {
+    background-color: #5a0000;
+}
 
-        /* Default position: above the element */
-        .tooltip .tooltiptext {
-            bottom: calc(100% + 5px); /* Space above the element */
-            left: 50%;
-            transform: translateX(-50%); /* Center horizontally */
-        }
+.combat-log {
+    font-family: "Courier New", monospace;
+    font-size: 0.9em;
+    display: flex;
+    flex-direction: column-reverse;
+}
 
-        /* Show tooltip on hover */
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
+.log-entry {
+    margin: 3px 0;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
 
-        /* Footer tooltips (positioned above due to fixed bottom) */
-        footer .tooltip .tooltiptext {
-            top: auto;
-            bottom: calc(100% + 5px); /* Ensure it appears above the footer */
-            transform: translateX(-50%);
-        }
-        .autofight {
-        display: inline-block;
-        margin-left: 10px;
-    }
-    .autofight input[type="checkbox"] {
-        display: none;
-    }
-    .autofight label {
-        cursor: pointer;
-        padding: 5px 10px;
-        background-color: #4a0000;
-        border-radius: 4px;
-        color: white;
-    }
-    .autofight input[type="checkbox"]:checked + label {
-        background-color: #00ff00;
-        color: #000;
-    }
+.damage {
+    background-color: #4a000055;
+    color: #ff6666;
+}
+
+.player-stat {
+    background-color: #004a0055;
+    color: #66ff66;
+}
+
+.enemy-defeated {
+    background-color: #4a4a0055;
+    color: #ffff66;
+}
+
+/* Modals */
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #3d3d3d;
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.stat-choice {
+    margin: 10px;
+    padding: 10px;
+    background: #4a0000;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stat-choice:hover {
+    background: #5a0000;
+}
+
+/* Tooltips */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    max-width: 300px;
+    background-color: #2d2d2d;
+    color: #fff;
+    text-align: left;
+    border-radius: 4px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 1002;
+    border: 1px solid #ff6666;
+    box-shadow: 0 0 5px rgba(255, 102, 102, 0.3);
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: normal;
+    pointer-events: none;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+footer .tooltip .tooltiptext {
+    top: auto;
+    bottom: calc(100% + 5px);
+    transform: translateX(-50%);
+}
+
+/* Footer */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background: #2d2d2d;
+    text-align: center;
+}
+
+footer a {
+    color: white;
+    font-size: 24px;
+    margin: 0 15px;
+    text-decoration: none;
+}
+
+/* Race Selection */
+.race-list {
+    display: grid;
+    gap: 15px;
+}
+
+.race-option {
+    border: 1px solid #444;
+    padding: 8px;
+    margin: 5px 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.locked {
+    opacity: 0.6;
+    filter: grayscale(0.8);
+}
+
+.unlock-requirement {
+    font-size: 0.9em;
+    color: #ff6666;
+    margin-top: 8px;
+}
+
+.stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 5px 0;
+}
+
+.race-option .stat {
+    background: #3d3d3d;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid #4a0000;
+}
+
+/* Action Buttons */
+.active-action {
+    border: 2px solid #00ff00;
+    box-shadow: 0 0 10px #00ff00;
+}
+
+/* Story Modal */
+.story-entry {
+    border-left: 3px solid #4a0000;
+    padding-left: 10px;
+    margin: 10px 0;
+}
+
+.race-option .stats {
+    flex-grow: 1;
+    margin-left: 10px;
+}
+
+.autofight {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.autofight input[type="checkbox"] {
+    display: none;
+}
+
+.autofight label {
+    cursor: pointer;
+    padding: 5px 10px;
+    background-color: #4a0000;
+    border-radius: 4px;
+    color: white;
+}
+
+.autofight input[type="checkbox"]:checked + label {
+    background-color: #00ff00;
+    color: #000;
+}
+#tabs {
+    display: flex;
+    gap: 5px;
+}
+
+#tabs button {
+    background-color: #3d3d3d; /* Slightly lighter than content background */
+    border: 1px solid #444;
+    border-bottom: none;
+    border-radius: 5px 5px 0 0; /* Rounded top corners */
+    padding: 10px 20px;
+    cursor: pointer;
+    position: relative;
+}
+
+#tabs button.active {
+    background-color: #2d2d2d; /* Matches game-section background */
+    border-bottom: 1px solid #2d2d2d; /* Blends with content */
+    bottom: -1px; /* Overlaps the tab-content border */
+}
+
+#tab-content {
+    border-top: 1px solid #444; /* Separates tabs from content */
+    padding-top: 10px;
+}
+#achievements-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.achievement-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: 2px solid #444;
+    border-radius: 5px;
+    background-color: #3d3d3d;
+    position: relative;
+}
+
+.achievement-icon.unlocked {
+    border-color: #66ff66; /* Green border for unlocked achievements */
+}
+
+.achievement-icon:not(.unlocked) {
+}
+.achievement-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: 2px solid #444;
+    border-radius: 5px;
+    background-color: #3d3d3d;
+    position: relative;
+}
+
+.achievement-icon.unlocked {
+    border-color: #66ff66; /* Green border for unlocked achievements */
+}
+
+.achievement-icon:not(.unlocked)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    max-width: 300px;
+    background-color: #2d2d2d;
+    color: #fff;
+    text-align: left;
+    border-radius: 4px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 1002;
+    border: 1px solid #ff6666;
+    box-shadow: 0 0 5px rgba(255, 102, 102, 0.3);
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: normal;
+    pointer-events: none;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1 !important;
+}
     </style>
 </head>
 <body>
@@ -456,8 +510,20 @@
 </div>
 
 <div id="zonesSection" class="game-section">
-    <h2>Zones</h2>
-    <div id="enemies"></div>
+    <div id="tabs">
+        <button class="active" onclick="showTab('zones')">Zones</button>
+        <button onclick="showTab('achievements')">Achievements</button>
+    </div>
+    <div id="tab-content">
+        <div id="zones-content">
+            <h2>Zones</h2>
+            <div id="enemies"></div> <!-- Existing zones content -->
+        </div>
+        <div id="achievements-content" style="display: none;">
+            <h2>Achievements</h2>
+            <div id="achievements-list"></div>
+        </div>
+    </div>
 </div>
 
 <div id="wielderSection" class="game-section">
@@ -526,10 +592,8 @@
 </footer>
 
 <script>
-
-
-        let lastUsedZoneIndex = 0;
-        const game = {
+    // Initialize variables
+    const game = {
             isFighting: false,
             autoBattle: false,
             currentEnemy: null,
@@ -558,22 +622,145 @@
             unlockedUpgrades: [],
             unlockedRaces: ['human']
         };
+game.achievements = {
+    noviceSlayer: {
+        name: "Novice Slayer",
+        description: "Defeat 100 enemies",
+        condition: () => game.statistics.totalKills >= 100,
+        bonus: { damageMultiplier: 1.05 },
+        unlocked: false,
+        icon: "🗡️" // Sword icon
+    },
+    energyHoarder: {
+        name: "Energy Hoarder",
+        description: "Accumulate 1000 energy",
+        condition: () => game.sword.energy >= 1000,
+        bonus: { maxEnergyMultiplier: 1.10 },
+        unlocked: false,
+        icon: "🔋" // Battery icon
+    },
+    upgradeMaster: {
+        name: "Upgrade Master",
+        description: "Upgrade any sword upgrade to level 5",
+        condition: () => Object.values(game.sword.upgrades).some(upg => upg.level >= 5),
+        bonus: { upgradeCostReduction: 0.05 },
+        unlocked: false,
+        icon: "🔧" // Wrench icon
+    },
+    zoneExplorer: {
+        name: "Zone Explorer",
+        description: "Explore all available zones",
+        condition: () => gameData.zones.every(zone => zone.unlocked),
+        bonus: { expMultiplier: 1.10 },
+        unlocked: false,
+        icon: "🗺️" // Map icon
+    },
+    wielderVeteran: {
+        name: "Wielder Veteran",
+        description: "Have 5 different wielders",
+        condition: () => game.statistics.wieldersUsed >= 5,
+        bonus: { startingStats: 1 },
+        unlocked: false,
+        icon: "👥" // People icon
+    }
+};
+        let lastUsedZoneIndex = 0;
+
         let gameData, races, zones, upgradeCaps;
         game.currentAction = null;
+        function showTab(tabName) {
+    const zonesContent = document.getElementById('zones-content');
+    const achievementsContent = document.getElementById('achievements-content');
+    const zonesButton = document.querySelector('#tabs button:nth-child(1)');
+    const achievementsButton = document.querySelector('#tabs button:nth-child(2)');
 
+    if (tabName === 'zones') {
+        zonesContent.style.display = 'block';
+        achievementsContent.style.display = 'none';
+        zonesButton.classList.add('active');
+        achievementsButton.classList.remove('active');
+    } else {
+        zonesContent.style.display = 'none';
+        achievementsContent.style.display = 'block';
+        achievementsButton.classList.add('active');
+        zonesButton.classList.remove('active');
+        updateAchievementsTab(); // Update achievements when switching to that tab
+    }
+}
+function checkAchievements() {
+    Object.entries(game.achievements).forEach(([key, achievement]) => {
+        if (!achievement.unlocked && achievement.condition()) {
+            achievement.unlocked = true;
+            addCombatMessage(
+                `Achievement Unlocked: ${achievement.name}! Bonus: ${getBonusDescription(achievement.bonus)}`,
+                'achievement'
+            );
+            if (achievement.bonus.maxEnergyMultiplier) {
+                calculateMaxEnergy(); // Update max energy if affected
+            }
+        }
+    });
+}
+function checkAchievements() {
+    Object.entries(game.achievements).forEach(([key, achievement]) => {
+        if (!achievement.unlocked && achievement.condition()) {
+            achievement.unlocked = true;
+            addCombatMessage(
+                `Achievement Unlocked: ${achievement.name}! Bonus: ${getBonusDescription(achievement.bonus)}`,
+                'achievement'
+            );
+            if (achievement.bonus.maxEnergyMultiplier) {
+                calculateMaxEnergy(); // Update max energy if affected
+            }
+        }
+    });
+}function getExpMultiplier() {
+    let multiplier = 1;
+    Object.values(game.achievements).forEach(ach => {
+        if (ach.unlocked && ach.bonus.expMultiplier) {
+            multiplier *= ach.bonus.expMultiplier;
+        }
+    });
+    return multiplier;
+}
+function updateAchievementsTab() {
+    const list = document.getElementById('achievements-list');
+    list.innerHTML = Object.entries(game.achievements).map(([key, ach]) => `
+        <div class="achievement-icon tooltip ${ach.unlocked ? 'unlocked' : ''}">
+            <span>${ach.icon}</span>
+            <span class="tooltiptext">
+                ${ach.name}<br>
+                ${ach.description}<br>
+                Status: ${ach.unlocked ? 'Unlocked' : 'Locked'}<br>
+                ${ach.unlocked ? `Bonus: ${getBonusDescription(ach.bonus)}` : ''}
+            </span>
+        </div>
+    `).join('');
+}
+
+function getBonusDescription(bonus) {
+    if (bonus.damageMultiplier) return `+${(bonus.damageMultiplier - 1) * 100}% damage`;
+    if (bonus.maxEnergyMultiplier) return `+${(bonus.maxEnergyMultiplier - 1) * 100}% max energy`;
+    if (bonus.upgradeCostReduction) return `-${bonus.upgradeCostReduction * 100}% upgrade cost`;
+    if (bonus.expMultiplier) return `+${(bonus.expMultiplier - 1) * 100}% EXP gain`;
+    if (bonus.startingStats) return `+${bonus.startingStats} to all starting stats`;
+    return '';
+}
         // Wielder Generation
         function generateWielder(race) {
             game.statistics.wieldersUsed = (game.statistics.wieldersUsed ?? 0) + 1;
+            checkAchievements();
             if (!race) {
                 const availableRaces = Object.keys(races).filter(r => races[r].unlocked);
                 race = availableRaces[Math.floor(Math.random() * availableRaces.length)];
             }
             const raceData = races[race];
+            const startingBonus = game.achievements.wielderVeteran.unlocked ? game.achievements.wielderVeteran.bonus.startingStats : 0;
             const baseStats = {
-                strength: Math.floor(Math.random() * 6 + 1) + (raceData.stats.strength || 0),
-                swordfighting: Math.floor(Math.random() * 6 + 1) + (raceData.stats.swordfighting || 0),
-                life: Math.floor(Math.random() * 11 + 10) + (raceData.stats.life || 0),
-                willpower: Math.floor(Math.random() * 50 + 50) + (raceData.stats.willpower || 0)
+                strength: Math.floor(Math.random() * 6 + 1) + (raceData.stats.strength || 0) + startingBonus,
+                swordfighting: Math.floor(Math.random() * 6 + 1) + (raceData.stats.swordfighting || 0) + startingBonus,
+                life: Math.floor(Math.random() * 11 + 10) + (raceData.stats.life || 0) + startingBonus,
+                willpower: Math.floor(Math.random() * 50 + 50) + (raceData.stats.willpower || 0) + startingBonus
             };
             return {
                 name: raceData.names[Math.floor(Math.random() * raceData.names.length)],
@@ -657,7 +844,7 @@ function updateCombatStats() {
     }
 
     // Update Energy
-    document.getElementById('energy').textContent = Math.floor(game.sword.energy);
+    document.getElementById('energy').textContent = `${game.sword.energy.toFixed(1)} / ${game.sword.maxEnergy.toFixed(1)}`;
 
     // Update Total Kills
     document.getElementById('totalKills').textContent = game.statistics.totalKills;
@@ -797,7 +984,31 @@ function updateCombatStats() {
             addCombatMessage(`Gained ${expGained.toFixed(1)} exp. ${(expMultiplier * 100).toFixed(2)}% of base due to level gap.`, 'player-stat');
             return expGained;
         }
+function getMaxEnergyMultiplier() {
+    let multiplier = 1;
+    Object.values(game.achievements).forEach(ach => {
+        if (ach.unlocked && ach.bonus.maxEnergyMultiplier) {
+            multiplier *= ach.bonus.maxEnergyMultiplier;
+        }
+    });
+    return multiplier;
+}
 
+function calculateMaxEnergy() {
+    let base = 100; // Base max energy
+    base *= Math.pow(2, game.sword.upgrades.capacity.level); // Apply capacity upgrade
+    base *= getMaxEnergyMultiplier(); // Apply achievement bonuses
+    game.sword.maxEnergy = base;
+}
+function getUpgradeCostReduction() {
+    let reduction = 0;
+    Object.values(game.achievements).forEach(ach => {
+        if (ach.unlocked && ach.bonus.upgradeCostReduction) {
+            reduction += ach.bonus.upgradeCostReduction;
+        }
+    });
+    return reduction;
+}
         async function attackEnemy(zoneIndex, enemyIndex) {
             if (game.currentAction && game.currentAction !== 'autoFighting') return;
             lastUsedZoneIndex = zoneIndex;
@@ -821,8 +1032,8 @@ function updateCombatStats() {
             const baseDamage = wielder.currentStats.strength * 2 + wielder.currentStats.swordfighting;
     const controlDamageBonus = baseDamage * game.controlBonus;
     const lifesteal = game.sword.upgrades.siphon.level; // 1 lifesteal per level
-    const totalDamage = baseDamage + controlDamageBonus;
-
+    const damageMultiplier = getDamageMultiplier();
+    const totalDamage = (baseDamage + lifesteal + controlDamageBonus) * damageMultiplier;
     addCombatMessage(`Engaging ${enemy.name} (${enemy.life} HP)`, 'player-stat');
 
     while (enemyLife > 0 && wielder.currentLife > 0 && !isAnyModalOpen()) {
@@ -858,7 +1069,7 @@ function updateCombatStats() {
                 game.statistics.zoneKills[zoneIndex] = (game.statistics.zoneKills[zoneIndex] ?? 0) + 1;
                 game.statistics.totalKills = (game.statistics.totalKills ?? 0) + 1;
                 game.statistics.mobKills[enemy.name] = (game.statistics.mobKills[enemy.name] ?? 0) + 1;
-
+                checkAchievements();
                 while (wielder.exp >= wielder.level * 100) {
                     wielder.exp -= wielder.level * 100;
                     wielder.level++;
@@ -878,6 +1089,32 @@ function updateCombatStats() {
             }
             updateDisplay();
         }
+        function getUpgradeCostReduction() {
+    let reduction = 0;
+    Object.values(game.achievements).forEach(ach => {
+        if (ach.unlocked && ach.bonus.upgradeCostReduction) {
+            reduction += ach.bonus.upgradeCostReduction;
+        }
+    });
+    return reduction;
+}
+function getDamageMultiplier() {
+    let multiplier = 1;
+    Object.values(game.achievements).forEach(ach => {
+        if (ach.unlocked && ach.bonus.damageMultiplier) {
+            multiplier *= ach.bonus.damageMultiplier;
+        }
+    });
+    return multiplier;
+}
+function updateUpgrades() {
+    const upgradesDiv = document.getElementById('upgrades');
+    const costReduction = getUpgradeCostReduction();
+    upgradesDiv.innerHTML = Object.entries(game.sword.upgrades).map(([name, upg]) => {
+        const effectiveCost = upg.cost * (1 - costReduction);
+        return `<button onclick="buyUpgrade('${name}')">${name} (Level ${upg.level}) - Cost: ${effectiveCost.toFixed(1)}</button>`;
+    }).join('');
+}
         function isAnyModalOpen() {
     const modals = [
         'raceSelectionModal',
@@ -1025,21 +1262,24 @@ function updateCombatStats() {
         function buyUpgrade(upgradeName) {
             const cap = gameData.upgradeCaps[upgradeName];
             const upgrade = game.sword.upgrades[upgradeName];
+            const costReduction = getUpgradeCostReduction();
+            const effectiveCost = upgrade.cost * (1 - costReduction);
             if (upgrade.level >= cap) {
                 addCombatMessage(`Maximum ${upgradeName} level reached!`, 'damage');
                 return;
             }
-            if (game.sword.energy >= upgrade.cost) {
-                game.sword.energy -= upgrade.cost;
+            if (game.sword.energy >= effectiveCost) {
+                game.sword.energy -= effectiveCost;
                 upgrade.level++;
                 upgrade.cost *= 2;
-                if (upgradeName === 'capacity') game.sword.maxEnergy *= 2;
+                if (upgradeName === 'capacity') calculateMaxEnergy();
                 if (upgradeName === 'senses') gameData.zones[upgrade.level - 1].unlocked = true;
                 if (upgradeName === 'soul') {
                     unlockNextStory();
                     showStory();
                 }
                 updateDisplay();
+                checkAchievements();
             }
         }
 
@@ -1072,7 +1312,8 @@ function updateCombatStats() {
             const saved = localStorage.getItem('cursedSwordSave');
             if (saved) {
                 const saveData = JSON.parse(saved);
-                Object.assign(game, saveData.game);
+                const { excludedField, ...gameDataToAssign } = saveData.game;
+                Object.assign(game, gameDataToAssign);
                 game.wielder = saveData.wielder;
                 gameData = saveData.gameData;
                 const temp = game.currentAction;
@@ -1146,6 +1387,7 @@ function updateCombatStats() {
             upgradeCaps = gameData.upgradeCaps;
             loadGame();
             saveGame();
+            calculateMaxEnergy();
             updateDisplay();
 
             setInterval(() => {
