@@ -86,13 +86,20 @@
             margin: 5px 0;
         }
 
+        .upgrade button{
+            order: 2; /* Move button to right side */
+            min-width: 120px;
+        }
         .upgrade {
+            display: flex !important;
+            justify-content: space-between;
+            align-items: center;
+            width:330px;
             background-color: #3d3d3d;
-            padding: 10px;
+            padding: 6px;
             margin: 5px 0;
             border-radius: 4px;
         }
-
         .zone {
             background-color: #3d3d3d;
             padding: 10px;
@@ -172,7 +179,9 @@
             display: inline-block;
             cursor: help;
         }
-
+.game-section, .modal {
+            overflow: visible; /* Prevent clipping of tooltips */
+        }
         .tooltip .tooltiptext {
             visibility: hidden;
             width: max-content;
@@ -272,6 +281,96 @@
             padding-left: 10px;
             margin: 10px 0;
         }
+        .race-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            margin: 5px 0;
+            cursor: pointer;
+            border: 1px solid #444;
+        }
+        .race-option .stats {
+            flex-grow: 1;
+            margin-left: 10px;
+        }
+        .zone {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .zone .explore-btn {
+            flex-grow: 0;
+        }
+        .zone .autofight {
+            margin-left: 10px;
+        }
+
+
+        /* Tooltip container */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        /* Tooltip text */
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: max-content;
+            max-width: 300px; /* Increased from 200px to allow more content */
+            background-color: #2d2d2d;
+            color: #fff;
+            text-align: left;
+            border-radius: 4px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 1002; /* Already high, but ensure it’s above everything */
+            border: 1px solid #ff6666;
+            box-shadow: 0 0 5px rgba(255, 102, 102, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: normal; /* Allow text to wrap */
+            pointer-events: none; /* Prevent tooltip from interfering with clicks */
+        }
+
+        /* Default position: above the element */
+        .tooltip .tooltiptext {
+            bottom: calc(100% + 5px); /* Space above the element */
+            left: 50%;
+            transform: translateX(-50%); /* Center horizontally */
+        }
+
+        /* Show tooltip on hover */
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Footer tooltips (positioned above due to fixed bottom) */
+        footer .tooltip .tooltiptext {
+            top: auto;
+            bottom: calc(100% + 5px); /* Ensure it appears above the footer */
+            transform: translateX(-50%);
+        }
+        .autofight {
+        display: inline-block;
+        margin-left: 10px;
+    }
+    .autofight input[type="checkbox"] {
+        display: none;
+    }
+    .autofight label {
+        cursor: pointer;
+        padding: 5px 10px;
+        background-color: #4a0000;
+        border-radius: 4px;
+        color: white;
+    }
+    .autofight input[type="checkbox"]:checked + label {
+        background-color: #00ff00;
+        color: #000;
+    }
     </style>
 </head>
 <body>
@@ -385,10 +484,7 @@
                 <button onclick="showRaceSelection()">Change Wielder (Cost: 10 energy)</button>
                 <span class="tooltiptext">Lose your current wielder permanently. Pick the race of a new one.</span>
             </span>
-        <span class="tooltip">
-                <button id="autoBattleButton" onclick="onActionButtonClick('autoFighting')">Auto Battle: Off</button>
-                <span class="tooltiptext">Unlocked by connection level 3. Start automatically fighting in the latest area you fought in</span>
-            </span>
+
     </div>
 </div>
 
@@ -421,10 +517,10 @@
         </span>
     <span class="tooltip">
             <a href="https://caffeineforge.com" target="_blank">🐙</a>
-            <span class="tooltiptext">Visit Developer's Site</span>
-        </span>
+            <span class="tooltiptext">Visit Writer's Site</span>
+    </span>
     <span class="tooltip">
-            <a href="https://royalroad.com" target="_blank">🐦</a>
+            <a href="https://www.royalroad.com/fiction/106967/bloodstained-blade-gamelit-sword-mc" target="_blank">🐦</a>
             <span class="tooltiptext">Read the Story</span>
         </span>
 </footer>
@@ -497,7 +593,7 @@
 
         // Action Handling
         function onActionButtonClick(actionType) {
-            const buttons = ['restButton', 'trainButton', 'autoBattleButton'];
+            const buttons = ['restButton', 'trainButton'];
             buttons.forEach(id => document.getElementById(id).classList.remove('active-action'));
 
             switch (actionType) {
@@ -509,29 +605,19 @@
                     game.currentAction = game.currentAction === 'training' ? null : 'training';
                     if (game.currentAction) document.getElementById('trainButton').classList.add('active-action');
                     break;
-                case 'autoFighting':
-                    game.currentAction = game.currentAction === 'autoFighting' ? null : 'autoFighting';
-                    const autoButton = document.getElementById('autoBattleButton');
-                    if (game.currentAction) {
-                        autoButton.textContent = 'Auto Battle: On';
-                        autoButton.classList.add('active-action');
-                        startAutoBattle();
-                    } else {
-                        autoButton.textContent = 'Auto Battle: Off';
-                    }
-                    break;
+
             }
             updateDisplay();
         }
 
         function startAutoBattle() {
-            if (!gameData.zones[lastUsedZoneIndex]) lastUsedZoneIndex = 0;
-            const zone = gameData.zones[lastUsedZoneIndex];
-            const enemyIndex = Math.floor(Math.random() * zone.enemies.length);
-            const autoButton = document.getElementById('autoBattleButton');
-            autoButton.innerHTML = `⚔ ${zone.name}<br><small>Auto Combat</small>`;
-            attackEnemy(lastUsedZoneIndex, enemyIndex);
-        }
+    if (!isAnyModalOpen()) {
+        if (!gameData.zones[lastUsedZoneIndex]) lastUsedZoneIndex = 0;
+        const zone = gameData.zones[lastUsedZoneIndex];
+        const enemyIndex = Math.floor(Math.random() * zone.enemies.length);
+        attackEnemy(lastUsedZoneIndex, enemyIndex);
+    }
+}
 
         function healWielder() {
             if (game.sword.energy >= 10 && game.wielder.currentLife < game.wielder.currentStats.life) {
@@ -549,12 +635,40 @@
             const count = game.wielder.wounds.filter(w => w === stat).length;
             return count > 0 ? `\n(Wounded: -${count})` : '';
         }
+function updateCombatStats() {
+    const wielder = game.wielder;
 
+    // Update HP
+    const hpElement = document.querySelector('#wielderStats .stat:nth-child(5)'); // Assuming HP is 5th stat
+    if (hpElement) {
+        hpElement.innerHTML = `
+            HP: ${Math.max(wielder.currentLife, 0)}/${wielder.currentStats.life}
+            <span class="tooltiptext">Current/Maximum health (Regenerates 1 HP every 5s)</span>
+        `;
+    }
+
+    // Update EXP
+    const expElement = document.querySelector('#wielderStats .stat:nth-child(7)'); // Assuming EXP is 7th stat
+    if (expElement) {
+        expElement.innerHTML = `
+            EXP: ${Math.round(wielder.exp)}/${wielder.level * 100}
+            <span class="tooltiptext">Gain a level every 100 exp points</span>
+        `;
+    }
+
+    // Update Energy
+    document.getElementById('energy').textContent = Math.floor(game.sword.energy);
+
+    // Update Total Kills
+    document.getElementById('totalKills').textContent = game.statistics.totalKills;
+}
         function updateDisplay() {
+
             const wielder = game.wielder;
             const baseDamage = wielder.currentStats.strength * 2 + wielder.currentStats.swordfighting;
             const siphonBonus = game.sword.upgrades.siphon.level;
             const totalDamage = baseDamage + siphonBonus;
+            game.controlBonus = game.sword.upgrades.control.level * 0.2 * (1 - Math.min(wielder.currentStats.willpower, 200) / 200);
             document.getElementById('wielderStats').innerHTML = `
                 <div class="stat">Name: <span id="wielderName">${wielder.name}</span></div>
                 <div class="stat">Race: <span id="wielderRace">${wielder.race}</span></div>
@@ -582,10 +696,11 @@
                     Level: ${wielder.level}
                 </div><br />
                 <div class="stat tooltip">
-                    Predicted Damage: ${totalDamage}
+                    Predicted Damage: ${totalDamage.toFixed(1)}
                     <span class="tooltiptext">
                         Base: ${baseDamage} (Strength: ${wielder.currentStats.strength} × 2 + Swordfighting: ${wielder.currentStats.swordfighting})<br>
-                        Siphon Bonus: +${siphonBonus}
+                        Control Bonus: +${(baseDamage * game.controlBonus).toFixed(1)} (${(game.controlBonus * 100).toFixed(0)}%)<br>
+                        Lifesteal: +${game.sword.upgrades.siphon.level} damage & HP per hit
                     </span>
                 </div>
             `;
@@ -602,40 +717,72 @@
                         <button onclick="buyUpgrade('${name}')" ${game.sword.energy >= data.cost ? '' : 'disabled'}>
                             Upgrade (${Math.round(data.cost)} energy)
                         </button>
-                    </div><br />
+                    </div>
                 `)
                 .join('');
 
             document.getElementById('enemies').innerHTML = gameData.zones
-                .filter(zone => zone.unlocked)
-                .map((zone, zi) => `
-                    <div class="zone">
-                        <h4>${zone.name}</h4>
-                        ${zone.enemies.map((enemy, ei) => `
-                            <button class="enemy-button" data-zone="${zi}" data-enemy="${ei}" onclick="attackEnemy(${zi}, ${ei})">
-                                ${enemy.name} (Lv. ${enemy.level})
-                            </button>
-                        `).join('')}
-                    </div>
-                `)
-                .join('');
+    .filter(zone => zone.unlocked)
+    .map((zone, zi) => `
+        <div class="zone">
+            <h4>${zone.name}</h4>
+            <span class="tooltip">
+                            <button class="explore-btn" onclick="exploreZone(${zi})">Explore</button>
+                            <span class="tooltiptext">
+                                Possible enemies:<br>
+                                ${zone.enemies.map(e => `${e.name} (Lv. ${e.level}, ${e.life} HP)`).join('<br>')}
+                            </span>
+                        </span>
+            <span class="autofight">
+                <input type="checkbox" id="auto-${zi}" onchange="toggleAutoFight(${zi})"
+                    ${game.currentAction === 'autoFighting' && lastUsedZoneIndex === zi ? 'checked' : ''}
+                    ${game.sword.upgrades.connection.level < zi + 1 || (game.currentAction && game.currentAction !== 'autoFighting') ? 'disabled' : ''}>
+                <label for="auto-${zi}">Auto explore</label>
+            </span>
+
+        </div>
+    `)
+    .join('');
 
             const actionInProgress = !!game.currentAction;
             document.querySelectorAll('#enemies button').forEach(btn => {
                 btn.disabled = actionInProgress || game.wielder.defeated;
             });
-            document.getElementById('autoBattleButton').disabled = game.sword.upgrades.connection.level < 3;
 
 
         }
+// Explore Zone Logic
+        function exploreZone(zoneIndex) {
+            if (game.currentAction && game.currentAction !== 'autoFighting') return;
+            lastUsedZoneIndex = zoneIndex;
+            const enemyIndex = Math.floor(Math.random() * gameData.zones[zoneIndex].enemies.length);
+            attackEnemy(zoneIndex, enemyIndex);
+        }
 
+        // Toggle Autofight
+        function toggleAutoFight(zoneIndex) {
+            const checkbox = document.getElementById(`auto-${zoneIndex}`);
+            if (checkbox.checked) {
+                gameData.zones.forEach((_, i) => {
+                    if (i !== zoneIndex && document.getElementById(`auto-${i}`) != null) document.getElementById(`auto-${i}`).checked = false;
+                });
+                game.currentAction = 'autoFighting';
+                lastUsedZoneIndex = zoneIndex;
+
+                startAutoBattle();
+            } else {
+                game.currentAction = null;
+
+            }
+            updateDisplay();
+        }
         function getUpgradeTooltip(name) {
             const tooltips = {
                 capacity: 'Increases maximum energy',
-                siphon: 'Increases energy gained from kills',
+                siphon: 'Adds 1 lifesteal per level',
                 senses: 'Unlocks stronger enemies',
                 connection: 'Improves bond with the wielder, unlocks additional mechanics, increases passive health regen',
-                control: 'Each level of control increases stat points gained per level by 1.',
+                control: 'Increases damage bonus (20% at 0 willpower, 0% at 200+ willpower per level)',
                 soul: 'Discover more of your history'
             };
             return tooltips[name] || '';
@@ -667,34 +814,39 @@
                 return;
             }
 
-            const maxControl = game.sword.upgrades.connection.level;
-            const controlLevel = Math.min(game.sword.upgrades.control.level, maxControl);
-            game.controlBonus = controlLevel * 0.2 * (1 - wielder.currentStats.willpower / 200);
+            const controlLevel = game.sword.upgrades.control.level;
+            const willpower = Math.min(wielder.currentStats.willpower, 200); // Cap at 200
+            game.controlBonus = controlLevel * 0.2 * (1 - willpower / 200); // 20% at 0 willpower, 0% at 200+
 
             const baseDamage = wielder.currentStats.strength * 2 + wielder.currentStats.swordfighting;
-            const siphonBonus = game.sword.upgrades.siphon.level;
-            const totalDamage = baseDamage + siphonBonus;
-            addCombatMessage(`Engaging ${enemy.name} (${enemy.life} HP)`, 'player-stat');
+    const controlDamageBonus = baseDamage * game.controlBonus;
+    const lifesteal = game.sword.upgrades.siphon.level; // 1 lifesteal per level
+    const totalDamage = baseDamage + controlDamageBonus;
 
-            while (enemyLife > 0 && wielder.currentLife > 0) {
-                const damageDealt = Math.min(totalDamage, enemyLife);
-                enemyLife -= damageDealt;
-                addCombatMessage(
-                    `Dealt ${damageDealt} damage (Base: ${baseDamage}, Siphon: ${siphonBonus}, Control: ${Math.round(game.controlBonus * 100)}%) Enemy HP: ${enemyLife}`,
-                    'damage'
-                );
+    addCombatMessage(`Engaging ${enemy.name} (${enemy.life} HP)`, 'player-stat');
 
-                const enemyDamage = Math.max(enemy.strength - Math.floor(wielder.currentStats.swordfighting * (1 + game.controlBonus)), 1);
-                wielder.currentLife -= enemyDamage;
-                addCombatMessage(
-                    `Took ${enemyDamage} damage (Base: ${enemy.strength}, Defense: ${Math.floor(wielder.currentStats.swordfighting * (1 + game.controlBonus))}) HP: ${wielder.currentLife}`,
-                    'damage'
-                );
+    while (enemyLife > 0 && wielder.currentLife > 0 && !isAnyModalOpen()) {
+        const damageDealt = Math.min(totalDamage, enemyLife);
+        const lifestealHealing = Math.min(lifesteal, enemyLife); // Can't heal more than damage dealt
+        enemyLife -= damageDealt;
+        wielder.currentLife = Math.min(
+            wielder.currentStats.life,
+            wielder.currentLife + lifestealHealing
+        );
+
+        addCombatMessage(
+            `Dealt ${damageDealt.toFixed(1)} damage (Base: ${baseDamage}, Control: ${controlDamageBonus.toFixed(1)}) ` +
+            `Lifesteal: +${lifestealHealing} HP | Enemy HP: ${enemyLife}`,
+            'damage'
+        );
 
                 await new Promise(resolve => setTimeout(resolve, 500));
-                document.querySelectorAll('.enemy-button').forEach(btn => btn.classList.remove('current-enemy'));
-                document.querySelector(`[data-zone="${zoneIndex}"][data-enemy="${enemyIndex}"]`).classList.add('current-enemy');
             }
+            if (isAnyModalOpen()) {
+        addCombatMessage('Combat paused due to open menu.', 'player-stat');
+        game.isFighting = false; // Reset fighting state
+        return;
+    }
 
             if (enemyLife <= 0) {
                 const energyGain = enemy.life * (1 + game.sword.upgrades.siphon.level * 0.1);
@@ -726,6 +878,18 @@
             }
             updateDisplay();
         }
+        function isAnyModalOpen() {
+    const modals = [
+        'raceSelectionModal',
+        'unlocksModal',
+        'statsModal',
+        'optionsModal',
+        'storyModal',
+        'changelogModal',
+        'levelUpModal'
+    ];
+    return modals.some(id => document.getElementById(id).style.display === 'block');
+}
         function calculateStatPointsPerLevel() {
             const controlLevel = game.sword.upgrades.control.level;
             return 1 + controlLevel;
@@ -773,7 +937,7 @@
                 const zone = gameData.zones[raceData.unlockRequirement?.zone];
                 const kills = raceData.unlockRequirement ? (game.statistics.zoneKills[raceData.unlockRequirement.zone] || 0) : 0;
                 const required = raceData.unlockRequirement?.kills || 0;
-                if (kills > required) gameData.races[raceKey].unlocked = true;
+                raceData.unlocked = raceData.unlocked || kills >= required; // Ensure unlocked status persists
 
                 const baseRanges = {
                     strength: { min: 1, max: 6 },
@@ -783,28 +947,34 @@
                 };
                 const statRanges = ['strength', 'swordfighting', 'life', 'willpower'].map(stat => {
                     const bonus = raceData.stats[stat] || 0;
+                    const levelBonus = raceData.levelBonuses?.[stat] || 0;
                     const base = baseRanges[stat];
-                    return { stat, min: base.min + bonus, max: base.max + bonus, baseText: `${base.min}-${base.max}` };
+                    return { stat, min: base.min + bonus, max: base.max + bonus, levelBonus };
                 });
 
+                // Conditionally apply .tooltip class only if the race is unlocked
+                const tooltipClass = raceData.unlocked ? 'tooltip' : '';
+
                 content += `
-                    <div onclick="selectRace('${raceKey}')" class="race-option ${raceData.unlocked ? '' : 'locked'}">
+                    <div onclick="selectRace('${raceKey}')" class="race-option ${raceData.unlocked ? '' : 'locked'} ${tooltipClass}">
                         <h4>${raceKey.toUpperCase()}</h4>
                         <div class="stats">
-                            ${statRanges.map(({ stat, min, max, baseText }) => `
-                                <div class="stat tooltip">
-                                    ${stat}: ${min}-${max}
-                                    <span class="tooltiptext">
-                                        Base: ${baseText}<br>
-                                        ${raceData.stats[stat] ? `Race bonus: ${raceData.stats[stat]}` : 'No racial bonus'}
-                                    </span>
-                                </div>
-                            `).join('')}
+                            ${statRanges.map(({ stat, min, max, levelBonus }) => `
+                                ${stat}: ${min}-${max} (+${levelBonus}/lvl)
+                            `).join(' | ')}
                         </div>
                         ${!raceData.unlocked ? `
                             <div class="unlock-requirement">
-                                Unlock by killing ${required} ${zone?.name} enemies (${kills}/${required})
+                                ${required} ${zone?.name} kills (${kills}/${required})
                             </div>
+                        ` : ''}
+                        ${raceData.unlocked ? `
+                            <span class="tooltiptext">
+                                Starting ranges and per-level bonuses:<br>
+                                ${statRanges.map(({ stat, min, max, levelBonus }) => `
+                                    ${stat}: ${min}-${max} (Base: ${baseRanges[stat].min}-${baseRanges[stat].max}, Bonus: ${raceData.stats[stat] || 0}) +${levelBonus}/level
+                                `).join('<br>')}
+                            </span>
                         ` : ''}
                     </div>
                 `;
@@ -812,6 +982,7 @@
             content += '</div>';
             document.getElementById('raceOptions').innerHTML = content;
             modal.style.display = 'block';
+            adjustTooltipPosition(); // Ensure tooltips are positioned correctly after rendering
         }
 
         function selectRace(race) {
@@ -999,7 +1170,58 @@
                 saveGame();
             }, 5000);
         }
+function adjustTooltipPosition() {
+            document.querySelectorAll('.tooltip').forEach(tooltip => {
+                const tooltipText = tooltip.querySelector('.tooltiptext');
+                if (!tooltipText) return;
 
+                // Reset any inline styles from previous adjustments
+                tooltipText.style.top = '';
+                tooltipText.style.bottom = '';
+                tooltipText.style.left = '50%';
+                tooltipText.style.transform = 'translateX(-50%)';
+
+                // Get bounding rectangles
+                const tooltipRect = tooltipText.getBoundingClientRect();
+                const triggerRect = tooltip.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+
+                // Check if tooltip would be cut off above
+                if (triggerRect.top - tooltipRect.height < 0) {
+                    // Position below instead
+                    tooltipText.style.top = 'calc(100% + 5px)';
+                    tooltipText.style.bottom = 'auto';
+                } else if (triggerRect.bottom + tooltipRect.height > viewportHeight) {
+                    // Ensure it doesn't go below viewport bottom
+                    tooltipText.style.bottom = 'calc(100% + 5px)';
+                    tooltipText.style.top = 'auto';
+                }
+
+                // Adjust horizontal overflow
+                if (tooltipRect.left < 0) {
+                    tooltipText.style.left = '0';
+                    tooltipText.style.transform = 'translateX(0)';
+                } else if (tooltipRect.right > window.innerWidth) {
+                    tooltipText.style.left = 'auto';
+                    tooltipText.style.right = '0';
+                    tooltipText.style.transform = 'translateX(0)';
+                }
+            });
+        }
+
+        // Call on load and whenever display updates might affect positioning
+        window.onload = function() {
+            initGame().then(() => {
+                adjustTooltipPosition();
+            });
+        };
+
+        // Hook into updateDisplay to adjust tooltips after UI changes
+        const originalUpdateDisplay = updateDisplay;
+        updateDisplay = function() {
+            originalUpdateDisplay();
+            adjustTooltipPosition();
+        };
         window.onload = initGame;
     </script>
 </body>
