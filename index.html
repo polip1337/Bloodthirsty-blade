@@ -852,8 +852,9 @@ function updateCombatStats() {
 
             const wielder = game.wielder;
             const baseDamage = wielder.currentStats.strength * 2 + wielder.currentStats.swordfighting;
-            const siphonBonus = game.sword.upgrades.siphon.level;
-            const totalDamage = baseDamage + siphonBonus;
+            const controlDamageBonus = baseDamage * game.controlBonus;
+            const lifesteal = game.sword.upgrades.siphon.level;
+            const totalDamage = (baseDamage + lifesteal + controlDamageBonus) * getDamageMultiplier();
             game.controlBonus = game.sword.upgrades.control.level * 0.2 * (1 - Math.min(wielder.currentStats.willpower, 200) / 200);
             document.getElementById('wielderStats').innerHTML = `
                 <div class="stat">Name: <span id="wielderName">${wielder.name}</span></div>
@@ -1071,7 +1072,14 @@ function getUpgradeCostReduction() {
             `Lifesteal: +${lifestealHealing} HP | Enemy HP: ${enemyLife}`,
             'damage'
         );
+        const enemyDamage = Math.max(enemy.strength * 2 -
+         Math.floor(game.wielder.currentStats.swordfighting), 1);
+         game.wielder.currentLife -= enemyDamage;
 
+                 addCombatMessage(`Took ${enemyDamage} damage ` +
+                     `(Base: ${enemy.strength}, Defense: ` +
+                     `${Math.floor(game.wielder.currentStats.swordfighting )})` +
+                     `Player Hp left: ${game.wielder.currentLife}`, 'damage');
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
             if (isAnyModalOpen()) {
@@ -1180,6 +1188,7 @@ function updateUpgrades() {
             if (wielder.statPoints <= 0) document.getElementById('levelUpModal').style.display = 'none';
             updateStatPointsInfo();
             updateDisplay();
+            onModalClose('levelUpModal');
         }
 function applyHeavyWound() {
     const stats = ['strength', 'swordfighting', 'willpower'];
@@ -1379,18 +1388,7 @@ function onModalClose(modalId) {
             }
         }
 
-        // Wound System
-        function applyHeavyWound() {
-            const stats = ['strength', 'swordfighting', 'willpower'];
-            const affectedStat = stats[Math.floor(Math.random() * stats.length)];
-            game.wielder.wounds.push(affectedStat);
-            game.wielder.currentStats[affectedStat] = Math.max(
-                game.wielder.baseStats[affectedStat] - game.wielder.wounds.filter(w => w === affectedStat).length,
-                1
-            );
-            addCombatMessage(`Heavy wound inflicted! Permanent -1 to ${affectedStat}`, 'damage');
-            updateDisplay();
-        }
+
 
         // Footer Functions
         function showChangelog() {
