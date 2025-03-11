@@ -485,9 +485,14 @@ footer a {
 </div>
 <div id="wielderDeathModal" class="modal">
     <h3>Wielder Death</h3>
-    <p id="wielderDeathMessage">Your wielder has succumbed to their wounds after receiving their 3rd grievous wound.</p>
+    <p id="wielderDeathMessage"></p>
     <p>You must select a new wielder.</p>
     <button onclick="showRaceSelection()">Select New Wielder</button>
+</div>
+<div id="heavyWoundModal" class="modal">
+    <h3>Heavy Wound Inflicted</h3>
+    <p id="heavyWoundMessage"></p>
+    <button onclick="onModalClose('heavyWoundModal')">Close</button>
 </div>
 <!-- Game Sections -->
 <div id="gameLogo" class="game-section">
@@ -857,40 +862,44 @@ function updateCombatStats() {
             const totalDamage = (baseDamage + lifesteal + controlDamageBonus) * getDamageMultiplier();
             game.controlBonus = game.sword.upgrades.control.level * 0.2 * (1 - Math.min(wielder.currentStats.willpower, 200) / 200);
             document.getElementById('wielderStats').innerHTML = `
-                <div class="stat">Name: <span id="wielderName">${wielder.name}</span></div>
-                <div class="stat">Race: <span id="wielderRace">${wielder.race}</span></div>
-                <div class="stat tooltip">
-                    Strength: ${wielder.currentStats.strength}${wielder.baseStats.strength > wielder.currentStats.strength ? '⚠' : ''}
-                    <span class="tooltiptext">Increases damage dealt per strike (+2 Damage)${getWoundText('strength')}</span>
-                </div><br />
-                <div class="stat tooltip">
-                    Swordfighting: ${wielder.currentStats.swordfighting}${wielder.baseStats.swordfighting > wielder.currentStats.swordfighting ? '⚠' : ''}
-                    <span class="tooltiptext">Reduces incoming damage (+1 resistance) Increases damage (+1)${getWoundText('swordfighting')}</span>
-                </div><br />
-                <div class="stat tooltip">
-                    HP: ${Math.max(wielder.currentLife, 0)}/${wielder.currentStats.endurance*5}
-                    <span class="tooltiptext">Current/Maximum health (Regenerates 1 HP every 5s)</span>
-                </div><br />
-                <div class="stat tooltip">
-                    Willpower: ${wielder.currentStats.willpower}${wielder.baseStats.willpower > wielder.currentStats.willpower ? '⚠' : ''}
-                    <span class="tooltiptext">Increases exp gain, reduces control (up to 100% at 200)${getWoundText('willpower')}</span>
-                </div><br />
-                <div class="stat tooltip">
-                    EXP: ${Math.round(wielder.exp)}/${wielder.level * 100}
-                    <span class="tooltiptext">Gain a level every 100 exp points</span>
-                </div><br />
-                <div class="stat tooltip">
-                    Level: ${wielder.level}
-                </div><br />
-                <div class="stat tooltip">
-                    Predicted Damage: ${totalDamage.toFixed(1)}
-                    <span class="tooltiptext">
-                        Base: ${baseDamage} (Strength: ${wielder.currentStats.strength} × 2 + Swordfighting: ${wielder.currentStats.swordfighting})<br>
-                        Control Bonus: +${(baseDamage * game.controlBonus).toFixed(1)} (${(game.controlBonus * 100).toFixed(0)}%)<br>
-                        Lifesteal: +${game.sword.upgrades.siphon.level} damage & HP per hit
-                    </span>
-                </div>
-            `;
+    <div class="stat">Name: <span id="wielderName">${wielder.name}</span></div>
+    <div class="stat">Race: <span id="wielderRace">${wielder.race}</span></div>
+    <div class="stat tooltip">
+        Strength: ${wielder.currentStats.strength}${wielder.baseStats.strength > wielder.currentStats.strength ? '⚠' : ''}
+        <span class="tooltiptext">Increases damage dealt per strike (+2 Damage)${getWoundText('strength')}</span>
+    </div><br />
+    <div class="stat tooltip">
+        Swordfighting: ${wielder.currentStats.swordfighting}${wielder.baseStats.swordfighting > wielder.currentStats.swordfighting ? '⚠' : ''}
+        <span class="tooltiptext">Reduces incoming damage (+1 resistance) Increases damage (+1)${getWoundText('swordfighting')}</span>
+    </div><br />
+    <div class="stat tooltip">
+        Endurance: ${wielder.currentStats.endurance}
+        <span class="tooltiptext">Determines maximum health (HP = Endurance × 5)</span>
+    </div><br />
+    <div class="stat tooltip">
+        HP: ${Math.max(wielder.currentLife, 0)}/${wielder.currentStats.endurance*5}
+        <span class="tooltiptext">Current/Maximum health (Regenerates 1 HP every 5s)</span>
+    </div><br />
+    <div class="stat tooltip">
+        Willpower: ${wielder.currentStats.willpower}${wielder.baseStats.willpower > wielder.currentStats.willpower ? '⚠' : ''}
+        <span class="tooltiptext">Increases exp gain, reduces control (up to 100% at 200)${getWoundText('willpower')}</span>
+    </div><br />
+    <div class="stat tooltip">
+        EXP: ${Math.round(wielder.exp)}/${wielder.level * 100}
+        <span class="tooltiptext">Gain a level every 100 exp points</span>
+    </div><br />
+    <div class="stat tooltip">
+        Level: ${wielder.level}
+    </div><br />
+    <div class="stat tooltip">
+        Predicted Damage: ${totalDamage.toFixed(1)}
+        <span class="tooltiptext">
+            Base: ${baseDamage} (Strength: ${wielder.currentStats.strength} × 2 + Swordfighting: ${wielder.currentStats.swordfighting})<br>
+            Control Bonus: +${(baseDamage * game.controlBonus).toFixed(1)} (${(game.controlBonus * 100).toFixed(0)}%)<br>
+            Lifesteal: +${game.sword.upgrades.siphon.level} damage & HP per hit
+        </span>
+    </div>
+`;
             // Button state management
                 const healButton = document.getElementById('healButton');
                 const changeWielderButton = document.getElementById('changeWielderButton');
@@ -1153,14 +1162,17 @@ function updateUpgrades() {
         'storyModal',
         'changelogModal',
         'levelUpModal',
-        'wielderDeathModal'
+        'wielderDeathModal',
+        'heavyWoundModal
     ];
     return modals.some(id => document.getElementById(id).style.display === 'block');
 }
         function calculateStatPointsPerLevel() {
-            const controlLevel = game.sword.upgrades.control.level;
-            return 1 + controlLevel;
-        }
+    const race = game.wielder.race;
+    const basePoints = gameData.races[race].skillpoints ; // Default to 1 if not specified
+    const controlLevel = game.sword.upgrades.control.level;
+    return basePoints + controlLevel;
+}
         // Level Up
         function showLevelUpModal() {
             updateStatPointsInfo();
@@ -1202,18 +1214,23 @@ function applyHeavyWound() {
     let message = `Heavy wound inflicted! Permanent -1 to ${affectedStat}. This is the ${woundCount}${['st', 'nd', 'rd'][woundCount - 1] || 'th'} wound.`;
     if (woundCount < 3) {
         message += ` If they receive a 3rd wound, they will die.`;
+        addCombatMessage(message, 'damage');
+        document.getElementById('heavyWoundMessage').textContent = message;
+        document.getElementById('heavyWoundModal').style.display = 'block';
+    } else {
+        handleWielderDeath(affectedStat);
     }
-    addCombatMessage(message, 'damage');
     updateDisplay();
-    if (woundCount >= 3) {
-        handleWielderDeath();
-    }
 }
-function handleWielderDeath() {
+function handleWielderDeath(affectedStat) {
     game.wielder.defeated = true;
     game.currentAction = null; // Stop any ongoing actions
     game.sword.energy = 10; // Set energy to 10 as specified
-    addCombatMessage('Your wielder has died from their wounds.', 'damage');
+    const message = affectedStat
+        ? `Your wielder has succumbed to their wounds after receiving a heavy wound to ${affectedStat}.`
+        : 'Your wielder has died from their wounds.';
+    addCombatMessage(message, 'damage');
+    document.getElementById('wielderDeathMessage').textContent = message;
     document.getElementById('wielderDeathModal').style.display = 'block';
     updateDisplay();
 }
@@ -1314,12 +1331,16 @@ function onModalClose(modalId) {
             combatLog.scrollTop = combatLog.scrollHeight;
         }
         function updateStatPointsInfo() {
-            const controlLevel = game.sword.upgrades.control.level; // Assuming control upgrade is stored here
-            const controlBonus = controlLevel ; // +1 stat point per 5 control levels
-            const totalPoints = game.wielder.statPoints; // Current stat points to allocate
-            const info = `You have ${totalPoints} stat points to allocate. ` +
-                         `(Each level grants 1 base point)`;
-            document.getElementById('statPointsInfo').textContent = info;
+            function updateStatPointsInfo() {
+    const race = game.wielder.race;
+    const basePoints = gameData.races[race].skillpoints || 1;
+    const controlLevel = game.sword.upgrades.control.level;
+    const totalPointsPerLevel = basePoints + controlLevel;
+    const totalPoints = game.wielder.statPoints;
+    const info = `You have ${totalPoints} stat points to allocate. ` +
+                 `(Each level grants ${basePoints} base point${basePoints === 1 ? '' : 's'} + ${controlLevel} from control)`;
+    document.getElementById('statPointsInfo').textContent = info;
+}
         }
         // Upgrades and Story
         function buyUpgrade(upgradeName) {
