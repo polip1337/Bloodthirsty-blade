@@ -1027,7 +1027,7 @@ function getMaxEnergyMultiplier() {
 
 function calculateMaxEnergy() {
     let base = 100; // Base max energy
-    base *= Math.pow(2, game.sword.upgrades.capacity.level); // Apply capacity upgrade
+    base *= Math.pow(2, game.sword.upgrades.capacity.level-1); // Apply capacity upgrade
     base *= getMaxEnergyMultiplier(); // Apply achievement bonuses
     game.sword.maxEnergy = base;
 }
