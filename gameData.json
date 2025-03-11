@@ -107,47 +107,47 @@
     {
       "name": "Kaladian Plains",
       "enemies": [
-        { "name": "Wild Beast", "level": 1, "strength": 3, "defense": 0, "endurance": 2, "exp": 10 },
-        { "name": "Bandit", "level": 1, "strength": 3, "defense": 0, "endurance": 7, "exp": 15 },
-        { "name": "A Group of Bandits", "level": 2, "strength": 4, "defense": 1, "endurance": 14, "exp": 20 }
+        { "name": "Wild Beast", "level": 1, "strength": 3, "defense": 0, "endurance": 3, "exp": 10 },
+        { "name": "Bandit", "level": 1, "strength": 4, "defense": 0, "endurance": 8, "exp": 15 },
+        { "name": "A Group of Bandits", "level": 2, "strength": 5, "defense": 1, "endurance": 15, "exp": 20 }
       ],
       "unlocked": true
     },
     {
       "name": "Rocky Foothills",
       "enemies": [
-        { "name": "A Sneak Goblin", "level": 2, "strength": 4, "defense": 1, "endurance": 6, "exp": 20 },
-        { "name": "A Wild Beastman", "level": 2, "strength": 4, "defense": 1, "endurance": 10, "exp": 20 },
-        { "name": "A Goblin Hunting Party", "level": 3, "strength": 5, "defense": 2, "endurance": 14, "exp": 30 },
-        { "name": "A Pack of Beastmen", "level": 3, "strength": 5, "defense": 2, "endurance": 20, "exp": 30 }
+        { "name": "A Sneak Goblin", "level": 2, "strength": 5, "defense": 1, "endurance": 10, "exp": 20 },
+        { "name": "A Wild Beastman", "level": 2, "strength": 6, "defense": 1, "endurance": 15, "exp": 20 },
+        { "name": "A Goblin Hunting Party", "level": 3, "strength": 7, "defense": 2, "endurance": 20, "exp": 30 },
+        { "name": "A Pack of Beastmen", "level": 3, "strength": 8, "defense": 2, "endurance": 25, "exp": 30 }
       ],
       "unlocked": false
     },
     {
       "name": "Ancient Ruins",
       "enemies": [
-        { "name": "Ghost of the Past", "level": 3, "strength": 5, "defense": 2, "endurance": 8, "exp": 20 },
-        { "name": "Painful Memory", "level": 3, "strength": 5, "defense": 1, "endurance": 12, "exp": 20 },
-        { "name": "Corpse of a Former Wielder", "level": 4, "strength": 6, "defense": 3, "endurance": 16, "exp": 30 }
+        { "name": "Ghost of the Past", "level": 3, "strength": 6, "defense": 2, "endurance": 12, "exp": 25 },
+        { "name": "Painful Memory", "level": 3, "strength": 7, "defense": 1, "endurance": 18, "exp": 25 },
+        { "name": "Corpse of a Former Wielder", "level": 4, "strength": 9, "defense": 3, "endurance": 25, "exp": 35 }
       ],
       "unlocked": false
     },
     {
       "name": "The City of Kalraka",
       "enemies": [
-        { "name": "A fearful Guardsman", "level": 4, "strength": 5, "defense": 2, "endurance": 6, "exp": 20 },
-        { "name": "A Prepared Knight", "level": 4, "strength": 5, "defense": 3, "endurance": 10, "exp": 20 },
-        { "name": "A Pack of Goat Men", "level": 5, "strength": 6, "defense": 1, "endurance": 20, "exp": 30 }
+        { "name": "A fearful Guardsman", "level": 4, "strength": 7, "defense": 2, "endurance": 15, "exp": 30 },
+        { "name": "A Prepared Knight", "level": 4, "strength": 8, "defense": 3, "endurance": 20, "exp": 30 },
+        { "name": "A Pack of Goat Men", "level": 5, "strength": 10, "defense": 1, "endurance": 30, "exp": 40 }
       ],
       "unlocked": false
     },
     {
       "name": "High Mountains",
       "enemies": [
-        { "name": "A Minotaur", "level": 2, "strength": 6, "defense": 1, "endurance": 50, "exp": 20 },
-        { "name": "An Orc", "level": 2, "strength": 6, "defense": 1, "endurance": 50, "exp": 20 },
-        { "name": "An Orcish Hunting Party", "level": 3, "strength": 7, "defense": 2, "endurance": 80, "exp": 30 },
-        { "name": "A Young Dragon", "level": 3, "strength": 7, "defense": 2, "endurance": 150, "exp": 30 }
+        { "name": "A Minotaur", "level": 4, "strength": 10, "defense": 1, "endurance": 60, "exp": 50 },
+        { "name": "An Orc", "level": 4, "strength": 10, "defense": 1, "endurance": 60, "exp": 50 },
+        { "name": "An Orcish Hunting Party", "level": 5, "strength": 12, "defense": 2, "endurance": 100, "exp": 60 },
+        { "name": "A Young Dragon", "level": 6, "strength": 15, "defense": 2, "endurance": 200, "exp": 100 }
       ],
       "unlocked": false
     }
