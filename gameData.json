@@ -7,6 +7,20 @@
       "names": ["Aldric", "Elara", "Gareth", "Liora"],
       "unlockRequirement": null
     },
+    "goblin": {
+      "stats": { "strength": 2, "swordfighting": 1 },
+      "levelBonuses": { "strength": 1, "swordfighting": 1 },
+      "unlocked": true,
+      "names": ["Vragik", "Braz", "Groll", "Thrank"],
+      "unlockRequirement": null
+    },
+    "beastman": {
+      "stats": { "strength": 2, "life": 5 },
+      "levelBonuses": { "strength": 1, "swordfighting": 1 },
+      "unlocked": true,
+      "names": ["Kel-thok", "Gar-dem", "Krug-en", "Dank-eb"],
+      "unlockRequirement": null
+    },
     "elf": {
       "stats": { "swordfighting": 2, "willpower": 5 },
       "levelBonuses": { "swordfighting": 2, "willpower": 5 },
@@ -16,9 +30,16 @@
     },
     "dwarf": {
       "stats": { "strength": 2, "swordfighting": 1, "willpower": 5 },
-      "levelBonuses": { "strength": 2, "life": 5 },
+      "levelBonuses": { "strength": 23, "life": 7 },
       "unlocked": false,
       "names": ["Thrain", "Hilda", "Borin", "Freyja"],
+      "unlockRequirement": { "zone": 1, "kills": 15 }
+    },
+    "orc": {
+      "stats": { "strength": 3, "swordfighting": 1, "willpower": 5 },
+      "levelBonuses": { "strength": 3, "life": 5 },
+      "unlocked": false,
+      "names": ["Thur'rog the Red", "Black hand", "Mardok'kar'vel", "Thrug one Handed"],
       "unlockRequirement": { "zone": 1, "kills": 15 }
     }
   },
