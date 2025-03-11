@@ -598,6 +598,7 @@ footer a {
 <script>
     // Initialize variables
     const game = {
+            strory1Viewed:false,
             isFighting: false,
             autoBattle: false,
             currentEnemy: null,
@@ -1377,7 +1378,12 @@ function onModalClose(modalId) {
             return false;
         }
 
-        function showStory() {
+        function showStory(vieved) {
+            if (vieved) {
+                if(!game.story1Vieved) showStory();
+                game.story1Vieved = true;
+                return;
+            }
             const stories = Object.values(gameData.story).filter(story => story.unlocked);
             document.getElementById('storyContent').innerHTML = stories.length > 0
                 ? stories.map(story => `<div class="story-entry"><h4>${story.title}</h4><p>${story.entry.join('</p><p>')}</p></div>`).join('')
@@ -1387,11 +1393,13 @@ function onModalClose(modalId) {
 
         // Save System
         function saveGame() {
+        console.log('Saved game');
             const saveData = { game, wielder: game.wielder, timestamp: Date.now(), gameData };
             localStorage.setItem('cursedSwordSave', JSON.stringify(saveData));
         }
 
         function loadGame() {
+        console.log('Loading game');
             const saved = localStorage.getItem('cursedSwordSave');
             if (saved) {
                 const saveData = JSON.parse(saved);
@@ -1483,6 +1491,8 @@ function onModalClose(modalId) {
                 updateDisplay();
                 saveGame();
             }, 5000);
+            showStory(true);
+
         }
 function adjustTooltipPosition() {
             document.querySelectorAll('.tooltip').forEach(tooltip => {
@@ -1523,13 +1533,7 @@ function adjustTooltipPosition() {
             });
         }
 
-        // Call on load and whenever display updates might affect positioning
-        window.onload = function() {
-            initGame().then(() => {
-                adjustTooltipPosition();
-            });
-            showStory();
-        };
+
 
         // Hook into updateDisplay to adjust tooltips after UI changes
         const originalUpdateDisplay = updateDisplay;
