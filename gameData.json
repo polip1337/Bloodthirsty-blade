@@ -1,14 +1,7 @@
 {
   "races": {
-    "human": {
-      "stats": { "strength": 1, "swordfighting": 1 },
-      "levelBonuses": { "strength": 1, "swordfighting": 1 },
-      "unlocked": true,
-      "names": ["Aldric", "Elara", "Gareth", "Liora"],
-      "unlockRequirement": null
-    },
     "goblin": {
-      "stats": { "strength": 2, "swordfighting": 1 },
+      "stats": { "strength": 1, "swordfighting": 1 },
       "levelBonuses": { "strength": 1, "swordfighting": 1 },
       "unlocked": true,
       "names": ["Vragik", "Braz", "Groll", "Thrank"],
@@ -17,30 +10,37 @@
     "beastman": {
       "stats": { "strength": 2, "life": 5 },
       "levelBonuses": { "strength": 1, "swordfighting": 1 },
-      "unlocked": true,
+      "unlocked": false,
       "names": ["Kel-thok", "Gar-dem", "Krug-en", "Dank-eb"],
-      "unlockRequirement": null
+      "unlockRequirement": { "zone": 1, "kills": 10 }
+    },
+    "human": {
+      "stats": { "strength": 2, "swordfighting": 1 },
+      "levelBonuses": { "strength": 1, "swordfighting": 1 },
+      "unlocked": false,
+      "names": ["Aldric", "Elara", "Gareth", "Liora"],
+      "unlockRequirement": { "zone": 2, "kills": 15 }
     },
     "elf": {
       "stats": { "swordfighting": 2, "willpower": 5 },
       "levelBonuses": { "swordfighting": 2, "willpower": 5 },
       "unlocked": false,
       "names": ["Aelar", "Lyria", "Thalorin", "Faelwen"],
-      "unlockRequirement": { "zone": 0, "kills": 10 }
+      "unlockRequirement": { "zone": 3, "kills": 20 }
     },
     "dwarf": {
       "stats": { "strength": 2, "swordfighting": 1, "willpower": 5 },
-      "levelBonuses": { "strength": 23, "life": 7 },
+      "levelBonuses": { "strength": 3, "life": 5 },
       "unlocked": false,
       "names": ["Thrain", "Hilda", "Borin", "Freyja"],
-      "unlockRequirement": { "zone": 1, "kills": 15 }
+      "unlockRequirement": { "zone": 4, "kills": 20 }
     },
     "orc": {
       "stats": { "strength": 3, "swordfighting": 1, "willpower": 5 },
-      "levelBonuses": { "strength": 3, "life": 5 },
+      "levelBonuses": { "strength": 3, "life": 7 },
       "unlocked": false,
       "names": ["Thur'rog the Red", "Black hand", "Mardok'kar'vel", "Thrug one Handed"],
-      "unlockRequirement": { "zone": 1, "kills": 15 }
+      "unlockRequirement": { "zone": 5, "kills": 20 }
     }
   },
   "upgradeCaps": {
