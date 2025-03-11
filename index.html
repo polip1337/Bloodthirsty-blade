@@ -1396,7 +1396,7 @@ function onModalClose(modalId) {
             const saved = localStorage.getItem('cursedSwordSave');
             if (saved) {
                 const saveData = JSON.parse(saved);
-                const { excludedField, ...gameDataToAssign } = saveData.game;
+                const { achievements, ...gameDataToAssign } = saveData.game;
                 Object.assign(game, gameDataToAssign);
                 game.wielder = saveData.wielder;
                 gameData = saveData.gameData;
