@@ -432,39 +432,34 @@ footer a {
 <div id="raceSelectionModal" class="modal">
     <h3>Choose Your Wielder's Race</h3>
     <div id="raceOptions"></div>
-    <button onclick="this.parentElement.style.display='none'">Close</button>
+    <button onclick="onModalClose('raceSelectionModal')">Close</button>
 </div>
-
 <div id="unlocksModal" class="modal">
     <h3>Next Unlocks</h3>
     <div id="unlockList"></div>
-    <button onclick="this.parentElement.style.display='none'">Close</button>
+    <button onclick="onModalClose('unlocksModal')">Close</button>
 </div>
-
 <div id="statsModal" class="modal">
     <h3>Game Statistics</h3>
     <div id="statisticsContent"></div>
-    <button onclick="this.parentElement.style.display='none'">Close</button>
+    <button onclick="onModalClose('statsModal')">Close</button>
 </div>
-
 <div id="optionsModal" class="modal">
     <h3>Game Options</h3>
     <textarea id="saveData" rows="5"></textarea>
     <button onclick="exportSave()">Export Save</button>
     <button onclick="importSave()">Import Save</button>
-    <button onclick="this.parentElement.style.display='none'">Close</button>
+    <button onclick="onModalClose('optionsModal')">Close</button>
 </div>
-
 <div id="storyModal" class="modal">
     <h3>Sword's Legacy</h3>
     <div id="storyContent"></div>
-    <button onclick="this.parentElement.style.display='none'">Close</button>
+    <button onclick="onModalClose('storyModal')">Close</button>
 </div>
-
 <div id="changelogModal" class="modal">
     <h3>Changelog</h3>
     <div id="changelogContent"></div>
-    <button onclick="this.parentElement.style.display='none'">Close</button>
+    <button onclick="onModalClose('changelogModal')">Close</button>
 </div>
 
 <div id="levelUpModal" class="modal">
@@ -479,8 +474,8 @@ footer a {
         [+] Swordfighting
         <span class="tooltiptext">Enhance defensive capabilities</span>
     </div>
-    <div class="stat-choice tooltip" onclick="allocatePoint('life')">
-        [+] Life
+    <div class="stat-choice tooltip" onclick="allocatePoint('endurance')">
+        [+] Endurance
         <span class="tooltiptext">Increase maximum health</span>
     </div>
     <div class="stat-choice tooltip" onclick="allocatePoint('willpower')">
@@ -488,7 +483,12 @@ footer a {
         <span class="tooltiptext">Resist sword's control but gain better bonuses</span>
     </div>
 </div>
-
+<div id="wielderDeathModal" class="modal">
+    <h3>Wielder Death</h3>
+    <p id="wielderDeathMessage">Your wielder has succumbed to their wounds after receiving their 3rd grievous wound.</p>
+    <p>You must select a new wielder.</p>
+    <button onclick="showRaceSelection()">Select New Wielder</button>
+</div>
 <!-- Game Sections -->
 <div id="gameLogo" class="game-section">
     <img src="BSBTitles6.webp" class="logo-img" alt="Cursed Sword Legacy">
@@ -534,23 +534,22 @@ footer a {
 <div id="actionsSection" class="game-section">
     <h2>🎮 Actions</h2>
     <div class="action-buttons">
-            <span class="tooltip">
-                <button id="restButton" onclick="onActionButtonClick('resting')">Rest</button>
-                <span class="tooltiptext">Recover health faster (disables other actions)</span>
-            </span>
         <span class="tooltip">
-                <button id="trainButton" onclick="onActionButtonClick('training')">Train</button>
-                <span class="tooltiptext">Gain 2 EXP/second (disables other actions)</span>
-            </span>
+            <button id="restButton" onclick="onActionButtonClick('resting')">Rest</button>
+            <span class="tooltiptext">Recover health faster (disables other actions)</span>
+        </span>
         <span class="tooltip">
-                <button onclick="healWielder()">Heal wielder (10 energy)</button>
-                <span class="tooltiptext">Restore 25% health for 10 energy</span>
-            </span><br>
+            <button id="trainButton" onclick="onActionButtonClick('training')">Train</button>
+            <span class="tooltiptext">Gain 2 EXP/second (disables other actions)</span>
+        </span>
         <span class="tooltip">
-                <button onclick="showRaceSelection()">Change Wielder (Cost: 10 energy)</button>
-                <span class="tooltiptext">Lose your current wielder permanently. Pick the race of a new one.</span>
-            </span>
-
+            <button id="healButton" onclick="healWielder()">Heal wielder (10 energy)</button>
+            <span class="tooltiptext">Restore 25% health for 10 energy</span>
+        </span><br>
+        <span class="tooltip">
+            <button id="changeWielderButton" onclick="showRaceSelection()">Change Wielder (Cost: 10 energy)</button>
+            <span class="tooltiptext">Lose your current wielder permanently. Pick the race of a new one.</span>
+        </span>
     </div>
 </div>
 
@@ -759,7 +758,7 @@ function getBonusDescription(bonus) {
             const baseStats = {
                 strength: Math.floor(Math.random() * 6 + 1) + (raceData.stats.strength || 0) + startingBonus,
                 swordfighting: Math.floor(Math.random() * 6 + 1) + (raceData.stats.swordfighting || 0) + startingBonus,
-                life: Math.floor(Math.random() * 11 + 10) + (raceData.stats.life || 0) + startingBonus,
+                endurance: Math.floor(Math.random() * 2 + 1) + (raceData.stats.endurance || 0) + startingBonus,
                 willpower: Math.floor(Math.random() * 50 + 50) + (raceData.stats.willpower || 0) + startingBonus
             };
             return {
@@ -771,7 +770,7 @@ function getBonusDescription(bonus) {
                 level: 1,
                 statPoints: 0,
                 exp: 0,
-                currentLife: baseStats.life,
+                currentLife: baseStats.endurance * 5,
                 resting: false,
                 training: false,
                 defeated: false
@@ -807,11 +806,11 @@ function getBonusDescription(bonus) {
 }
 
         function healWielder() {
-            if (game.sword.energy >= 10 && game.wielder.currentLife < game.wielder.currentStats.life) {
+            if (game.sword.energy >= 10 && game.wielder.currentLife < game.wielder.currentStats.endurance*5) {
                 game.sword.energy -= 10;
                 game.wielder.currentLife = Math.min(
-                    game.wielder.currentLife + Math.floor(game.wielder.currentStats.life * 0.25),
-                    game.wielder.currentStats.life
+                    game.wielder.currentLife + Math.floor(game.wielder.currentStats.endurance * 1.25),
+                    game.wielder.currentStats.endurance*5
                 );
                 updateDisplay();
             }
@@ -829,7 +828,7 @@ function updateCombatStats() {
     const hpElement = document.querySelector('#wielderStats .stat:nth-child(5)'); // Assuming HP is 5th stat
     if (hpElement) {
         hpElement.innerHTML = `
-            HP: ${Math.max(wielder.currentLife, 0)}/${wielder.currentStats.life}
+            HP: ${Math.max(wielder.currentLife, 0)}/${wielder.currentStats.endurance*5}
             <span class="tooltiptext">Current/Maximum health (Regenerates 1 HP every 5s)</span>
         `;
     }
@@ -868,7 +867,7 @@ function updateCombatStats() {
                     <span class="tooltiptext">Reduces incoming damage (+1 resistance) Increases damage (+1)${getWoundText('swordfighting')}</span>
                 </div><br />
                 <div class="stat tooltip">
-                    HP: ${Math.max(wielder.currentLife, 0)}/${wielder.currentStats.life}
+                    HP: ${Math.max(wielder.currentLife, 0)}/${wielder.currentStats.endurance*5}
                     <span class="tooltiptext">Current/Maximum health (Regenerates 1 HP every 5s)</span>
                 </div><br />
                 <div class="stat tooltip">
@@ -891,7 +890,24 @@ function updateCombatStats() {
                     </span>
                 </div>
             `;
+            // Button state management
+                const healButton = document.getElementById('healButton');
+                const changeWielderButton = document.getElementById('changeWielderButton');
+                const restButton = document.getElementById('restButton');
+                const trainButton = document.getElementById('trainButton');
 
+                if (game.wielder.defeated) {
+                    // This block will be updated in Step 2
+                    restButton.disabled = true;
+                    trainButton.disabled = true;
+                    healButton.disabled = true;
+                    changeWielderButton.disabled = false;
+                } else {
+                    restButton.disabled = false;
+                    trainButton.disabled = false;
+                    healButton.disabled = game.sword.energy < 10 || game.wielder.currentLife >= game.wielder.currentStats.endurance*5;
+                    changeWielderButton.disabled = game.sword.energy < 10;
+                }
             document.getElementById('energy').textContent = Math.floor(game.sword.energy);
             document.getElementById('maxEnergy').textContent = game.sword.maxEnergy;
             document.getElementById('totalKills').textContent = game.statistics.totalKills;
@@ -917,7 +933,7 @@ function updateCombatStats() {
                             <button class="explore-btn" onclick="exploreZone(${zi})">Explore</button>
                             <span class="tooltiptext">
                                 Possible enemies:<br>
-                                ${zone.enemies.map(e => `${e.name} (Lv. ${e.level}, ${e.life} HP)`).join('<br>')}
+                                ${zone.enemies.map(e => `${e.name} (Lv. ${e.level}, ${e.endurance*5} HP)`).join('<br>')}
                             </span>
                         </span>
             <span class="autofight">
@@ -935,7 +951,12 @@ function updateCombatStats() {
             document.querySelectorAll('#enemies button').forEach(btn => {
                 btn.disabled = actionInProgress || game.wielder.defeated;
             });
-
+            gameData.zones.forEach((_, zi) => {
+                const checkbox = document.getElementById(`auto-${zi}`);
+                if (checkbox) {
+                    checkbox.disabled = game.sword.upgrades.connection.level < zi + 1 || game.wielder.defeated || (game.currentAction && game.currentAction !== 'autoFighting');
+                }
+            });
 
         }
 // Explore Zone Logic
@@ -1016,7 +1037,7 @@ function getUpgradeCostReduction() {
             game.isFighting = true;
             game.currentEnemy = { zoneIndex, enemyIndex };
             const enemy = gameData.zones[zoneIndex].enemies[enemyIndex];
-            let enemyLife = enemy.life;
+            let enemyLife = enemy.endurance*5;
 
             if (wielder.currentLife <= 0) {
                 addCombatMessage('Wielder is too injured to fight!', 'damage');
@@ -1034,14 +1055,14 @@ function getUpgradeCostReduction() {
     const lifesteal = game.sword.upgrades.siphon.level; // 1 lifesteal per level
     const damageMultiplier = getDamageMultiplier();
     const totalDamage = (baseDamage + lifesteal + controlDamageBonus) * damageMultiplier;
-    addCombatMessage(`Engaging ${enemy.name} (${enemy.life} HP)`, 'player-stat');
+    addCombatMessage(`Engaging ${enemy.name} (${enemy.endurance*5} HP)`, 'player-stat');
 
     while (enemyLife > 0 && wielder.currentLife > 0 && !isAnyModalOpen()) {
         const damageDealt = Math.min(totalDamage, enemyLife);
         const lifestealHealing = Math.min(lifesteal, enemyLife); // Can't heal more than damage dealt
         enemyLife -= damageDealt;
         wielder.currentLife = Math.min(
-            wielder.currentStats.life,
+            wielder.currentStats.endurance*5,
             wielder.currentLife + lifestealHealing
         );
 
@@ -1060,7 +1081,7 @@ function getUpgradeCostReduction() {
     }
 
             if (enemyLife <= 0) {
-                const energyGain = enemy.life * (1 + game.sword.upgrades.siphon.level * 0.1);
+                const energyGain = enemy.endurance*5 * (1 + game.sword.upgrades.siphon.level * 0.1);
                 game.sword.energy = Math.min(game.sword.energy + energyGain, game.sword.maxEnergy);
                 addCombatMessage(`${enemy.name} defeated! +${energyGain.toFixed(1)} energy`, 'enemy-defeated');
 
@@ -1123,7 +1144,8 @@ function updateUpgrades() {
         'optionsModal',
         'storyModal',
         'changelogModal',
-        'levelUpModal'
+        'levelUpModal',
+        'wielderDeathModal'
     ];
     return modals.some(id => document.getElementById(id).style.display === 'block');
 }
@@ -1141,7 +1163,7 @@ function updateUpgrades() {
             const levelBonuses = gameData.races[race].levelBonuses || {};
             for (const [stat, bonus] of Object.entries(levelBonuses)) {
                 game.wielder.currentStats[stat] += bonus;
-                if (stat === 'life') {
+                if (stat === 'enduranec') {
                     game.wielder.currentLife += bonus; // Increase current HP when max HP increases
                 }
             }
@@ -1150,8 +1172,8 @@ function updateUpgrades() {
             const wielder = game.wielder;
             wielder.currentStats[stat]++;
             wielder.statPoints--;
-            if (stat === 'life') {
-                wielder.currentStats.life += 4;
+            if (stat === 'endurance') {
+                wielder.currentStats.endurance += 1;
                 wielder.currentLife += 5;
             }
 
@@ -1160,7 +1182,33 @@ function updateUpgrades() {
             updateStatPointsInfo();
             updateDisplay();
         }
-
+function applyHeavyWound() {
+    const stats = ['strength', 'swordfighting', 'willpower'];
+    const affectedStat = stats[Math.floor(Math.random() * stats.length)];
+    game.wielder.wounds.push(affectedStat);
+    const woundCount = game.wielder.wounds.length;
+    game.wielder.currentStats[affectedStat] = Math.max(
+        game.wielder.baseStats[affectedStat] - game.wielder.wounds.filter(w => w === affectedStat).length,
+        1
+    );
+    let message = `Heavy wound inflicted! Permanent -1 to ${affectedStat}. This is the ${woundCount}${['st', 'nd', 'rd'][woundCount - 1] || 'th'} wound.`;
+    if (woundCount < 3) {
+        message += ` If they receive a 3rd wound, they will die.`;
+    }
+    addCombatMessage(message, 'damage');
+    updateDisplay();
+    if (woundCount >= 3) {
+        handleWielderDeath();
+    }
+}
+function handleWielderDeath() {
+    game.wielder.defeated = true;
+    game.currentAction = null; // Stop any ongoing actions
+    game.sword.energy = 10; // Set energy to 10 as specified
+    addCombatMessage('Your wielder has died from their wounds.', 'damage');
+    document.getElementById('wielderDeathModal').style.display = 'block';
+    updateDisplay();
+}
         // UI Functions
         function showRaceSelection() {
             const modal = document.getElementById('raceSelectionModal');
@@ -1179,10 +1227,10 @@ function updateUpgrades() {
                 const baseRanges = {
                     strength: { min: 1, max: 6 },
                     swordfighting: { min: 1, max: 6 },
-                    life: { min: 10, max: 20 },
+                    endurance: { min: 10, max: 15 },
                     willpower: { min: 75, max: 125 }
                 };
-                const statRanges = ['strength', 'swordfighting', 'life', 'willpower'].map(stat => {
+                const statRanges = ['strength', 'swordfighting', 'endurance', 'willpower'].map(stat => {
                     const bonus = raceData.stats[stat] || 0;
                     const levelBonus = raceData.levelBonuses?.[stat] || 0;
                     const base = baseRanges[stat];
@@ -1221,12 +1269,19 @@ function updateUpgrades() {
             modal.style.display = 'block';
             adjustTooltipPosition(); // Ensure tooltips are positioned correctly after rendering
         }
-
+function onModalClose(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+    if (game.currentAction === 'autoFighting' && !game.isFighting && !isAnyModalOpen()) {
+        startAutoBattle();
+    }
+    updateDisplay();
+}
         function selectRace(race) {
             if (game.sword.energy >= 10 && gameData.races[race].unlocked) {
                 game.sword.energy -= 10;
                 game.wielder = generateWielder(race);
                 document.getElementById('raceSelectionModal').style.display = 'none';
+                document.getElementById('wielderDeathModal').style.display = 'none';
                 updateDisplay();
             }
         }
@@ -1255,7 +1310,7 @@ function updateUpgrades() {
             const controlBonus = controlLevel ; // +1 stat point per 5 control levels
             const totalPoints = game.wielder.statPoints; // Current stat points to allocate
             const info = `You have ${totalPoints} stat points to allocate. ` +
-                         `(Each level grants 1 base point + ${controlBonus} from control bonus)`;
+                         `(Each level grants 1 base point)`;
             document.getElementById('statPointsInfo').textContent = info;
         }
         // Upgrades and Story
@@ -1391,11 +1446,11 @@ function updateUpgrades() {
             updateDisplay();
 
             setInterval(() => {
-                if (game.wielder.currentLife < game.wielder.currentStats.life) {
+                if (game.wielder.currentLife < game.wielder.currentStats.endurance*5) {
                     const regenRate = game.currentAction === 'resting' ? 5 : 1;
                     game.wielder.currentLife = Math.min(
                         game.wielder.currentLife + regenRate,
-                        game.wielder.currentStats.life
+                        game.wielder.currentStats.endurance*5
                     );
                 }
                 if (game.currentAction === 'training') {

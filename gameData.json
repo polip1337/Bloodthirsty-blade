@@ -1,15 +1,17 @@
 {
   "races": {
     "goblin": {
-      "stats": { "strength": 1, "swordfighting": 1 },
-      "levelBonuses": { "strength": 1, "swordfighting": 1 },
+      "stats": { },
+      "levelBonuses": { },
       "unlocked": true,
+      "skillpoints": 1,
       "names": ["Vragik", "Braz", "Groll", "Thrank"],
       "unlockRequirement": null
     },
     "beastman": {
-      "stats": { "strength": 2, "life": 5 },
-      "levelBonuses": { "strength": 1, "swordfighting": 1 },
+      "stats": { "strength": 2, "endurance": 1 },
+      "levelBonuses": { "strength": 1},
+      "skillpoints": 1,
       "unlocked": false,
       "names": ["Kel-thok", "Gar-dem", "Krug-en", "Dank-eb"],
       "unlockRequirement": { "zone": 1, "kills": 10 }
@@ -17,6 +19,7 @@
     "human": {
       "stats": { "strength": 2, "swordfighting": 1 },
       "levelBonuses": { "strength": 1, "swordfighting": 1 },
+      "skillpoints": 2,
       "unlocked": false,
       "names": ["Aldric", "Elara", "Gareth", "Liora"],
       "unlockRequirement": { "zone": 2, "kills": 15 }
@@ -24,20 +27,23 @@
     "elf": {
       "stats": { "swordfighting": 2, "willpower": 5 },
       "levelBonuses": { "swordfighting": 2, "willpower": 5 },
+      "skillpoints": 3,
       "unlocked": false,
       "names": ["Aelar", "Lyria", "Thalorin", "Faelwen"],
       "unlockRequirement": { "zone": 3, "kills": 20 }
     },
     "dwarf": {
       "stats": { "strength": 2, "swordfighting": 1, "willpower": 5 },
-      "levelBonuses": { "strength": 3, "life": 5 },
+      "skillpoints": 2,
+      "levelBonuses": { "strength": 1, "endurance": 2 },
       "unlocked": false,
       "names": ["Thrain", "Hilda", "Borin", "Freyja"],
       "unlockRequirement": { "zone": 4, "kills": 20 }
     },
     "orc": {
       "stats": { "strength": 3, "swordfighting": 1, "willpower": 5 },
-      "levelBonuses": { "strength": 3, "life": 7 },
+      "skillpoints": 1,
+      "levelBonuses": { "strength": 3, "endurance": 2 },
       "unlocked": false,
       "names": ["Thur'rog the Red", "Black hand", "Mardok'kar'vel", "Thrug one Handed"],
       "unlockRequirement": { "zone": 5, "kills": 20 }
