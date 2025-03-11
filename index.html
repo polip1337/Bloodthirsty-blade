@@ -552,7 +552,7 @@ footer a {
             <span class="tooltiptext">Restore 25% health for 10 energy</span>
         </span><br>
         <span class="tooltip">
-            <button id="changeWielderButton" onclick="showRaceSelection()">Change Wielder (Cost: 10 energy)</button>
+            <button id="changeWielderButton" onclick="showRaceSelection()">Change Wielder </button>
             <span class="tooltiptext">Lose your current wielder permanently. Pick the race of a new one.</span>
         </span>
     </div>
@@ -916,7 +916,7 @@ function updateCombatStats() {
                     restButton.disabled = false;
                     trainButton.disabled = false;
                     healButton.disabled = game.sword.energy < 10 || game.wielder.currentLife >= game.wielder.currentStats.endurance*5;
-                    changeWielderButton.disabled = game.sword.energy < 10;
+                    changeWielderButton.disabled = false;
                 }
             document.getElementById('energy').textContent = Math.floor(game.sword.energy);
             document.getElementById('maxEnergy').textContent = game.sword.maxEnergy;
@@ -1086,7 +1086,7 @@ function getUpgradeCostReduction() {
          game.wielder.currentLife -= enemyDamage;
 
                  addCombatMessage(`Took ${enemyDamage} damage ` +
-                     `(Base: ${enemy.strength}, Defense: ` +
+                     `(Base: ${enemy.strength*2}, Defense: ` +
                      `${Math.floor(game.wielder.currentStats.swordfighting )})` +
                      `Player Hp left: ${game.wielder.currentLife}`, 'damage');
                 await new Promise(resolve => setTimeout(resolve, 500));
@@ -1096,7 +1096,15 @@ function getUpgradeCostReduction() {
         game.isFighting = false; // Reset fighting state
         return;
     }
+            if (wielder.currentLife <= 0) {
+                addCombatMessage('Lost the fight! Disengaging. Rest or heal.', 'damage');
 
+                if (game.currentAction === 'autoFighting') onActionButtonClick('autoFighting');
+                applyHeavyWound();
+                game.isFighting = false;
+                updateDisplay();
+                return;
+            }
             if (enemyLife <= 0) {
                 const energyGain = enemy.endurance*5 * (1 + game.sword.upgrades.siphon.level * 0.1);
                 game.sword.energy = Math.min(game.sword.energy + energyGain, game.sword.maxEnergy);
@@ -1119,12 +1127,7 @@ function getUpgradeCostReduction() {
                 if (game.currentAction === 'autoFighting') startAutoBattle();
             }
 
-            if (wielder.currentLife <= 0) {
-                addCombatMessage('Lost the fight! Disengaging. Rest or heal.', 'damage');
-                applyHeavyWound();
-                if (game.currentAction === 'autoFighting') onActionButtonClick('autoFighting');
-                game.isFighting = false;
-            }
+
             updateDisplay();
         }
         function getUpgradeCostReduction() {
@@ -1170,8 +1173,7 @@ function updateUpgrades() {
         function calculateStatPointsPerLevel() {
     const race = game.wielder.race;
     const basePoints = gameData.races[race].skillpoints ; // Default to 1 if not specified
-    const controlLevel = game.sword.upgrades.control.level;
-    return basePoints + controlLevel;
+    return basePoints;
 }
         // Level Up
         function showLevelUpModal() {
@@ -1189,18 +1191,16 @@ function updateUpgrades() {
             }
         }
         function allocatePoint(stat) {
-            const wielder = game.wielder;
-            wielder.currentStats[stat]++;
-            wielder.statPoints--;
+            game.wielder.currentStats[stat]++;
+            game.wielder.statPoints--;
             if (stat === 'endurance') {
-                wielder.currentLife += 5;
+                game.wielder.currentLife += 5;
             }
 
-            if (stat === 'willpower') wielder.currentStats.willpower += 4;
-            if (wielder.statPoints <= 0) document.getElementById('levelUpModal').style.display = 'none';
+            if (stat === 'willpower') game.wielder.currentStats.willpower += 4;
+            if (game.wielder.statPoints <= 0) onModalClose('levelUpModal');
             updateStatPointsInfo();
             updateDisplay();
-            onModalClose('levelUpModal');
         }
 function applyHeavyWound() {
     const stats = ['strength', 'swordfighting', 'willpower'];
@@ -1225,7 +1225,7 @@ function applyHeavyWound() {
 function handleWielderDeath(affectedStat) {
     game.wielder.defeated = true;
     game.currentAction = null; // Stop any ongoing actions
-    game.sword.energy = 10; // Set energy to 10 as specified
+    game.sword.energy = 0;
     const message = affectedStat
         ? `Your wielder has succumbed to their wounds after receiving a heavy wound to ${affectedStat}.`
         : 'Your wielder has died from their wounds.';
@@ -1304,11 +1304,9 @@ function onModalClose(modalId) {
     updateDisplay();
 }
         function selectRace(race) {
-            if (game.sword.energy >= 10 && gameData.races[race].unlocked) {
-                game.sword.energy -= 10;
+            if ( races[race].unlocked) {
                 game.wielder = generateWielder(race);
                 document.getElementById('raceSelectionModal').style.display = 'none';
-                document.getElementById('wielderDeathModal').style.display = 'none';
                 updateDisplay();
             }
         }
@@ -1333,17 +1331,16 @@ function onModalClose(modalId) {
             combatLog.scrollTop = combatLog.scrollHeight;
         }
         function updateStatPointsInfo() {
-            function updateStatPointsInfo() {
+
     const race = game.wielder.race;
     const basePoints = gameData.races[race].skillpoints || 1;
-    const controlLevel = game.sword.upgrades.control.level;
-    const totalPointsPerLevel = basePoints + controlLevel;
+
     const totalPoints = game.wielder.statPoints;
     const info = `You have ${totalPoints} stat points to allocate. ` +
-                 `(Each level grants ${basePoints} base point${basePoints === 1 ? '' : 's'} + ${controlLevel} from control)`;
+                 `(Each level grants ${basePoints} point.)`;
     document.getElementById('statPointsInfo').textContent = info;
 }
-        }
+
         // Upgrades and Story
         function buyUpgrade(upgradeName) {
             const cap = gameData.upgradeCaps[upgradeName];

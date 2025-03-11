@@ -107,9 +107,9 @@
     {
       "name": "Kaladian Plains",
       "enemies": [
-        { "name": "Wild Beast", "level": 1, "strength": 3, "defense": 0, "endurance": 3, "exp": 10 },
-        { "name": "Bandit", "level": 1, "strength": 4, "defense": 0, "endurance": 8, "exp": 15 },
-        { "name": "A Group of Bandits", "level": 2, "strength": 5, "defense": 1, "endurance": 15, "exp": 20 }
+        { "name": "Wild Beast", "level": 1, "strength": 2, "defense": 0, "endurance": 3, "exp": 10 },
+        { "name": "Bandit", "level": 1, "strength": 3, "defense": 0, "endurance": 8, "exp": 15 },
+        { "name": "A Group of Bandits", "level": 2, "strength": 4, "defense": 1, "endurance": 15, "exp": 20 }
       ],
       "unlocked": true
     },
