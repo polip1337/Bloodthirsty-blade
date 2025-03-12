@@ -1,0 +1,483 @@
+
+       :root {
+    --logo-row-height: auto;
+    --combat-row-height: 25%;
+}
+
+/* Grid Layout */
+body {
+    display: grid;
+    grid-template:
+        "logo    wielder  zones"    var(--logo-row-height)
+        "sword   wielder  zones"    0.8fr
+        "sword   wielder  zones"    0.7fr
+        "actions  combat   combat"   var(--combat-row-height)
+        / 33%    33%      auto;
+    height: 100vh;
+    margin: 0;
+    padding: 20px;
+    gap: 15px;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+}
+
+/* General Styling */
+.game-section {
+    background-color: #2d2d2d;
+    padding: 15px;
+    border-radius: 8px;
+    overflow: auto;
+}
+
+.game-section, .modal {
+    overflow: visible; /* Prevent clipping of tooltips */
+}
+
+button {
+    background-color: #4a0000;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+}
+
+/* Grid Sections */
+#gameLogo {
+    grid-area: logo;
+    text-align: center;
+}
+
+#swordSection {
+    grid-area: sword;
+}
+
+#wielderSection {
+    grid-area: wielder;
+    display: flex;
+    gap: 20px;
+}
+
+#zonesSection {
+    grid-area: zones;
+}
+
+#actionsSection {
+    grid-area: actions;
+}
+
+#combatLog {
+    grid-area: combat;
+        overflow-y: auto;
+
+}
+#combat-log {
+}
+#upgrades {
+    overflow-y: auto;
+}
+/* Specific Components */
+.logo-img {
+    height: 80px;
+    margin-bottom: 10px;
+}
+
+.stat {
+    margin: 5px 0;
+}
+
+.upgrade {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    width: 330px;
+    background-color: #3d3d3d;
+    padding: 6px;
+    margin: 5px 0;
+    border-radius: 4px;
+}
+
+.upgrade button {
+    order: 2;
+    min-width: 120px;
+}
+
+.zone {
+    background-color: #3d3d3d;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.zone h4 {
+    margin: 0 0 10px 0;
+    color: #ff6666;
+}
+
+.zone button:hover {
+    background-color: #5a0000;
+}
+
+.combat-log {
+    font-family: "Courier New", monospace;
+    font-size: 0.9em;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.log-entry {
+    margin: 3px 0;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.damage {
+    background-color: #4a000055;
+    color: #ff6666;
+}
+
+.player-stat {
+    background-color: #004a0055;
+    color: #66ff66;
+}
+
+.enemy-defeated {
+    background-color: #4a4a0055;
+    color: #ffff66;
+}
+
+/* Modals */
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #3d3d3d;
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.stat-choice {
+    margin: 10px;
+    padding: 10px;
+    background: #4a0000;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stat-choice:hover {
+    background: #5a0000;
+}
+
+/* Tooltips */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    max-width: 300px;
+    background-color: #2d2d2d;
+    color: #fff;
+    text-align: left;
+    border-radius: 4px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 1002;
+    border: 1px solid #ff6666;
+    box-shadow: 0 0 5px rgba(255, 102, 102, 0.3);
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: normal;
+    pointer-events: none;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+footer .tooltip .tooltiptext {
+    top: auto;
+    bottom: calc(100% + 5px);
+    transform: translateX(-50%);
+}
+
+/* Footer */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background: #2d2d2d;
+    text-align: center;
+}
+
+footer a {
+    color: white;
+    font-size: 24px;
+    margin: 0 15px;
+    text-decoration: none;
+}
+
+/* Race Selection */
+.race-list {
+    display: grid;
+    gap: 15px;
+}
+
+.race-option {
+    border: 1px solid #444;
+    padding: 8px;
+    margin: 5px 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.locked {
+    opacity: 0.6;
+    filter: grayscale(0.8);
+}
+
+.unlock-requirement {
+    font-size: 0.9em;
+    color: #ff6666;
+    margin-top: 8px;
+}
+
+.stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 5px 0;
+}
+
+.race-option .stat {
+    background: #3d3d3d;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid #4a0000;
+}
+
+/* Action Buttons */
+.active-action {
+    border: 2px solid #00ff00;
+    box-shadow: 0 0 10px #00ff00;
+}
+
+/* Story Modal */
+.story-entry {
+    border-left: 3px solid #4a0000;
+    padding-left: 10px;
+    margin: 10px 0;
+}
+
+.race-option .stats {
+    flex-grow: 1;
+    margin-left: 10px;
+}
+
+.autofight {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.autofight input[type="checkbox"] {
+    display: none;
+}
+
+.autofight label {
+    cursor: pointer;
+    padding: 5px 10px;
+    background-color: #4a0000;
+    border-radius: 4px;
+    color: white;
+}
+
+.autofight input[type="checkbox"]:checked + label {
+    background-color: #00ff00;
+    color: #000;
+}
+#tabs {
+    display: flex;
+    gap: 5px;
+}
+
+#tabs button {
+    background-color: #3d3d3d; /* Slightly lighter than content background */
+    border: 1px solid #444;
+    border-bottom: none;
+    border-radius: 5px 5px 0 0; /* Rounded top corners */
+    padding: 10px 20px;
+    cursor: pointer;
+    position: relative;
+}
+
+#tabs button.active {
+    background-color: #2d2d2d; /* Matches game-section background */
+    border-bottom: 1px solid #2d2d2d; /* Blends with content */
+    bottom: -1px; /* Overlaps the tab-content border */
+}
+
+#tab-content {
+    border-top: 1px solid #444; /* Separates tabs from content */
+    padding-top: 10px;
+}
+#achievements-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.achievement-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: 2px solid #444;
+    border-radius: 5px;
+    background-color: #3d3d3d;
+    position: relative;
+}
+
+.achievement-icon.unlocked {
+    border-color: #66ff66; /* Green border for unlocked achievements */
+}
+
+.achievement-icon:not(.unlocked) {
+}
+.achievement-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: 2px solid #444;
+    border-radius: 5px;
+    background-color: #3d3d3d;
+    position: relative;
+}
+
+.achievement-icon.unlocked {
+    border-color: #66ff66; /* Green border for unlocked achievements */
+}
+
+.achievement-icon:not(.unlocked)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    max-width: 300px;
+    background-color: #2d2d2d;
+    color: #fff;
+    text-align: left;
+    border-radius: 4px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 1002;
+    border: 1px solid #ff6666;
+    box-shadow: 0 0 5px rgba(255, 102, 102, 0.3);
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: normal;
+    pointer-events: none;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1 !important;
+}
+#wielderSection {
+    display: flex;
+    gap: 20px;
+}
+
+#statsDiv {
+    flex: 1; /* Takes available space */
+}
+
+#equipmentDiv {
+    width: 300px; /* Fixed width for consistency */
+    display: flex;
+    flex-direction: column;
+}
+
+#equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Two columns for equipment */
+}
+
+#inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Three columns for inventory */
+    gap: 5px;
+    width: 100%;
+    height: 150px; /* Fixed height for 3x3 grid with icons */
+}
+
+.inventory-slot, .equipment-slot {
+    width: 50px; /* Fixed size for icons */
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.shop-item {
+    width: 60px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.shop-item img {
+    width: 50px;
+    height: 50px;
+}
+.border-white { border: 2px solid white; }
+.border-blue { border: 2px solid blue; }
+.border-green { border: 2px solid green; }
+.border-orange { border: 2px solid orange; }
+.border-purple { border: 2px solid purple; }
