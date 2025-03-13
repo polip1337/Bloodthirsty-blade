@@ -15,9 +15,17 @@ function buyUpgrade(name) {
             label.textContent = `${name.charAt(0).toUpperCase() + name.slice(1)} (Level ${upgrade.level}) `;
         }
         updateUpgrades(game.sword.energy);
-        if (name === 'senses' || name === 'connection') {
-            updateButtonStates(); // Update auto-combat button states
+        if (name === 'capacity') calculateMaxEnergy();
+        if (name === 'senses'){
+            gameData.zones[upgrade.level - 1].unlocked = true;
+            updateEnemyZones();
+            updateButtonStates();
         }
+        if (name === 'soul') {
+            unlockNextStory();
+            showStory();
+        }
+        updateDisplay();
     }
 }
 
