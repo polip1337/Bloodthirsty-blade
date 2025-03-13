@@ -11,7 +11,8 @@ async function attackEnemy(zoneIndex, enemyIndex) {
     if (wielder.currentLife <= 0) {
         addCombatMessage('Wielder is too injured to fight!', 'damage');
         game.isFighting = false;
-        updateDisplay();
+        updateWielderStats();
+        updateButtonStates();
         return;
     }
 
@@ -54,19 +55,23 @@ async function attackEnemy(zoneIndex, enemyIndex) {
         if (game.currentAction === 'autoFighting') onActionButtonClick('autoFighting');
         applyHeavyWound();
         game.isFighting = false;
-        updateDisplay();
+        updateWielderStats();
+        updateButtonStates();
         return;
     }
     if (enemyLife <= 0) {
         defeatEnemy(enemy, zoneIndex);
     }
-    updateDisplay();
+    updateWielderStats();
+    updateButtonStates();
+    updateEnergyAndKills();
+
 }
 
 function defeatEnemy(enemy, zoneIndex) {
     const wielder = game.wielder;
-    const goldMultiplier = Object.values(game.achievements).reduce((mul, ach) => mul * (ach.unlocked && ach.bonus.goldMultiplier ? ach.bonus.goldMultiplier : 1), 1);
-    const energyGainMultiplier = Object.values(game.achievements).reduce((mul, ach) => mul * (ach.unlocked && ach.bonus.energyGain ? ach.bonus.energyGain : 1), 1);
+    const goldMultiplier = Object.values(game.achievements).reduce((mul, ach) => mul * (ach.unlocked && ach.bonus.goldMultiplier ? 1 + ach.bonus.goldMultiplier : 1), 1);
+    const energyGainMultiplier = Object.values(game.achievements).reduce((mul, ach) => mul * (ach.unlocked && ach.bonus.energyGain ? 1 + ach.bonus.energyGain : 1),1);
     const energyGain = enemy.endurance * 5 * (1 + game.sword.upgrades.siphon.level * 0.1) * energyGainMultiplier;
     game.sword.energy = Math.min(game.sword.energy + energyGain, game.sword.maxEnergy);
     addCombatMessage(`${enemy.name} defeated! +${energyGain.toFixed(1)} energy`, 'enemy-defeated');
@@ -144,7 +149,7 @@ function toggleAutoFight(zoneIndex) {
     } else {
         game.currentAction = null;
     }
-    updateDisplay();
+    updateButtonStates();
 }
 
 function startAutoBattle() {

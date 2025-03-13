@@ -24,7 +24,8 @@ function buyItem(itemName, zoneIndex) {
     if (game.wielder.gold >= effectivePrice && game.wielder.inventory.length < 9) {
         game.wielder.gold -= effectivePrice;
         game.wielder.inventory.push(item);
-        updateDisplay();
+        updateWielderStats();
+        updateEquipmentAndInventory();
     } else {
         alert('Not enough gold or inventory full');
     }
@@ -38,7 +39,8 @@ function handleInventoryClick(index) {
             game.wielder.gold += sellPrice;
             game.wielder.inventory.splice(index, 1);
             addCombatMessage(`Sold ${item.name} for ${sellPrice} gold`, 'player-stat');
-            updateDisplay();
+            updateWielderStats();
+            updateEquipmentAndInventory();
         }
     } else {
         const item = game.wielder.inventory[index];
@@ -56,7 +58,8 @@ function handleInventoryClick(index) {
                 game.wielder.equipment[slot] = item;
                 game.wielder.inventory.splice(index, 1);
             }
-            updateDisplay();
+            updateWielderStats();
+            updateEquipmentAndInventory();
         }
     }
 }
@@ -70,13 +73,14 @@ function unequipItem(slot) {
     } else if (game.wielder.equipment[slot] && game.wielder.inventory.length < 9) {
         game.wielder.inventory.push(game.wielder.equipment[slot]);
         game.wielder.equipment[slot] = null;
-        updateDisplay();
+        updateWielderStats();
+        updateEquipmentAndInventory();
     }
 }
 
 function toggleSellMode() {
     game.sellMode = !game.sellMode;
-    updateDisplay();
+    updateEquipmentAndInventory();
 }
 
 function getEquipmentBonuses() {

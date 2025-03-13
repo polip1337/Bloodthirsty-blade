@@ -60,7 +60,6 @@ function resetSaveGameOver() {
 function disableInquisition() {
     game.inquisitionEnabled = false;
     document.getElementById('inquisitionModal').style.display = 'none';
-    updateDisplay();
 }
 
 function exportSave() {
@@ -100,7 +99,8 @@ function onActionButtonClick(actionType) {
             if (game.currentAction) document.getElementById('trainButton').classList.add('active-action');
             break;
     }
-    updateDisplay();
+    updateButtonStates();
+    updateEnemyZones();
 }
 
 function addCombatMessage(text, className) {

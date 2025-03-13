@@ -26,7 +26,7 @@ async function initGame() {
                 showLevelUpModal();
             }
         }
-        updateDisplay();
+        updateWielderStats();
         saveGame();
     }, 5000);
     showStory(true);

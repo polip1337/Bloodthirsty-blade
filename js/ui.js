@@ -1,14 +1,15 @@
-function updateDisplay() {
+function updateEnergyAndKills() {
+    document.getElementById('energy').textContent = game.sword.energy.toFixed(0);
+    document.getElementById('maxEnergy').textContent = game.sword.maxEnergy.toFixed(0);
+    document.getElementById('totalKills').textContent = game.statistics.totalKills;
+}
+function updateWielderStats() {
     const wielder = game.wielder;
     const effectiveStats = getEffectiveStats();
     const baseDamage = effectiveStats.strength * 2 + effectiveStats.swordfighting;
     const controlDamageBonus = baseDamage * game.controlBonus;
     const lifesteal = game.sword.upgrades.siphon.level;
     const totalDamage = (baseDamage + lifesteal + controlDamageBonus) * getDamageMultiplier();
-
-    document.getElementById('energy').textContent = game.sword.energy.toFixed(0);
-    document.getElementById('maxEnergy').textContent = game.sword.maxEnergy.toFixed(0);
-    document.getElementById('totalKills').textContent = game.statistics.totalKills;
 
     let wielderHTML = `
         <div class="stat">Name: <span id="wielderName">${wielder.name}</span></div>
@@ -47,17 +48,25 @@ function updateDisplay() {
                 Control Bonus: +${controlDamageBonus.toFixed(1)} (${(game.controlBonus * 100).toFixed(0)}%)<br>
                 Lifesteal: +${lifesteal} damage & HP per hit
             </span>
-        </div>
+        </div><br />
         <div class="stat tooltip">
             Damage Reduction: ${effectiveStats.swordfighting.toFixed(1)}
             <span class="tooltiptext">Reduces incoming damage by this amount</span>
         </div>
+        <br />
+        <br />
+        <div class="stat tooltip">
+            Gold: ${game.wielder.gold}
+            <span class="tooltiptext">Your current gold. If the wielder dies you loose it along with any equipment</span>
+        </div>
     `;
 
+    document.getElementById('statsDiv').innerHTML = wielderHTML;
+}
+function updateEquipmentAndInventory() {
     let equipmentHTML = '';
     if (gameData.zones[3].unlocked) {
         equipmentHTML += '<h3>Equipment</h3>';
-        equipmentHTML += `<div>Gold: ${game.wielder.gold}</div>`;
         equipmentHTML += '<div id="equipment-grid">';
         const slots = ['helmet', 'body', 'gauntlets', 'weapon', 'shield', 'boots', 'ring', 'amulet'];
         slots.forEach(slot => {
@@ -89,10 +98,9 @@ function updateDisplay() {
                 ${game.sellMode ? 'Exit Sell Mode' : 'Enter Sell Mode'}
             </button>`;
     }
-
-    document.getElementById('statsDiv').innerHTML = wielderHTML;
     document.getElementById('equipmentDiv').innerHTML = equipmentHTML;
-
+}
+function updateUpgrades() {
     document.getElementById('upgrades').innerHTML = Object.entries(game.sword.upgrades)
         .map(([name, data]) => `
             <div class="upgrade tooltip">
@@ -104,7 +112,8 @@ function updateDisplay() {
             </div>
         `)
         .join('');
-
+}
+function updateEnemyZones() {
     document.getElementById('enemies').innerHTML = gameData.zones
         .filter(zone => zone.unlocked)
         .map((zone, zi) => `
@@ -126,7 +135,8 @@ function updateDisplay() {
             </div>
         `)
         .join('');
-
+}
+function updateButtonStates() {
     const actionInProgress = !!game.currentAction;
     document.querySelectorAll('#enemies button').forEach(btn => {
         btn.disabled = actionInProgress || game.wielder.defeated;
@@ -151,9 +161,17 @@ function updateDisplay() {
     } else {
         restButton.disabled = false;
         trainButton.disabled = false;
-        healButton.disabled = game.sword.energy < 10 || game.wielder.currentLife >= effectiveStats.endurance * 5;
+        healButton.disabled = game.sword.energy < 10 || game.wielder.currentLife >= getEffectiveStats().endurance * 5;
         changeWielderButton.disabled = game.sword.energy < 10;
     }
+}
+function updateDisplay() {
+    updateEnergyAndKills();
+    updateWielderStats();
+    updateEquipmentAndInventory();
+    updateUpgrades();
+    updateEnemyZones();
+    updateButtonStates();
 }
 
 function showTab(tabName) {

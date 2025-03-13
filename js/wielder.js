@@ -36,7 +36,7 @@ function generateWielder(race, isInitial = false) {
             helmet: null,
             body: null,
             gauntlets: null,
-            weapon: { type: 'weapon', name: 'Cursed Sword', stats: { strength: 1 }, icon: 'blade.png', permanent: true }, // Permanent sword
+            weapon: { type: 'weapon', name: 'Cursed Sword', stats: { strength: 1 }, icon: 'assets/blade.png', permanent: true }, // Permanent sword
             shield: null,
             boots: null,
             ring: null,
@@ -73,7 +73,7 @@ function allocatePoint(stat) {
     } else {
         showLevelUpModal();
     }
-    updateDisplay();
+    updateWielderStats();
 }
 
 function applyLevelBonuses() {
@@ -105,7 +105,7 @@ function applyHeavyWound() {
     } else {
         handleWielderDeath(affectedStat);
     }
-    updateDisplay();
+    updateWielderStats();
 }
 
 function handleWielderDeath(affectedStat) {
@@ -125,7 +125,7 @@ function selectRace(race) {
     if (races[race].unlocked) {
         game.wielder = generateWielder(race);
         document.getElementById('raceSelectionModal').style.display = 'none';
-        updateDisplay();
+        updateWielderStats();
     }
 }
 
@@ -136,6 +136,6 @@ function healWielder() {
             game.wielder.currentLife + Math.floor(game.wielder.currentStats.endurance * 1.25),
             game.wielder.currentStats.endurance * 5
         );
-        updateDisplay();
+        updateWielderStats();
     }
 }
