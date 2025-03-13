@@ -66,7 +66,6 @@ function updateWielderStats() {
 function updateEquipmentAndInventory() {
     let equipmentHTML = '';
     if (gameData.zones[3].unlocked) {
-        equipmentHTML += '<h3>Equipment</h3>';
         equipmentHTML += '<div id="equipment-grid">';
         const slots = ['helmet', 'body', 'gauntlets', 'weapon', 'shield', 'boots', 'ring', 'amulet'];
         slots.forEach(slot => {
@@ -79,7 +78,6 @@ function updateEquipmentAndInventory() {
         });
         equipmentHTML += '</div>';
 
-        equipmentHTML += '<h3>Inventory</h3>';
         equipmentHTML += '<div id="inventory-grid">';
         game.wielder.inventory.forEach((item, index) => {
             equipmentHTML += `

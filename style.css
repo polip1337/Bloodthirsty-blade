@@ -10,8 +10,8 @@ body {
     grid-template:
         "logo    wielder  zones"    var(--logo-row-height)
         "sword   wielder  zones"    0.8fr
-        "sword   wielder  zones"    0.7fr
-        "actions  combat   combat"   var(--combat-row-height)
+        "sword   actions  zones"    0.7fr
+        "combat  combat   combat"   var(--combat-row-height)
         / 33%    33%      auto;
     height: 100vh;
     margin: 0;
@@ -189,29 +189,19 @@ button:disabled {
 .tooltip {
     position: relative;
     display: inline-block;
-    cursor: help;
 }
 
 .tooltip .tooltiptext {
+    position: fixed; /* Use fixed to position relative to viewport */
     visibility: hidden;
-    width: max-content;
-    max-width: 300px;
-    background-color: #2d2d2d;
+    background-color: #555;
     color: #fff;
-    text-align: left;
-    border-radius: 4px;
-    padding: 8px 12px;
-    position: absolute;
-    z-index: 1002;
-    border: 1px solid #ff6666;
-    box-shadow: 0 0 5px rgba(255, 102, 102, 0.3);
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    z-index: 10;
     opacity: 0;
     transition: opacity 0.3s;
-    white-space: normal;
-    pointer-events: none;
-    bottom: calc(100% + 5px);
-    left: 50%;
-    transform: translateX(-50%);
 }
 
 .tooltip:hover .tooltiptext {
