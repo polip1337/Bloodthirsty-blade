@@ -10,6 +10,7 @@ function buyUpgrade(upgradeName) {
     if (game.sword.energy >= effectiveCost) {
         game.sword.energy -= effectiveCost;
         upgrade.level++;
+        updateUpgrades();
         upgrade.cost *= 2;
         if (upgradeName === 'capacity') calculateMaxEnergy();
         if (upgradeName === 'senses') gameData.zones[upgrade.level - 1].unlocked = true;
@@ -19,6 +20,7 @@ function buyUpgrade(upgradeName) {
         }
         updateDisplay();
         checkAchievements();
+        redrawUpgrades();
     }
 }
 

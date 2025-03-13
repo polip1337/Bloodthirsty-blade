@@ -2,6 +2,7 @@ function updateEnergyAndKills() {
     document.getElementById('energy').textContent = game.sword.energy.toFixed(0);
     document.getElementById('maxEnergy').textContent = game.sword.maxEnergy.toFixed(0);
     document.getElementById('totalKills').textContent = game.statistics.totalKills;
+    updateUpgrades();
 }
 function updateWielderStats() {
     const wielder = game.wielder;
@@ -98,18 +99,75 @@ function updateEquipmentAndInventory() {
     }
     document.getElementById('equipmentDiv').innerHTML = equipmentHTML;
 }
-function updateUpgrades() {
-    document.getElementById('upgrades').innerHTML = Object.entries(game.sword.upgrades)
-        .map(([name, data]) => `
-            <div class="upgrade tooltip">
-                ${name.charAt(0).toUpperCase() + name.slice(1)} (Level ${data.level})
-                <span class="tooltiptext">${getUpgradeTooltip(name)}</span>
-                <button onclick="buyUpgrade('${name}')" ${data.level >= gameData.upgradeCaps[name] ? 'disabled' : game.sword.energy >= data.cost ? '' : 'disabled'}>
-                    ${data.level >= gameData.upgradeCaps[name] ? 'Max level' : `Upgrade (${Math.round(data.cost)} energy)`}
-                </button>
-            </div>
-        `)
+function redrawUpgrades(){
+    const upgradesDiv = document.getElementById('upgrades');
+    if (!upgradesDiv) return;
+
+    upgradesDiv.innerHTML = Object.entries(game.sword.upgrades)
+        .map(([name, data]) => {
+            const buttonId = `upgrade-${name}-btn`;
+            return `
+                <div class="upgrade tooltip" id="upgrade-${name}">
+                    ${name.charAt(0).toUpperCase() + name.slice(1)} (Level ${data.level})
+                    <span class="tooltiptext">${getUpgradeTooltip(name)}</span>
+                    <button id="${buttonId}" onclick="buyUpgrade('${name}')" ${data.level >= gameData.upgradeCaps[name] ? 'disabled' : game.sword.energy >= data.cost ? '' : 'disabled'}>
+                        ${data.level >= gameData.upgradeCaps[name] ? 'Max level' : `Upgrade (${Math.round(data.cost)} energy)`}
+                    </button>
+                </div>
+            `;
+        })
         .join('');
+
+    // Cache button references and initial costs
+    Object.keys(game.sword.upgrades).forEach(name => {
+        upgradeButtons[name] = document.getElementById(`upgrade-${name}-btn`);
+        previousCosts[name] = game.sword.upgrades[name].cost;
+    });
+    isUpgradesInitialized = true;
+}
+let previousEnergy = null; // Cache previous energy to detect changes
+let previousCosts = {}; // Cache previous costs to detect changes
+let upgradeButtons = {}; // Store references to buttons for selective updates
+let isUpgradesInitialized = false; // Track if DOM has been created
+
+function updateUpgrades(currentEnergy = game.sword.energy) {
+
+
+    // Initialize the upgrades DOM on the first call
+    if (!isUpgradesInitialized) {
+        redrawUpgrades();
+    }
+
+    // Skip update if energy hasn't changed and no costs have changed
+    let costsChanged = false;
+    Object.entries(game.sword.upgrades).forEach(([name, data]) => {
+        if (previousCosts[name] !== data.cost) {
+            costsChanged = true;
+            previousCosts[name] = data.cost;
+        }
+    });
+    if (previousEnergy === currentEnergy && !costsChanged) return;
+
+    // Update buttons that need to change state or text
+    Object.entries(game.sword.upgrades).forEach(([name, data]) => {
+        const button = upgradeButtons[name];
+        if (!button) return;
+
+        const isMaxLevel = data.level >= gameData.upgradeCaps[name];
+        const wasAffordable = previousEnergy !== null && previousEnergy >= data.cost;
+        const isAffordable = currentEnergy >= data.cost;
+        const costChanged = previousCosts[name] !== data.cost;
+
+        // Update if affordability changes or cost changes
+        if (isMaxLevel || wasAffordable !== isAffordable || costChanged) {
+            button.disabled = isMaxLevel || !isAffordable;
+            button.textContent = isMaxLevel
+                ? 'Max level'
+                : `Upgrade (${Math.round(data.cost)} energy)`;
+        }
+    });
+
+    previousEnergy = currentEnergy; // Update cached energy
 }
 function updateEnemyZones() {
     document.getElementById('enemies').innerHTML = gameData.zones
