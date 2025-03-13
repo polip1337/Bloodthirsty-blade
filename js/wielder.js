@@ -1,6 +1,5 @@
 function generateWielder(race, isInitial = false) {
     game.statistics.wieldersUsed = (game.statistics.wieldersUsed ?? 0) + 1;
-    checkAchievements();
     if (!race) {
         const availableRaces = Object.keys(races).filter(r => races[r].unlocked);
         race = availableRaces[Math.floor(Math.random() * availableRaces.length)];
@@ -34,8 +33,14 @@ function generateWielder(race, isInitial = false) {
         exp: 0,
         currentLife: baseStats.endurance * 5,
         equipment: {
-            helmet: null, body: null, gauntlets: null, weapon: null,
-            shield: null, boots: null, ring: null, amulet: null
+            helmet: null,
+            body: null,
+            gauntlets: null,
+            weapon: { type: 'weapon', name: 'Cursed Sword', stats: { strength: 1 }, icon: 'blade.png', permanent: true }, // Permanent sword
+            shield: null,
+            boots: null,
+            ring: null,
+            amulet: null
         },
         inventory: [],
         gold: 0,

@@ -284,30 +284,32 @@ function adjustTooltipPosition() {
         const tooltipText = tooltip.querySelector('.tooltiptext');
         if (!tooltipText) return;
 
-        tooltipText.style.top = '';
-        tooltipText.style.bottom = '';
-        tooltipText.style.left = '50%';
-        tooltipText.style.transform = 'translateX(-50%)';
-
-        const tooltipRect = tooltipText.getBoundingClientRect();
         const triggerRect = tooltip.getBoundingClientRect();
+        const tooltipRect = tooltipText.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
 
-        if (triggerRect.top - tooltipRect.height < 0) {
-            tooltipText.style.top = 'calc(100% + 5px)';
-            tooltipText.style.bottom = 'auto';
-        } else if (triggerRect.bottom + tooltipRect.height > viewportHeight) {
-            tooltipText.style.bottom = 'calc(100% + 5px)';
-            tooltipText.style.top = 'auto';
+        // Try to position below the trigger
+        let top = triggerRect.bottom + 5;
+        let left = triggerRect.left + (triggerRect.width / 2) - (tooltipRect.width / 2);
+
+        // If below goes offscreen, position above
+        if (top + tooltipRect.height > viewportHeight) {
+            top = triggerRect.top - tooltipRect.height - 5;
         }
 
-        if (tooltipRect.left < 0) {
-            tooltipText.style.left = '0';
-            tooltipText.style.transform = 'translateX(0)';
-        } else if (tooltipRect.right > window.innerWidth) {
-            tooltipText.style.left = 'auto';
-            tooltipText.style.right = '0';
-            tooltipText.style.transform = 'translateX(0)';
+        // Adjust horizontal position to stay within viewport
+        if (left < 0) {
+            left = 0;
+        } else if (left + tooltipRect.width > viewportWidth) {
+            left = viewportWidth - tooltipRect.width;
         }
+
+        // Apply the calculated position
+        tooltipText.style.top = `${top}px`;
+        tooltipText.style.left = `${left}px`;
+        tooltipText.style.bottom = 'auto';
+        tooltipText.style.right = 'auto';
+        tooltipText.style.transform = 'none';
     });
 }

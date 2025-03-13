@@ -62,7 +62,12 @@ function handleInventoryClick(index) {
 }
 
 function unequipItem(slot) {
-    if (game.wielder.equipment[slot] && game.wielder.inventory.length < 9) {
+    if (slot === 'weapon') {
+        // Show popup instead of unequipping
+        document.getElementById('swordUnequipMessage').textContent =
+            'The Cursed Sword is bound to you and cannot be unequipped!';
+        document.getElementById('swordUnequipModal').style.display = 'block';
+    } else if (game.wielder.equipment[slot] && game.wielder.inventory.length < 9) {
         game.wielder.inventory.push(game.wielder.equipment[slot]);
         game.wielder.equipment[slot] = null;
         updateDisplay();

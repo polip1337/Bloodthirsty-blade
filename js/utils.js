@@ -25,11 +25,28 @@ function loadGame() {
 function wipeSave() {
     if (confirm('Permanently delete all progress?')) {
         localStorage.removeItem('cursedSwordSave');
+        // Fully reset game state
         game.wielder = generateWielder('goblin', true);
+        game.statistics = { totalKills: 0, wieldersUsed: 0, mobKills: {}, zoneKills: {} };
+        game.sword.energy = 0;
+        game.inquisitionEnabled = true;
+        game.currentAction = null;
+        Object.values(game.sword.upgrades).forEach(upg => { upg.level = 1; upg.cost = upg.initialCost; });
+        // Reinitialize achievements to ensure conditions are functions
+        clearAllIntervals();
+        initGame();
+        loadAchievements();
         updateDisplay();
+        checkAchievements(); // Safe to call now with reinitialized achievements
     }
 }
-
+function clearAllIntervals() {
+    let id = setInterval(() => {}, 1000); // Create a dummy interval to get the latest ID
+    while (id >= 0) {
+        clearInterval(id);
+        id--;
+    }
+}
 function resetSaveGameOver() {
     localStorage.removeItem('cursedSwordSave');
     game.wielder = generateWielder('goblin', true);
