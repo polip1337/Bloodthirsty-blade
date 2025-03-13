@@ -69,7 +69,7 @@ function allocatePoint(stat) {
     }
     if (stat === 'willpower') game.wielder.currentStats.willpower += 4;
     if (game.wielder.statPoints <= 0) {
-        document.getElementById('levelUpModal').style.display = 'none';
+        onModalClose('levelUpModal');
     } else {
         showLevelUpModal();
     }
@@ -137,5 +137,6 @@ function healWielder() {
             game.wielder.currentStats.endurance * 5
         );
         updateWielderStats();
+        updateEnergyAndKills();
     }
 }

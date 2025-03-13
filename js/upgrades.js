@@ -1,26 +1,23 @@
-function buyUpgrade(upgradeName) {
-    const cap = gameData.upgradeCaps[upgradeName];
-    const upgrade = game.sword.upgrades[upgradeName];
-    const costReduction = getUpgradeCostReduction();
-    const effectiveCost = upgrade.cost * (1 - costReduction);
-    if (upgrade.level >= cap) {
-        addCombatMessage(`Maximum ${upgradeName} level reached!`, 'damage');
-        return;
-    }
-    if (game.sword.energy >= effectiveCost) {
-        game.sword.energy -= effectiveCost;
+function buyUpgrade(name) {
+    const upgrade = game.sword.upgrades[name];
+    if (game.sword.energy >= upgrade.cost && upgrade.level < gameData.upgradeCaps[name]) {
+        game.sword.energy -= upgrade.cost;
         upgrade.level++;
-        updateUpgrades();
-        upgrade.cost *= 2;
-        if (upgradeName === 'capacity') calculateMaxEnergy();
-        if (upgradeName === 'senses') gameData.zones[upgrade.level - 1].unlocked = true;
-        if (upgradeName === 'soul') {
-            unlockNextStory();
-            showStory();
+        upgrade.cost *= 2; // Example cost increase
+        if (name === 'capacity') {
+            calculateMaxEnergy();
+            updateEnergyAndKills();
         }
-        updateDisplay();
-        checkAchievements();
-        redrawUpgrades();
+        // Update the upgrade's level display
+        const upgradeDiv = document.getElementById(`upgrade-${name}`);
+        if (upgradeDiv) {
+            const label = upgradeDiv.firstChild;
+            label.textContent = `${name.charAt(0).toUpperCase() + name.slice(1)} (Level ${upgrade.level}) `;
+        }
+        updateUpgrades(game.sword.energy);
+        if (name === 'senses' || name === 'connection') {
+            updateButtonStates(); // Update auto-combat button states
+        }
     }
 }
 

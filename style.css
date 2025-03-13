@@ -474,3 +474,7 @@ footer a {
 #inquisitionModal button {
     margin: 5px;
 }
+.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

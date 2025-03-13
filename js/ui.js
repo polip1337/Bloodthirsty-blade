@@ -182,11 +182,14 @@ function updateEnemyZones() {
                         ${zone.enemies.map(e => `${e.name} (Lv. ${e.level}, ${e.endurance*5} HP)`).join('<br>')}
                     </span>
                 </span>
-                ${zi > 3 ? `<button onclick="openShop(${zi})">Shop</button>` : ''}
-                <span class="autofight">
+                ${zi > 2 ? `<button onclick="openShop(${zi})">Shop</button>` : ''}
+                <span class="autofight tooltip">
                     <input type="checkbox" id="auto-${zi}" onchange="toggleAutoFight(${zi})"
                         ${game.currentAction === 'autoFighting' && lastUsedZoneIndex === zi ? 'checked' : ''}>
                     <label for="auto-${zi}">Auto explore</label>
+                    <span class="tooltiptext">
+                        Requires connection lvl ${zi + 1}
+                    </span>
                 </span>
             </div>
         `)
@@ -200,10 +203,21 @@ function updateButtonStates() {
     gameData.zones.forEach((_, zi) => {
         const checkbox = document.getElementById(`auto-${zi}`);
         if (checkbox) {
-            checkbox.disabled = game.sword.upgrades.connection.level < zi + 1 || game.wielder.defeated || (game.currentAction && game.currentAction !== 'autoFighting');
-        }
-    });
+            const connectionLevel = game.sword.upgrades.connection?.level || 0;
+            const sensesLevel = game.sword.upgrades.senses?.level || 0;
+            const requiredLevel = zi + 1;
+            const shouldBeEnabled = connectionLevel >= requiredLevel || game.wielder.defeated || (game.currentAction && game.currentAction !== 'autoFighting');
+            if(shouldBeEnabled){
+                checkbox.parentNode.classList.remove("disabled");
+                console.log(_.name + " enabled. Should be enabled:" + shouldBeEnabled);
+            }
+            else{
+                checkbox.parentNode.classList.add("disabled");
+                console.log(_.name + " disabled");
 
+            }
+       }
+    });
     const healButton = document.getElementById('healButton');
     const changeWielderButton = document.getElementById('changeWielderButton');
     const restButton = document.getElementById('restButton');
@@ -228,6 +242,7 @@ function updateDisplay() {
     updateUpgrades();
     updateEnemyZones();
     updateButtonStates();
+    redrawUpgrades();
 }
 
 function showTab(tabName) {
@@ -251,6 +266,8 @@ function showTab(tabName) {
 }
 
 function showRaceSelection() {
+    document.getElementById('wielderDeathModal').style.display = 'none';
+
     const modal = document.getElementById('raceSelectionModal');
     gameData.zones = gameData.zones.map((zone, index) => ({
         ...zone,
