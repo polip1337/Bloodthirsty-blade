@@ -33,8 +33,11 @@ async function attackEnemy(zoneIndex, enemyIndex) {
     const totalDamage = (baseDamage + lifesteal + controlDamageBonus) * damageMultiplier;
     addCombatMessage(`Engaging ${enemy.name} (${enemy.endurance*5} HP)`, 'player-stat');
     enemyHealthFill.style.width = '100%';
+
+
+    wielderHealthFill.style.width = `${(wielder.currentLife / (effectiveStats.endurance *5)) * 100}%`;
+
     while (enemyLife > 0 && wielder.currentLife > 0 && !isAnyModalOpen()) {
-        wielderHealthFill.style.width = `${(wielder.currentLife / wielderMaxLife) * 100}%`;
         enemyHealthFill.style.width = `${(enemyLife / enemy.maxLife) * 100}%`;
         document.getElementById('combat-area').classList.add('combat-active');
         const damageDealt = Math.min(totalDamage, enemyLife);
@@ -51,9 +54,10 @@ async function attackEnemy(zoneIndex, enemyIndex) {
         wielder.currentLife -= enemyDamage;
 
         addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(wielder.currentStats.swordfighting)}) Player HP left: ${wielder.currentLife}`, 'damage');
+        wielderHealthFill.style.width = `${(wielder.currentLife / (effectiveStats.endurance *5)) * 100}%`;
 
         await new Promise(resolve => setTimeout(resolve, 1000));
-        wielderHealthFill.style.width = `${(wielder.currentLife / wielderMaxLife) * 100}%`;
+
         enemyHealthFill.style.width = `${(enemyLife / (enemy.endurance * 5)) * 100}%`;
 
         document.getElementById('combat-area').classList.remove('combat-active');

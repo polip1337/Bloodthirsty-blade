@@ -144,6 +144,10 @@ function healWielder() {
             game.wielder.currentLife + Math.floor(game.wielder.currentStats.endurance * 1.25),
             game.wielder.currentStats.endurance * 5
         );
+        const wielderHealthFill = document.querySelector('#wielder-health .health-bar-fill');
+
+        wielderHealthFill.style.width = `${(wielder.currentLife / (effectiveStats.endurance *5)) * 100}%`;
+
         updateWielderStats();
         updateEnergyAndKills();
     }
