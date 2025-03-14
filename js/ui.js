@@ -170,6 +170,9 @@ function updateUpgrades(currentEnergy = game.sword.energy) {
     previousEnergy = currentEnergy; // Update cached energy
 }
 function updateEnemyZones() {
+    if (gameData.zones[4].unlocked && !game.selectedPath) {
+            showPathSelectionModal();
+    }
     document.getElementById('enemies').innerHTML = gameData.zones
         .filter(zone => zone.unlocked)
         .map((zone, zi) => `
@@ -243,26 +246,24 @@ function updateDisplay() {
     updateEnemyZones();
     updateButtonStates();
     redrawUpgrades();
+    updatePathsTab();
 }
 
 function showTab(tabName) {
     const zonesContent = document.getElementById('zones-content');
     const achievementsContent = document.getElementById('achievements-content');
-    const zonesButton = document.querySelector('#tabs button:nth-child(1)');
-    const achievementsButton = document.querySelector('#tabs button:nth-child(2)');
+    const pathsContent = document.getElementById('paths-content');
+    const tabs = document.querySelectorAll('#tabs button');
 
-    if (tabName === 'zones') {
-        zonesContent.style.display = 'block';
-        achievementsContent.style.display = 'none';
-        zonesButton.classList.add('active');
-        achievementsButton.classList.remove('active');
-    } else {
-        zonesContent.style.display = 'none';
-        achievementsContent.style.display = 'block';
-        achievementsButton.classList.add('active');
-        zonesButton.classList.remove('active');
-        updateAchievementsTab();
-    }
+    zonesContent.style.display = tabName === 'zones' ? 'block' : 'none';
+    achievementsContent.style.display = tabName === 'achievements' ? 'block' : 'none';
+    pathsContent.style.display = tabName === 'paths' ? 'block' : 'none';
+
+    tabs.forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`#tabs button[onclick="showTab('${tabName}')"]`).classList.add('active');
+
+    if (tabName === 'achievements') updateAchievementsTab();
+    if (tabName === 'paths') updatePathsTab();
 }
 
 function showRaceSelection() {
@@ -403,4 +404,102 @@ function adjustTooltipPosition() {
         tooltipText.style.right = 'auto';
         tooltipText.style.transform = 'none';
     });
+}
+function showPathSelectionModal() {
+    const modal = document.getElementById('pathSelectionModal');
+    const content = `
+        <div class="race-list">
+            <div onclick="selectPath('blood')" class="race-option tooltip">
+                <h4>Path of Blood</h4>
+                <p>Harness the energy absorbed by the sword.</p>
+                <span class="tooltiptext">${gameData.paths.blood.description}</span>
+            </div>
+            <div onclick="selectPath('death')" class="race-option tooltip">
+                <h4>Path of Death</h4>
+                <p>Revel in the slaughter and collect souls.</p>
+                <span class="tooltiptext">${gameData.paths.death.description}</span>
+            </div>
+            <div onclick="selectPath('vengeance')" class="race-option tooltip">
+                <h4>Path of Vengeance</h4>
+                <p>Seek retribution against mighty foes.</p>
+                <span class="tooltiptext">${gameData.paths.vengeance.description}</span>
+            </div>
+        </div>
+    `;
+    document.getElementById('pathOptions').innerHTML = content;
+    modal.style.display = 'block';
+}
+function updatePathsTab() {
+    const display = document.getElementById('paths-display');
+    if (!game.unlockedPaths.length) {
+        display.innerHTML = '<p>Reach Zone 5 to unlock the Path mechanic.</p>';
+        return;
+    }
+    let content = '<div id="path-subtabs">';
+    game.unlockedPaths.forEach(path => {
+        content += `<button onclick="showPathSubtab('${path}')">${gameData.paths[path].name}</button>`;
+    });
+    content += '</div><div id="path-subtab-content"></div>';
+    display.innerHTML = content;
+    showPathSubtab(game.selectedPath || game.unlockedPaths[0]);
+}
+
+function showPathSubtab(path) {
+    const contentDiv = document.getElementById('path-subtab-content');
+    const pathData = gameData.paths[path];
+    const progress = game.pathProgress[path];
+    const tiersUnlocked = game.pathTiersUnlocked[path];
+    let content = `<h3>${pathData.name}</h3><p>${pathData.description}</p>`;
+    if (path === 'death') {
+        content += `
+            <div class="stat tooltip">
+                Souls: ${game.souls.minor}/${game.souls.normal}/${game.souls.major}/${game.souls.epic}
+                <span class="tooltiptext">Minor/Normal/Major/Epic souls collected</span>
+            </div>`;
+    }
+    content += '<h4>Progress</h4>';
+    pathData.tiers.forEach((tier, idx) => {
+        const isUnlocked = tiersUnlocked.includes(idx);
+        if (isUnlocked) {
+            content += `
+                <div class="upgrade unlocked">
+                    Tier ${idx + 1}: Unlocked<br>
+                    Reward: ${getPathRewardText(tier.reward)}
+                </div>`;
+        } else {
+            content += `
+                <div class="upgrade">
+                    Tier ${idx + 1}: ${progress}/${tier.threshold}
+                </div>`;
+        }
+    });
+    contentDiv.innerHTML = content;
+    document.querySelectorAll('#path-subtabs button').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent === pathData.name) btn.classList.add('active');
+    });
+}
+
+function getPathRewardText(reward) {
+    if (reward.damageMultiplier) return `+${((reward.damageMultiplier - 1) * 100).toFixed(0)}% damage`;
+    if (reward.maxEnergyMultiplier) return `+${((reward.maxEnergyMultiplier - 1) * 100).toFixed(0)}% max energy`;
+    if (reward.upgradeCostReduction) return `-${(reward.upgradeCostReduction * 100).toFixed(0)}% upgrade cost`;
+    if (reward.expMultiplier) return `+${((reward.expMultiplier - 1) * 100).toFixed(0)}% EXP gain`;
+    if (reward.startingStats) return `+${reward.startingStats} to all starting stats`;
+    if (reward.souls) return `+${Object.entries(reward.souls).map(([type, num]) => `${num} ${type}`).join(', ')} souls`;
+    if (reward.bossDamage) return `+${((reward.bossDamage - 1) * 100).toFixed(0)}% boss damage`;
+    if (reward.bossExp) return `+${((reward.bossExp - 1) * 100).toFixed(0)}% boss EXP`;
+    if (reward.bossGold) return `+${((reward.bossGold - 1) * 100).toFixed(0)}% boss gold`;
+    if (reward.bossSouls) return `+${((reward.bossSouls - 1) * 100).toFixed(0)}% boss souls`;
+    if (reward.ultimateReward) return `Ultimate Vengeance Reward`;
+    return 'Unknown reward';
+}
+function showLeftTab(tabName) {
+    const tabs = ['sword', 'wielder', 'equipment'];
+    tabs.forEach(tab => {
+        document.getElementById(`${tab}-content`).style.display = tab === tabName ? 'block' : 'none';
+    });
+    document.querySelectorAll('#left-tabs #tabs-left button').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`#left-tabs #tabs-left button[onclick="showLeftTab('${tabName}')"]`).classList.add('active');
+    updateDisplay();
 }

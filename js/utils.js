@@ -27,18 +27,43 @@ function wipeSave() {
         localStorage.removeItem('cursedSwordSave');
         // Fully reset game state
         game.wielder = generateWielder('goblin', true);
-        game.statistics = { totalKills: 0, wieldersUsed: 0, mobKills: {}, zoneKills: {} };
+        resetStats();
         game.sword.energy = 0;
         game.inquisitionEnabled = true;
         game.currentAction = null;
         Object.values(game.sword.upgrades).forEach(upg => { upg.level = 1; upg.cost = upg.initialCost; });
-        // Reinitialize achievements to ensure conditions are functions
+        game.selectedPath = null;
+        game.pathProgress = { blood: 0, death: 0, vengeance: 0 };
+        game.souls = { minor: 0, normal: 0, major: 0, epic: 0 };
+        game.pathTiersUnlocked = { blood: [], death: [], vengeance: [] };
+        game.unlockedPaths = [];
         clearAllIntervals();
         initGame();
         loadAchievements();
         updateDisplay();
         checkAchievements(); // Safe to call now with reinitialized achievements
     }
+}
+function resetStats(){
+game.statistics = {
+    totalKills: 0,          // Existing
+    wieldersUsed: 0,        // Existing
+    zoneKills: {},          // Existing
+    mobKills: {},
+    itemsBought: 0,         // For Shopaholic
+    manualKills: 0,         // For Manual Warrior
+    timesEnergyMaxed: 0,    // For Energy Peak
+    goblinWieldersUsed: 0,  // For Goblin King
+    totalRestTime: 0,       // For Restful (in seconds)
+    totalAutoExploreTime: 0,// For Auto Master (in seconds)
+    totalPlayTime: 0,       // For Marathon (in seconds)
+    hasSwiftKilled: false,  // For Swift Killer
+    hasSurvivedWithOneHP: false, // For Survivor
+    hasOneHitKilled: false, // For Lucky Strike
+    hasTakenFiftyDamage: false, // For Tough Nut
+    hasPacifistLeveled: false, // For Pacifist
+    hasEscapedInquisition: false // For Escape Artist
+};
 }
 function clearAllIntervals() {
     let id = setInterval(() => {}, 1000); // Create a dummy interval to get the latest ID
@@ -48,13 +73,7 @@ function clearAllIntervals() {
     }
 }
 function resetSaveGameOver() {
-    localStorage.removeItem('cursedSwordSave');
-    game.wielder = generateWielder('goblin', true);
-    game.statistics = { totalKills: 0, wieldersUsed: 0, mobKills: {}, zoneKills: {} };
-    game.sword.energy = 0;
-    Object.values(game.sword.upgrades).forEach(upg => { upg.level = 1; upg.cost = upg.initialCost; });
-    document.getElementById('inquisitionModal').style.display = 'none';
-    updateDisplay();
+    wipeSave();
 }
 
 function disableInquisition() {

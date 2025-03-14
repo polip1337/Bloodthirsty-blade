@@ -90,51 +90,86 @@
     <p id="swordUnequipMessage"></p>
     <button onclick="onModalClose('swordUnequipModal')">OK</button>
 </div>
+<div id="pathSelectionModal" class="modal">
+    <h3>Choose Your Path</h3>
+    <p>Upon reaching Zone 5, the sword offers you a choice:</p>
+    <div id="pathOptions"></div>
+    <button onclick="onModalClose('pathSelectionModal')">Close</button>
+</div>
+<audio id="combat-sound" src="combat-win.mp3"></audio>
 <!-- Game Sections -->
 <div id="gameLogo" class="game-section">
-    <img src="BSBTitles6.webp" class="logo-img" alt="Cursed Sword Legacy">
+    <img src="BSBTitles5.webp" class="logo-img" alt="Cursed Sword Legacy">
 </div>
 
-<div id="swordSection" class="game-section">
-    <div id="swordStats">
-        <h2>Sword Upgrades</h2>
-        <div class="stat tooltip">
-            Energy: <span id="energy">0</span>/<span id="maxEnergy">100</span>
-            <span class="tooltiptext">Current/Maximum energy stored in the sword</span>
+<div id="left-tabs" class="game-section" >
+    <div id="tabs-left">
+        <button class="active" onclick="showLeftTab('sword')">Sword Upgrades</button>
+        <button onclick="showLeftTab('wielder')">Wielder</button>
+        <button onclick="showLeftTab('equipment')">Equipment</button>
+    </div>
+    <div id="tab-content-left">
+        <div id="sword-content">
+            <div id="swordStats">
+                <div class="stat tooltip">
+                    Energy: <span id="energy">0</span>/<span id="maxEnergy">100</span>
+                    <span class="tooltiptext">Current/Maximum energy stored in the sword</span>
+                </div>
+                <div class="stat tooltip">
+                    Total Kills: <span id="totalKills">0</span>
+                    <span class="tooltiptext">Total number of enemies defeated</span>
+                </div>
+            </div>
+            <div id="upgrades"></div>
         </div>
-        <div class="stat tooltip">
-            Total Kills: <span id="totalKills">0</span>
-            <span class="tooltiptext">Total number of enemies defeated</span>
+        <div id="wielder-content" style="display: none;">
+            <div id="statsDiv"></div>
+        </div>
+        <div id="equipment-content" style="display: none;">
+            <div id="equipmentDiv"></div>
         </div>
     </div>
-    <div id="upgrades"></div>
 </div>
+<div id="combat-area">
+    <img src="assets\kaladian_bg.png" style="height: 100%; width:100%">
 
+    <div id="wielder-sprite">
+        <div id="wielder-health" class="health-bar">
+            <div class="health-bar-fill"></div>
+        </div>
+    </div>
+    <div id="enemy-sprite">
+        <div id="enemy-health" class="health-bar">
+            <div class="health-bar-fill"></div>
+        </div>
+    </div>
+
+</div>
 <div id="zonesSection" class="game-section">
     <div id="tabs">
         <button class="active" onclick="showTab('zones')">Zones</button>
         <button onclick="showTab('achievements')">Achievements</button>
+        <button onclick="showTab('paths')">Paths</button>
     </div>
     <div id="tab-content">
         <div id="zones-content">
             <h2>Zones</h2>
-            <div id="enemies"></div> <!-- Existing zones content -->
+            <div id="enemies"></div>
         </div>
         <div id="achievements-content" style="display: none;">
             <h2>Achievements</h2>
             <div id="achievements-list"></div>
         </div>
+        <div id="paths-content" style="display: none;">
+            <h2>Paths</h2>
+            <div id="paths-display"></div>
+        </div>
     </div>
 </div>
 
-<div id="wielderSection" class="game-section">
-
-    <div id="statsDiv"></div>
-    <div id="equipmentDiv"></div>
 </div>
 
 <div id="actionsSection" class="game-section">
-    <h2>🎮 Actions</h2>
     <div class="action-buttons">
         <span class="tooltip">
             <button id="restButton" onclick="onActionButtonClick('resting')">Rest</button>
@@ -147,7 +182,7 @@
         <span class="tooltip">
             <button id="healButton" onclick="healWielder()">Heal wielder (10 energy)</button>
             <span class="tooltiptext">Restore 25% health for 10 energy</span>
-        </span><br>
+        </span>
         <span class="tooltip">
             <button id="changeWielderButton" onclick="showRaceSelection()">Change Wielder </button>
             <span class="tooltiptext">Lose your current wielder permanently. Pick the race of a new one.</span>
@@ -196,6 +231,7 @@
 <script src="js/gameData.js"></script>
 <script src="js/inventory.js"></script>
 <script src="js/main.js"></script>
+<script src="js/paths.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/upgrades.js"></script>
 <script src="js/utils.js"></script>

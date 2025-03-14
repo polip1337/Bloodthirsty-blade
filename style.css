@@ -8,11 +8,11 @@
 body {
     display: grid;
     grid-template:
-        "logo    wielder  zones"    var(--logo-row-height)
-        "sword   wielder  zones"    0.8fr
-        "sword   actions  zones"    0.7fr
-        "combat  combat   combat"   var(--combat-row-height)
-        / 33%    33%      auto;
+        "tabs-left    logo  zones"    100px
+        "tabs-left   combatArea  zones"    45%
+        "tabs-left   actions  zones"    70px
+        "combat  combat   combat"   25%
+        / 25%    45%      auto;
     height: 100vh;
     margin: 0;
     padding: 20px;
@@ -55,8 +55,8 @@ button:disabled {
     text-align: center;
 }
 
-#swordSection {
-    grid-area: sword;
+#left-tabs {
+    grid-area: tabs-left;
 }
 
 #wielderSection {
@@ -68,7 +68,9 @@ button:disabled {
 #zonesSection {
     grid-area: zones;
 }
-
+#combat-area {
+    grid-area: combatArea;
+}
 #actionsSection {
     grid-area: actions;
 }
@@ -313,12 +315,12 @@ footer a {
     background-color: #00ff00;
     color: #000;
 }
-#tabs {
+#tabs, #tabs-left {
     display: flex;
     gap: 5px;
 }
 
-#tabs button {
+#tabs button,#tabs-left button {
     background-color: #3d3d3d; /* Slightly lighter than content background */
     border: 1px solid #444;
     border-bottom: none;
@@ -328,7 +330,7 @@ footer a {
     position: relative;
 }
 
-#tabs button.active {
+#tabs button.active, #tabs-left button.active {
     background-color: #2d2d2d; /* Matches game-section background */
     border-bottom: 1px solid #2d2d2d; /* Blends with content */
     bottom: -1px; /* Overlaps the tab-content border */
@@ -418,10 +420,7 @@ footer a {
     visibility: visible;
     opacity: 1 !important;
 }
-#wielderSection {
-    display: flex;
-    gap: 20px;
-}
+
 
 #statsDiv {
     flex: 1; /* Takes available space */
@@ -477,4 +476,134 @@ footer a {
 .disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+.upgrade.unlocked {
+    border: 2px solid #66ff66;
+}
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+}
+
+#left-tabs {
+    overflow-y: auto;
+}
+
+#combat-area {
+    background: url('combat-bg.png') no-repeat center center; /* Add your background */
+    background-size: cover;
+    position: relative;
+}
+
+#wielder-sprite, #enemy-sprite {
+    position: absolute;
+    width: 100px;
+    height: 200px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-size: cover;
+}
+
+#wielder-sprite {
+    left: 10%;
+}
+
+#enemy-sprite {
+    right: 10%;
+    background-image: url('enemy-default.png'); /* Default, update dynamically */
+    display: none;
+}
+
+@keyframes combatAnimation {
+    0% { transform: translateY(-50%) translateX(0); }
+    25% { transform: translateY(-50%) translateX(50%); }
+    50% { transform: translateY(-50%) translateX(50%); }
+    100% { transform: translateY(-50%) translateX(0); }
+}
+@keyframes combatAnimation2 {
+    0% { transform: translateY(-50%) translateX(0); }
+    25% { transform: translateY(-50%) translateX(-50%); }
+    50% { transform: translateY(-50%) translateX(-50%); }
+    100% { transform: translateY(-50%) translateX(0); }
+}
+.combat-active #wielder-sprite {
+    animation: combatAnimation 1s ease-in-out;
+}
+
+.combat-active #enemy-sprite {
+    animation: combatAnimation2 1s ease-in-out ;
+}
+#path-subtabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+#path-subtabs button {
+    background-color: #3d3d3d;
+    border: 1px solid #444;
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+#path-subtabs button.active {
+    background-color: #2d2d2d;
+    border-bottom: 1px solid #2d2d2d;
+}
+.health-bar {
+    position: absolute;
+    width: 100px;
+    height: 10px;
+    background: #444;
+    top: -15px;
+}
+
+.health-bar-fill {
+    height: 100%;
+    background: #66ff66;
+    width: 100%;
+}
+
+#wielder-health {
+    left: 10%;
+}
+
+#enemy-health {
+    right: 10%;
+}
+
+#actionsSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+#actionsSection .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+#statsDiv {
+    background: #2a2a2a;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px #000;
+}
+
+.stat-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.stat-icon {
+    margin-right: 5px;
+    font-size: 1.2em;
 }

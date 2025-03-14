@@ -4,6 +4,11 @@ function generateWielder(race, isInitial = false) {
         const availableRaces = Object.keys(races).filter(r => races[r].unlocked);
         race = availableRaces[Math.floor(Math.random() * availableRaces.length)];
     }
+    if (race === 'goblin') {
+        game.statistics.goblinWieldersUsed++;
+    }
+    const wielderSprite = document.getElementById('wielder-sprite');
+    wielderSprite.style.backgroundImage = `url('assets/wielder-${race}.png')`;
     const raceData = races[race];
     const startingBonus = Object.values(game.achievements).reduce((sum, ach) => sum + (ach.unlocked && ach.bonus.startingStats ? ach.bonus.startingStats : 0), 0);
     let baseStats;
@@ -22,6 +27,7 @@ function generateWielder(race, isInitial = false) {
             willpower: Math.floor(Math.random() * 50 + 50) + (raceData.stats.willpower || 0) + startingBonus
         };
     }
+
     return {
         name: raceData.names[Math.floor(Math.random() * raceData.names.length)],
         race,
@@ -32,6 +38,8 @@ function generateWielder(race, isInitial = false) {
         statPoints: 0,
         exp: 0,
         currentLife: baseStats.endurance * 5,
+        hasFought: false,         // For Pacifist
+        currentFightDamageTaken: 0, // For Tough Nut
         equipment: {
             helmet: null,
             body: null,

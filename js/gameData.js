@@ -6,6 +6,9 @@ const game = {
     currentEnemy: null,
     controlBonus: 0,
     inquisitionEnabled: true,
+    swiftKillStartTime: null, // For Swift Killer timing
+    swiftKillCount: 0,        // For Swift Killer count
+    wasEnergyMaxed: false,    // To detect Energy Peak transitions
     sword: {
         energy: 0,
         maxEnergy: 100,
@@ -29,7 +32,25 @@ const game = {
     story: [],
     unlockedUpgrades: [],
     unlockedRaces: ['human'],
-    currentAction: null
+    currentAction: null,
+    selectedPath: null,
+    unlockedPaths: [],
+    pathProgress: {
+        blood: 0,  // Total energy gained
+        death: 0,  // Total kills
+        vengeance: 0  // Boss kills (placeholder)
+    },
+    souls: {
+        minor: 0,
+        normal: 0,
+        major: 0,
+        epic: 0
+    },
+    pathTiersUnlocked: {
+        blood: [],
+        death: [],
+        vengeance: []
+    }
 };
 
 let gameData, races, zones, upgradeCaps;
@@ -64,4 +85,43 @@ const shopItems = {
         { type: 'amulet', name: 'Emerald Amulet', stats: { endurance: 3, willpower: 2 }, price: 260, icon: 'assets/neck.png' }
     ]
 };
+function loadGameData() {
+    // Assuming gameData is already fetched or defined
+    gameData.paths = {
+        blood: {
+            name: "Path of Blood",
+            description: "Tracks total energy gained",
+            tiers: [
+                { threshold: 1000, reward: { damageMultiplier: 1.05 } },
+                { threshold: 5000, reward: { maxEnergyMultiplier: 1.10 } },
+                { threshold: 10000, reward: { upgradeCostReduction: 0.05 } },
+                { threshold: 20000, reward: { expMultiplier: 1.10 } },
+                { threshold: 50000, reward: { startingStats: 1 } }
+            ]
+        },
+        death: {
+            name: "Path of Death",
+            description: "Tracks total kills and collects souls",
+            tiers: [
+                { threshold: 100, reward: { souls: { minor: 10 } } },
+                { threshold: 500, reward: { souls: { normal: 5 } } },
+                { threshold: 1000, reward: { souls: { major: 2 } } },
+                { threshold: 2000, reward: { souls: { epic: 1 } } },
+                { threshold: 5000, reward: { damageMultiplier: 1.10 } }
+            ]
+        },
+        vengeance: {
+            name: "Path of Vengeance",
+            description: "Tracks boss kills (placeholder)",
+            tiers: [
+                { threshold: 1, reward: { bossDamage: 1.05 } }, // Placeholder
+                { threshold: 5, reward: { bossExp: 1.10 } },
+                { threshold: 10, reward: { bossGold: 1.10 } },
+                { threshold: 20, reward: { bossSouls: 1.05 } },
+                { threshold: 50, reward: { ultimateReward: true } }
+            ]
+        }
+    };
+}
 loadAchievements();
+
