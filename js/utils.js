@@ -18,7 +18,7 @@ function loadGame() {
         game.wielder = saveData.wielder;
         gameData = saveData.gameData;
         const wielderSprite = document.getElementById('wielder-sprite');
-        wielderSprite.style.backgroundImage = `url('assets/wielder-${game.wielder.race}.png')`;
+        wielderSprite.style.backgroundImage = `url('assets/characters/wielder-${game.wielder.race}.png')`;
     } else {
         game.wielder = generateWielder('goblin', true);
     }
