@@ -8,6 +8,7 @@ function updateWielderStats() {
     const wielder = game.wielder;
     const effectiveStats = getEffectiveStats();
     const baseDamage = effectiveStats.strength * 2 + effectiveStats.swordfighting;
+
     const controlDamageBonus = baseDamage * game.controlBonus;
     const lifesteal = game.sword.upgrades.siphon.level;
     const totalDamage = (baseDamage + lifesteal + controlDamageBonus) * getDamageMultiplier();

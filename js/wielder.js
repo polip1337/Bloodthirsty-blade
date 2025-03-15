@@ -75,7 +75,7 @@ function allocatePoint(stat) {
         game.wielder.currentLife += 5;
     }
     if (stat === 'willpower') game.wielder.currentStats.willpower += 4;
-    if (game.wielder.statPoints <= 0) {
+    if (game.wielder.statPoints < 1) {
         onModalClose('levelUpModal');
     } else {
         showLevelUpModal();
@@ -136,6 +136,11 @@ function selectRace(race) {
         updateWielderStats();
     }
 }
+function calculateControlBonus(){
+    const controlLevel = game.sword.upgrades.control.level;
+    const willpower = Math.min(game.wielder.currentStats.willpower, 200);
+    game.controlBonus = controlLevel * 0.2 * (1 - willpower / 200);
+}
 
 function healWielder() {
     if (game.sword.energy >= 10 && game.wielder.currentLife < game.wielder.currentStats.endurance * 5) {
@@ -145,8 +150,7 @@ function healWielder() {
             game.wielder.currentStats.endurance * 5
         );
         const wielderHealthFill = document.querySelector('#wielder-health .health-bar-fill');
-
-        wielderHealthFill.style.width = `${(wielder.currentLife / (effectiveStats.endurance *5)) * 100}%`;
+        wielderHealthFill.style.width = `${(game.wielder.currentLife / (getEffectiveStats().endurance *5)) * 100}%`;
 
         updateWielderStats();
         updateEnergyAndKills();

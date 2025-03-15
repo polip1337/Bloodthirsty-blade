@@ -118,7 +118,7 @@ function updateStatPointsInfo() {
     const race = game.wielder.race;
     const basePoints = gameData.races[race].skillpoints || 1;
     const totalPoints = game.wielder.statPoints;
-    const info = `You have ${totalPoints} stat points to allocate. ` +
+    const info = `You have ${totalPoints.toFixed(0)} stat points to allocate. ` +
         `(Each level grants ${basePoints} point.)`;
     document.getElementById('statPointsInfo').textContent = info;
 }

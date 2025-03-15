@@ -16,6 +16,7 @@ function buyUpgrade(name) {
         }
         updateUpgrades(game.sword.energy);
         if (name === 'capacity') calculateMaxEnergy();
+        if (name === 'control') calculateControlBonus();
         if (name === 'senses'){
             gameData.zones[upgrade.level - 1].unlocked = true;
             updateEnemyZones();
