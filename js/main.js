@@ -3,12 +3,11 @@ async function initGame() {
     races = gameData.races;
     zones = gameData.zones;
     upgradeCaps = gameData.upgradeCaps;
+
     loadGame();
     saveGame();
     calculateMaxEnergy();
     updateDisplay();
-    loadGameData();
-    loadAchievements();
     setInterval(() => {
         if (game.wielder.currentLife < game.wielder.currentStats.endurance * 5) {
                 let regenRate = 1; // Base regen
@@ -46,7 +45,7 @@ async function initGame() {
         if (game.currentAction === 'autoExploring') {
             game.statistics.totalAutoExploreTime++;
         }
-    }, 10000);
+    }, 1000);
 }
 
 window.onload = initGame;

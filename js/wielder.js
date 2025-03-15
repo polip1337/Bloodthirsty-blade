@@ -27,7 +27,6 @@ function generateWielder(race, isInitial = false) {
             willpower: Math.floor(Math.random() * 50 + 50) + (raceData.stats.willpower || 0) + startingBonus
         };
     }
-
     return {
         name: raceData.names[Math.floor(Math.random() * raceData.names.length)],
         race,
@@ -132,6 +131,7 @@ function handleWielderDeath(affectedStat) {
 function selectRace(race) {
     if (races[race].unlocked) {
         game.wielder = generateWielder(race);
+        checkAchievements();
         document.getElementById('raceSelectionModal').style.display = 'none';
         updateWielderStats();
     }

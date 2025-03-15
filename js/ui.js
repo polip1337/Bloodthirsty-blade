@@ -247,6 +247,7 @@ function updateDisplay() {
     updateButtonStates();
     redrawUpgrades();
     updatePathsTab();
+    updateAchievementsTab();
 }
 
 function showTab(tabName) {

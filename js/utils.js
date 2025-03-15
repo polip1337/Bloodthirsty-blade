@@ -10,63 +10,34 @@ function saveGame() {
 }
 
 function loadGame() {
-    console.log('Loading game');
     const saved = localStorage.getItem('cursedSwordSave');
     if (saved) {
+        console.log('Loading game from Saved state');
+
         const saveData = JSON.parse(saved);
+        game = {};
         Object.assign(game, saveData.game);
         game.wielder = saveData.wielder;
         gameData = saveData.gameData;
+        loadAchievements();
         const wielderSprite = document.getElementById('wielder-sprite');
         wielderSprite.style.backgroundImage = `url('assets/wielder-${game.wielder.race}.png')`;
     } else {
+        console.log('Loading game from scratch');
+        loadGameData();
         game.wielder = generateWielder('goblin', true);
+        loadAchievements();
     }
 }
 
 function wipeSave() {
     if (confirm('Permanently delete all progress?')) {
         localStorage.removeItem('cursedSwordSave');
-        // Fully reset game state
-        game.wielder = generateWielder('goblin', true);
-        resetStats();
-        game.sword.energy = 0;
-        game.inquisitionEnabled = true;
-        game.currentAction = null;
-        Object.values(game.sword.upgrades).forEach(upg => { upg.level = 1; upg.cost = upg.initialCost; });
-        game.selectedPath = null;
-        game.pathProgress = { blood: 0, death: 0, vengeance: 0 };
-        game.souls = { minor: 0, normal: 0, major: 0, epic: 0 };
-        game.pathTiersUnlocked = { blood: [], death: [], vengeance: [] };
-        game.unlockedPaths = [];
         clearAllIntervals();
         initGame();
-        loadAchievements();
-        updateDisplay();
-        checkAchievements(); // Safe to call now with reinitialized achievements
     }
 }
-function resetStats(){
-game.statistics = {
-    totalKills: 0,          // Existing
-    wieldersUsed: 0,        // Existing
-    zoneKills: {},          // Existing
-    mobKills: {},
-    itemsBought: 0,         // For Shopaholic
-    manualKills: 0,         // For Manual Warrior
-    timesEnergyMaxed: 0,    // For Energy Peak
-    goblinWieldersUsed: 0,  // For Goblin King
-    totalRestTime: 0,       // For Restful (in seconds)
-    totalAutoExploreTime: 0,// For Auto Master (in seconds)
-    totalPlayTime: 0,       // For Marathon (in seconds)
-    hasSwiftKilled: false,  // For Swift Killer
-    hasSurvivedWithOneHP: false, // For Survivor
-    hasOneHitKilled: false, // For Lucky Strike
-    hasTakenFiftyDamage: false, // For Tough Nut
-    hasPacifistLeveled: false, // For Pacifist
-    hasEscapedInquisition: false // For Escape Artist
-};
-}
+
 function clearAllIntervals() {
     let id = setInterval(() => {}, 1000); // Create a dummy interval to get the latest ID
     while (id >= 0) {

@@ -55,7 +55,7 @@ game.achievements = {
         description: "Defeat 25 enemies in one zone",
         condition: () => Object.values(game.statistics.zoneKills).some(k => k >= 25),
         target: 25,
-        progress: () => Math.max(...Object.values(game.statistics.zoneKills)),
+        progress: () => Math.max(...Object.values(game.statistics.zoneKills), 0),
         bonus: { damageMultiplier: 1.02 },
         unlocked: false,
         icon: "⚔️"
@@ -75,7 +75,7 @@ game.achievements = {
         description: "Kill 100 enemies in zone 4+",
         condition: () => Object.entries(game.statistics.zoneKills).some(([z, k]) => z >= 4 && k >= 100),
         target: 100,
-        progress: () => Math.max(...Object.entries(game.statistics.zoneKills).filter(([z, k]) => parseInt(z) >= 4).map(([z, k]) => k)),
+        progress: () => Math.max(...Object.entries(game.statistics.zoneKills).filter(([z, k]) => parseInt(z) >= 4).map(([z, k]) => k),0),
         bonus: { goldMultiplier: 1.05 },
         unlocked: false,
         icon: "🏰"
@@ -119,7 +119,7 @@ game.achievements = {
         description: "Trigger Inquisition warning",
         condition: () => Object.values(game.statistics.zoneKills).some(k => k >= 50),
         target: 50,
-        progress: () => Math.max(...Object.values(game.statistics.zoneKills)),
+        progress: () => Math.max(...Object.values(game.statistics.zoneKills),0),
         bonus: { willpowerBonus: 1 },
         unlocked: false,
         icon: "🕵️"
@@ -371,19 +371,21 @@ game.achievements = {
         description: "Kill 200 enemies in one zone",
         condition: () => Object.values(game.statistics.zoneKills).some(k => k >= 200),
         target: 200,
-        progress: () => Math.max(...Object.values(game.statistics.zoneKills)),
+        progress: () => Math.max(...Object.values(game.statistics.zoneKills), 0),
         bonus: { zoneExp: 0.05 },
         unlocked: false,
         icon: "✅"
     },
     goblinKing: {
-        name: "Goblin King",
-        description: "Use 5 goblin wielders",
-        condition: () => false,
-        bonus: { goblinBonus: 1 },
-        unlocked: false,
-        icon: "👑"
-    },
+            name: "Goblin King",
+            description: "Use 5 goblin wielders",
+            condition: () => game.statistics.goblinWieldersUsed >= 5,
+            target: 5,
+            progress: () => game.statistics.goblinWieldersUsed,
+            bonus: { goblinBonus: 1 },
+            unlocked: false,
+            icon: "👑"
+        },
     minimalist: {
         name: "Minimalist",
         description: "Reach level 10 with no items",
