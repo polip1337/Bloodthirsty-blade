@@ -530,11 +530,11 @@ body {
     100% { transform: translateY(-50%) translateX(0); }
 }
 .combat-active #wielder-sprite {
-    animation: combatAnimation 1s ease-in-out;
+    animation: combatAnimation 0.9s ease-in-out;
 }
 
 .combat-active #enemy-sprite {
-    animation: combatAnimation2 1s ease-in-out ;
+    animation: combatAnimation2 0.9s ease-in-out ;
 }
 #path-subtabs {
     display: flex;

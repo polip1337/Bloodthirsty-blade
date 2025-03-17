@@ -56,11 +56,13 @@ async function attackEnemy(zoneIndex, enemyIndex) {
         addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(wielder.currentStats.swordfighting)}) Player HP left: ${wielder.currentLife}`, 'damage');
         wielderHealthFill.style.width = `${(wielder.currentLife / (effectiveStats.endurance *5)) * 100}%`;
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 900));
+                document.getElementById('combat-area').classList.remove('combat-active');
+
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         enemyHealthFill.style.width = `${(enemyLife / (enemy.endurance * 5)) * 100}%`;
 
-        document.getElementById('combat-area').classList.remove('combat-active');
     }
     if (enemyLife <= 0) {
         endCombat(true);
