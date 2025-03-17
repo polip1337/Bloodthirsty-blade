@@ -1,6 +1,5 @@
 async function attackEnemy(zoneIndex, enemyIndex) {
     if (game.currentAction && game.currentAction !== 'autoFighting') return;
-    const wielderHealthFill = document.querySelector('#wielder-health .health-bar-fill');
     const enemyHealthFill = document.querySelector('#enemy-health .health-bar-fill');
     game.wielder.hasFought = true;
     const effectiveStats = getEffectiveStats();
@@ -34,8 +33,7 @@ async function attackEnemy(zoneIndex, enemyIndex) {
     addCombatMessage(`Engaging ${enemy.name} (${enemy.endurance*5} HP)`, 'player-stat');
     enemyHealthFill.style.width = '100%';
 
-
-    wielderHealthFill.style.width = `${(wielder.currentLife / (effectiveStats.endurance *5)) * 100}%`;
+       updateHealthBar();
 
     while (enemyLife > 0 && wielder.currentLife > 0 && !isAnyModalOpen()) {
         enemyHealthFill.style.width = `${(enemyLife / enemy.maxLife) * 100}%`;
@@ -54,8 +52,7 @@ async function attackEnemy(zoneIndex, enemyIndex) {
         wielder.currentLife -= enemyDamage;
 
         addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(wielder.currentStats.swordfighting)}) Player HP left: ${wielder.currentLife}`, 'damage');
-        wielderHealthFill.style.width = `${(wielder.currentLife / (effectiveStats.endurance *5)) * 100}%`;
-
+        updateHealthBar();
         await new Promise(resolve => setTimeout(resolve, 900));
                 document.getElementById('combat-area').classList.remove('combat-active');
 

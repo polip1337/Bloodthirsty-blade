@@ -249,6 +249,7 @@ function updateDisplay() {
     redrawUpgrades();
     updatePathsTab();
     updateAchievementsTab();
+    updateHealthBar();
 }
 
 function showTab(tabName) {
@@ -504,4 +505,9 @@ function showLeftTab(tabName) {
     document.querySelectorAll('#left-tabs #tabs-left button').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`#left-tabs #tabs-left button[onclick="showLeftTab('${tabName}')"]`).classList.add('active');
     updateDisplay();
+}
+function updateHealthBar(){
+    const wielderHealthFill = document.querySelector('#wielder-health .health-bar-fill');
+
+    wielderHealthFill.style.width = `${(game.wielder.currentLife / (getEffectiveStats().endurance *5)) * 100}%`;
 }
