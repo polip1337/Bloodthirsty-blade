@@ -1,3 +1,4 @@
+Given this css, modify it so that tooltips never appear offscreen:
 
        :root {
     --logo-row-height: auto;
@@ -194,27 +195,30 @@ button:disabled {
 }
 
 .tooltip .tooltiptext {
-    position: fixed; /* Use fixed to position relative to viewport */
-    visibility: hidden;
-    background-color: #555;
+    visibility: hidden; /* Hidden by default */
+    width: max-content;
+    max-width: 300px;
+    background-color: #2d2d2d;
     color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    z-index: 10;
-    opacity: 0;
-    transition: opacity 0.3s;
+    text-align: left;
+    border-radius: 4px;
+    padding: 8px 12px;
+    position: absolute; /* Start with absolute for parent relativity */
+    z-index: 1002; /* High z-index to ensure it’s on top */
+    border: 1px solid #ff6666;
+    box-shadow: 0 0 5px rgba(255, 102, 102, 0.3);
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.3s; /* Smooth transition */
+    white-space: normal;
+    pointer-events: none; /* Prevent interference with hover */
+    bottom: calc(100% + 5px); /* Default above */
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
-
-footer .tooltip .tooltiptext {
-    top: auto;
-    bottom: calc(100% + 5px);
-    transform: translateX(-50%);
+    visibility: visible; /* Show on hover */
+    opacity: 1; /* Fully opaque */
 }
 
 /* Footer */

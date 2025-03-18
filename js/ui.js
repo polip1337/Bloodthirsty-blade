@@ -248,7 +248,7 @@ function updateDisplay() {
     updatePathsTab();
     updateAchievementsTab();
     updateHealthBar();
-
+    adjustTooltipPosition();
     const equipmentTabBtn = document.getElementById('equipmentTabBtn');
     equipmentTabBtn.style.display = gameData.zones[3].unlocked ? 'inline' : 'none';
 
@@ -433,39 +433,96 @@ function showOptions() {
 }
 
 function adjustTooltipPosition() {
-    document.querySelectorAll('.tooltip').forEach(tooltip => {
+    const tooltips = document.querySelectorAll('.tooltip');
+
+    console.log(`Found ${tooltips.length} tooltip elements`);
+
+    if (tooltips.length === 0) {
+        console.warn('No elements with class "tooltip" found.');
+        return;
+    }
+
+    tooltips.forEach((tooltip, index) => {
         const tooltipText = tooltip.querySelector('.tooltiptext');
-        if (!tooltipText) return;
 
-        const triggerRect = tooltip.getBoundingClientRect();
-        const tooltipRect = tooltipText.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-
-        // Try to position below the trigger
-        let top = triggerRect.bottom + 5;
-        let left = triggerRect.left + (triggerRect.width / 2) - (tooltipRect.width / 2);
-
-        // If below goes offscreen, position above
-        if (top + tooltipRect.height > viewportHeight) {
-            top = triggerRect.top - tooltipRect.height - 5;
+        if (!tooltipText) {
+            console.warn(`Tooltip ${index} has no .tooltiptext child.`);
+            return;
         }
 
-        // Adjust horizontal position to stay within viewport
-        if (left < 0) {
-            left = 0;
-        } else if (left + tooltipRect.width > viewportWidth) {
-            left = viewportWidth - tooltipRect.width;
-        }
+        tooltip.addEventListener('mouseenter', () => {
+            const rect = tooltip.getBoundingClientRect();
+            const tooltipRect = tooltipText.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
 
-        // Apply the calculated position
-        tooltipText.style.top = `${top}px`;
-        tooltipText.style.left = `${left}px`;
-        tooltipText.style.bottom = 'auto';
-        tooltipText.style.right = 'auto';
-        tooltipText.style.transform = 'none';
+            // Reset positioning styles
+            tooltipText.style.top = '';
+            tooltipText.style.bottom = '';
+            tooltipText.style.left = '';
+            tooltipText.style.right = '';
+            tooltipText.style.transform = '';
+
+            // Calculate available space
+            const spaceAbove = rect.top;
+            const spaceBelow = viewportHeight - rect.bottom;
+            const spaceLeft = rect.left;
+            const spaceRight = viewportWidth - rect.right;
+
+            // Default position: above
+            tooltipText.style.position = 'fixed'; // Use fixed for viewport-based positioning
+            let top = rect.top - tooltipRect.height - 5;
+            let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+
+            // Adjust vertical position
+            if (spaceAbove < tooltipRect.height && spaceBelow > tooltipRect.height + 5) {
+                console.log(`Placing tooltip ${index} below (spaceAbove: ${spaceAbove}, spaceBelow: ${spaceBelow})`);
+                top = rect.bottom + 5;
+                tooltipText.style.top = `${top}px`;
+                tooltipText.style.bottom = 'auto';
+            } else {
+                console.log(`Placing tooltip ${index} above (spaceAbove: ${spaceAbove}, spaceBelow: ${spaceBelow})`);
+                tooltipText.style.top = `${top}px`;
+                tooltipText.style.bottom = 'auto';
+            }
+
+            // Adjust horizontal position
+            if (left < 0) {
+                console.log(`Adjusting tooltip ${index} from left edge`);
+                left = 5;
+                tooltipText.style.left = `${left}px`;
+                tooltipText.style.transform = 'none';
+            } else if (left + tooltipRect.width > viewportWidth) {
+                console.log(`Adjusting tooltip ${index} from right edge`);
+                left = viewportWidth - tooltipRect.width - 5;
+                tooltipText.style.left = `${left}px`;
+                tooltipText.style.transform = 'none';
+            } else {
+                tooltipText.style.left = `${left}px`;
+                tooltipText.style.transform = 'none'; // Remove centering transform since we’re using exact pixels
+            }
+
+            // Debug positioning
+            console.log(`Tooltip ${index} positioned at: top=${tooltipText.style.top}, left=${tooltipText.style.left}`);
+            console.log(`Tooltip ${index} visibility: ${window.getComputedStyle(tooltipText).visibility}, opacity: ${window.getComputedStyle(tooltipText).opacity}`);
+        });
+
+
     });
 }
+
+// Run on DOM load
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded, initializing tooltips');
+    adjustTooltipPosition();
+});
+
+// Handle dynamic content
+const observer = new MutationObserver(() => {
+    console.log('DOM changed, re-initializing tooltips');
+    adjustTooltipPosition();
+});
+observer.observe(document.body, { childList: true, subtree: true });
 function showPathSelectionModal() {
     const modal = document.getElementById('pathSelectionModal');
     const content = `
