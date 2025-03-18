@@ -667,7 +667,7 @@ body {
     }
     50% {
         border-color: #ff0; /* Midpoint color (yellow) */
-        box-shadow: 0 0 0 10px rgba(255, 255, 0, 0);
+        box-shadow: 0 0 0 10px rgba(0, 0, 255, 0);
     }
     100% {
         border-color: #fff; /* Back to starting color */
@@ -713,12 +713,56 @@ body {
 .modal {
     display: none;
     position: fixed;
-    top: 20%;
+    top: 10%;
     left: 50%;
     transform: translateX(-50%);
-    background: #222;
+    background: #1a1a1a; /* Dark background */
     color: #fff;
     padding: 20px;
-    border: 2px solid #fff;
+    border: 2px solid red; /* Gold border */
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
     z-index: 1000;
+    width: 600px; /* Fixed width for two columns */
+}
+
+.modal h3 {
+    text-align: center;
+    color: #ffd700; /* Gold title */
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.stats-grid {
+    display: flex;
+    justify-content: space-between;
+}
+
+.column {
+    width: 48%;
+}
+
+.stat-item {
+    background: #2a2a2a; /* Slightly lighter background */
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid #444;
+    transition: transform 0.2s;
+}
+
+.stat-item:hover {
+    transform: scale(1.02); /* Slight hover effect */
+    border-color: #ffd700;
+}
+
+.label {
+    color: #ccc; /* Light gray for labels */
+    font-weight: bold;
+}
+
+.value {
+    color: #00ff00; /* Green for values */
 }

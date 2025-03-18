@@ -342,53 +342,59 @@ function onModalClose(modalId) {
     updateDisplay();
 }
 
-function showStatistics() {
-const content = document.getElementById('statisticsContent');
-    let html = '<ul>';
+function updateStatsModal() {
+    const content = document.getElementById('statsContent');
+    let html = '';
 
-    // Wielder Stats
-    html += '<li><strong>Wielder Stats</strong></li>';
-    html += `<li>Current HP: ${game.wielder.currentLife.toFixed(1)} / ${getEffectiveStats().endurance*5}</li>`;
-    html += `<li>Level: ${game.wielder.level}</li>`;
-    html += `<li>Experience: ${game.wielder.exp.toFixed(1)} / ${(game.wielder.level * 100).toFixed(1)}</li>`;
-    html += `<li>Gold: ${game.wielder.gold.toFixed(0)}</li>`;
-    html += `<li>Defeated: ${game.wielder.defeated ? 'Yes' : 'No'}</li>`; // Assumed tracked
+    // Stats data
+    const stats = [
+        { label: "Total Kills", value: game.statistics.totalKills },
+        { label: "Achievements Completed", value: Object.keys(game.completedAchievements).length },
+        { label: "Current Action", value: game.currentAction || "None" },
+        { label: "Time Auto fighting", value: formatTime(game.statistics.totalAutoExploreTime) },
+        { label: "Time Resting", value: formatTime(game.statistics.totalRestTime) },
+        { label: "Time Playing", value: formatTime(game.statistics.totalPlayTime) },
+        { label: "Damage Multiplier", value: getDamageMultiplier().toFixed(2) + "x" },
+        { label: "EXP Gain Multiplier", value: getExpMultiplier().toFixed(2) + "x" },
+        { label: "Max Energy Multiplier", value: getMaxEnergyMultiplier().toFixed(2) + "x" },
+        { label: "Energy Gain Multiplier", value: getEnergyGainMultiplier().toFixed(2) + "x" },
+        { label: "Cost Reduction Multiplier", value: (getUpgradeCostReduction() + 1).toFixed(2) + "x" }
+    ];
 
-    // Sword Stats
-    html += '<li><strong>Sword Stats</strong></li>';
-    html += `<li>Energy: ${game.sword.energy.toFixed(1)} / ${game.sword.maxEnergy.toFixed(1)}</li>`;
-    if (game.sword.upgrades) {
-        Object.entries(game.sword.upgrades).forEach(([key, upgrade]) => {
-            html += `<li>${key.charAt(0).toUpperCase() + key.slice(1)} Level: ${upgrade.level}</li>`;
-        });
-    }
-
-    // General Statistics
-    html += '<li><strong>General Statistics</strong></li>';
-    html += `<li>Total Kills: ${game.statistics.totalKills}</li>`;
-    html += `<li>Total Upgrades Performed: ${game.statistics.totalUpgrades}</li>`;
-    html += `<li>Achievements Completed: ${game.completedAchievements.length}</li>`;
-
-    // Souls (if Path of Death is selected)
+    // Souls if Path of Death
     if (game.selectedPath === 'death' && game.souls) {
-        html += '<li><strong>Souls Collected</strong></li>';
-        html += `<li>Minor Souls: ${game.souls.minor}</li>`;
-        html += `<li>Normal Souls: ${game.souls.normal}</li>`;
-        html += `<li>Major Souls: ${game.souls.major}</li>`;
-        html += `<li>Epic Souls: ${game.souls.epic}</li>`;
+        stats.push({ label: "Minor Souls", value: game.souls.minor });
+        stats.push({ label: "Normal Souls", value: game.souls.normal });
+        stats.push({ label: "Major Souls", value: game.souls.major });
+        stats.push({ label: "Epic Souls", value: game.souls.epic });
     }
 
-    // Zone Progress (assumed tracked)
-    if (game.zones) {
-        html += '<li><strong>Zone Progress</strong></li>';
-        game.zones.forEach((zone, index) => {
-            html += `<li>Zone ${index + 1} Unlocked: ${zone.unlocked ? 'Yes' : 'No'}</li>`;
-        });
-    }
+    // Split into two columns
+    const midPoint = Math.ceil(stats.length / 2);
+    const leftColumn = stats.slice(0, midPoint);
+    const rightColumn = stats.slice(midPoint);
 
-    html += '</ul>';
+    html += '<div class="column">';
+    leftColumn.forEach(stat => {
+        html += `<div class="stat-item"><span class="label">${stat.label}:</span> <span class="value">${stat.value}</span></div>`;
+    });
+    html += '</div>';
+
+    html += '<div class="column">';
+    rightColumn.forEach(stat => {
+        html += `<div class="stat-item"><span class="label">${stat.label}:</span> <span class="value">${stat.value}</span></div>`;
+    });
+    html += '</div>';
+
     content.innerHTML = html;
     document.getElementById('statsModal').style.display = 'block';
+}
+
+function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours}h ${minutes}m ${secs}s`;
 }
 
 function showStory(viewed) {
@@ -420,9 +426,8 @@ function showStoryContent(key) {
 }
 function showChangelog() {
     document.getElementById('changelogContent').innerHTML = `
-        <p>v1.2 - Added Save System & Wounds</p>
-        <p>v1.1 - Zone Combat System</p>
-        <p>v1.0 - Base Game</p>
+
+        <p>0.1 - Base Game</p>
     `;
     document.getElementById('changelogModal').style.display = 'block';
 }
@@ -438,7 +443,7 @@ function adjustTooltipPosition() {
     console.log(`Found ${tooltips.length} tooltip elements`);
 
     if (tooltips.length === 0) {
-        console.warn('No elements with class "tooltip" found.');
+        console.log('No elements with class "tooltip" found.');
         return;
     }
 
@@ -446,7 +451,7 @@ function adjustTooltipPosition() {
         const tooltipText = tooltip.querySelector('.tooltiptext');
 
         if (!tooltipText) {
-            console.warn(`Tooltip ${index} has no .tooltiptext child.`);
+            console.log(`Tooltip ${index} has no .tooltiptext child.`);
             return;
         }
 
