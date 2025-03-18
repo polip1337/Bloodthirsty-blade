@@ -51,7 +51,7 @@ async function attackEnemy(zoneIndex, enemyIndex) {
         const enemyDamage = Math.max(enemy.strength * 2 - Math.floor(wielder.currentStats.swordfighting), 1);
         wielder.currentLife -= enemyDamage;
 
-        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(wielder.currentStats.swordfighting)}) Player HP left: ${wielder.currentLife}`, 'damage');
+        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(wielder.currentStats.swordfighting)}) Player HP left: ${wielder.currentLife.toFixed(1)}`, 'damage');
         updateHealthBar();
         updateEnemyHealthBar(enemy);
         await new Promise(resolve => setTimeout(resolve, 900));
