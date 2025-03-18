@@ -31,7 +31,10 @@
 </div>
 <div id="storyModal" class="modal">
     <h3>Sword's Legacy</h3>
-    <div id="storyContent"></div>
+    <div class="story-library">
+        <div class="story-list"></div>
+        <div class="story-content"></div>
+    </div>
     <button onclick="onModalClose('storyModal')">Close</button>
 </div>
 <div id="changelogModal" class="modal">
@@ -106,7 +109,7 @@
     <div id="tabs-left">
         <button class="active" onclick="showLeftTab('sword')">Sword Upgrades</button>
         <button onclick="showLeftTab('wielder')">Wielder</button>
-        <button onclick="showLeftTab('equipment')">Equipment</button>
+        <button id="equipmentTabBtn" onclick="showLeftTab('equipment')">Equipment</button>
     </div>
     <div id="tab-content-left">
         <div id="sword-content">
@@ -149,7 +152,7 @@
     <div id="tabs">
         <button class="active" onclick="showTab('zones')">Zones</button>
         <button onclick="showTab('achievements')">Achievements</button>
-        <button onclick="showTab('paths')">Paths</button>
+        <button id="pathsTabBtn" onclick="showTab('paths')">Paths</button>
     </div>
     <div id="tab-content">
         <div id="zones-content">
@@ -177,7 +180,7 @@
         </span>
         <span class="tooltip">
             <button id="trainButton" onclick="onActionButtonClick('training')">Train</button>
-            <span class="tooltiptext">Gain 2 EXP/second (disables other actions)</span>
+            <span class="tooltiptext">Gain 1 EXP/second (disables other actions)</span>
         </span>
         <span class="tooltip">
             <button id="healButton" onclick="healWielder()">Heal wielder (10 energy)</button>

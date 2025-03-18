@@ -80,7 +80,7 @@ function updateEquipmentAndInventory() {
         });
         equipmentHTML += '</div>';
 
-        equipmentHTML += '<div id="inventory-grid">';
+        equipmentHTML += '<h3>Inventory</h3><div id="inventory-grid">';
         game.wielder.inventory.forEach((item, index) => {
             equipmentHTML += `
                 <div class="inventory-slot tooltip ${getItemBorderClass(item)}" onclick="handleInventoryClick(${index})">
@@ -93,6 +93,7 @@ function updateEquipmentAndInventory() {
         }
         equipmentHTML += '</div>';
 
+        equipmentHTML += `<div class="stat">Gold: ${game.wielder.gold}</div>`;
         equipmentHTML += `
             <button id="sellModeButton" onclick="toggleSellMode()">
                 ${game.sellMode ? 'Exit Sell Mode' : 'Enter Sell Mode'}
@@ -201,27 +202,23 @@ function updateEnemyZones() {
 }
 function updateButtonStates() {
     const actionInProgress = !!game.currentAction;
-    document.querySelectorAll('#enemies button').forEach(btn => {
-        btn.disabled = actionInProgress || game.wielder.defeated;
-    });
-    gameData.zones.forEach((_, zi) => {
-        const checkbox = document.getElementById(`auto-${zi}`);
-        if (checkbox) {
-            const connectionLevel = game.sword.upgrades.connection?.level || 0;
-            const sensesLevel = game.sword.upgrades.senses?.level || 0;
-            const requiredLevel = zi + 1;
-            const shouldBeEnabled = connectionLevel >= requiredLevel || game.wielder.defeated || (game.currentAction && game.currentAction !== 'autoFighting');
-            if(shouldBeEnabled){
-                checkbox.parentNode.classList.remove("disabled");
-                console.log(_.name + " enabled. Should be enabled:" + shouldBeEnabled);
+        document.querySelectorAll('#enemies button').forEach(btn => {
+            btn.disabled = actionInProgress || game.wielder.defeated;
+        });
+        gameData.zones.forEach((_, zi) => {
+            const checkbox = document.getElementById(`auto-${zi}`);
+            if (checkbox) {
+                const connectionLevel = game.sword.upgrades.connection?.level || 0;
+                const requiredLevel = zi + 1;
+                const shouldBeDisabled = connectionLevel < requiredLevel || game.wielder.defeated || (game.currentAction && game.currentAction !== 'autoFighting');
+                checkbox.disabled = shouldBeDisabled; // Disable the checkbox
+                if (shouldBeDisabled) {
+                    checkbox.parentNode.classList.add("disabled");
+                } else {
+                    checkbox.parentNode.classList.remove("disabled");
+                }
             }
-            else{
-                checkbox.parentNode.classList.add("disabled");
-                console.log(_.name + " disabled");
-
-            }
-       }
-    });
+        });
     const healButton = document.getElementById('healButton');
     const changeWielderButton = document.getElementById('changeWielderButton');
     const restButton = document.getElementById('restButton');
@@ -250,6 +247,13 @@ function updateDisplay() {
     updatePathsTab();
     updateAchievementsTab();
     updateHealthBar();
+
+    const equipmentTabBtn = document.getElementById('equipmentTabBtn');
+    equipmentTabBtn.style.display = gameData.zones[3].unlocked ? 'inline' : 'none';
+
+    // Hide/show Paths tab based on Zone 5 unlock
+    const pathsTabBtn = document.getElementById('pathsTabBtn');
+    pathsTabBtn.style.display = gameData.zones[4].unlocked ? 'inline' : 'none';
 }
 
 function showTab(tabName) {
@@ -349,17 +353,31 @@ function showStatistics() {
 
 function showStory(viewed) {
     if (viewed) {
-        if (!game.story1Viewed) showStory();
+        if (!game.story1Viewed){
+            showStory();
+            showStoryContent("story1");
+        }
         game.story1Viewed = true;
         return;
     }
-    const stories = Object.values(gameData.story).filter(story => story.unlocked);
-    document.getElementById('storyContent').innerHTML = stories.length > 0 ?
-        stories.map(story => `<div class="story-entry"><h4>${story.title}</h4><p>${story.entry.join('</p><p>')}</p></div>`).join('') :
-        '<p>No story fragments unlocked yet</p>';
+    const stories = Object.entries(gameData.story).filter(([_, story]) => story.unlocked);
+    const listDiv = document.querySelector('#storyModal .story-list');
+    const contentDiv = document.querySelector('#storyModal .story-content');
+    listDiv.innerHTML = stories.map(([key, story]) => `
+        <div class="story-title" onclick="showStoryContent('${key}')">${story.title}</div>
+    `).join('');
+
     document.getElementById('storyModal').style.display = 'block';
 }
-
+function showStoryContent(key) {
+    const story = gameData.story[key];
+    if (story && story.unlocked) {
+        document.querySelector('#storyModal .story-content').innerHTML = `
+            <h4>${story.title}</h4>
+            <p>${story.entry.join('</p><p>')}</p>
+        `;
+    }
+}
 function showChangelog() {
     document.getElementById('changelogContent').innerHTML = `
         <p>v1.2 - Added Save System & Wounds</p>
@@ -460,21 +478,25 @@ function showPathSubtab(path) {
                 <span class="tooltiptext">Minor/Normal/Major/Epic souls collected</span>
             </div>`;
     }
+    const nextTierIndex = pathData.tiers.findIndex((tier, idx) => !tiersUnlocked.includes(idx));
     content += '<h4>Progress</h4>';
-    pathData.tiers.forEach((tier, idx) => {
-        const isUnlocked = tiersUnlocked.includes(idx);
-        if (isUnlocked) {
-            content += `
-                <div class="upgrade unlocked">
-                    Tier ${idx + 1}: Unlocked<br>
-                    Reward: ${getPathRewardText(tier.reward)}
-                </div>`;
-        } else {
-            content += `
-                <div class="upgrade">
-                    Tier ${idx + 1}: ${progress}/${tier.threshold}
-                </div>`;
-        }
+    if (nextTierIndex !== -1) {
+        const nextTier = pathData.tiers[nextTierIndex];
+        content += `
+            <div class="upgrade">
+                Tier ${nextTierIndex + 1}: ${progress}/${nextTier.threshold}
+            </div>`;
+    } else {
+        content += '<p>All tiers unlocked for this path.</p>';
+    }
+    content += '<h4>Unlocked Tiers</h4>';
+    tiersUnlocked.forEach(idx => {
+        const tier = pathData.tiers[idx];
+        content += `
+            <div class="upgrade unlocked">
+                Tier ${idx + 1}: Unlocked<br>
+                Reward: ${getPathRewardText(tier.reward)}
+            </div>`;
     });
     contentDiv.innerHTML = content;
     document.querySelectorAll('#path-subtabs button').forEach(btn => {
@@ -510,4 +532,24 @@ function updateHealthBar(){
     const wielderHealthFill = document.querySelector('#wielder-health .health-bar-fill');
 
     wielderHealthFill.style.width = `${(game.wielder.currentLife / (getEffectiveStats().endurance *5)) * 100}%`;
+}
+function updateEnemyHealthBar(enemy){
+    const enemyHealthFill = document.querySelector('#enemy-health .health-bar-fill');
+    enemyHealthFill.style.width = `${(enemy.endurance * 5 / enemy.maxLife) * 100}%`;
+
+}
+function showFloatingNumber(value, elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    const rect = element.getBoundingClientRect();
+    const number = document.createElement('div');
+    number.className = 'floating-number';
+    number.textContent = `+${value}`;
+    number.style.left = `${rect.left + rect.width / 2 - 10}px`; // Center horizontally
+    number.style.top = `${rect.top - 10}px`; // Above the button
+    document.body.appendChild(number);
+
+    // Remove the element after animation completes
+    setTimeout(() => number.remove(), 2000);
 }

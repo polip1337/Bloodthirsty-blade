@@ -607,3 +607,90 @@ body {
     margin-right: 5px;
     font-size: 1.2em;
 }
+
+
+.equipment-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.item-icon {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #ccc;
+    background: #222;
+    cursor: pointer;
+}
+
+#inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.inventory-slot {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #ccc;
+    background: #222;
+    cursor: pointer;
+}
+.story-library {
+    display: flex;
+}
+
+.story-list {
+    width: 30%;
+    border-right: 1px solid #ccc;
+    padding-right: 10px;
+}
+
+.story-title {
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.story-content {
+    width: 70%;
+    padding-left: 10px;
+}
+@keyframes pulse {
+    0% {
+        border-color: #fff; /* Starting color */
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+    }
+    50% {
+        border-color: #ff0; /* Midpoint color (yellow) */
+        box-shadow: 0 0 0 10px rgba(255, 255, 0, 0);
+    }
+    100% {
+        border-color: #fff; /* Back to starting color */
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+    }
+}
+
+.pulse-animation {
+    animation: pulse 5s infinite; /* Runs for 5 seconds, repeats infinitely */
+}
+.floating-number {
+    position: absolute;
+    color: #00ff00; /* Green */
+    font-size: 16px;
+    font-weight: bold;
+    pointer-events: none; /* Prevents clicking through */
+    animation: floatAndFade 2s ease-out forwards;
+    z-index: 1000; /* Ensure it’s above other elements */
+}
+
+@keyframes floatAndFade {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px); /* Moves up 20px */
+    }
+}

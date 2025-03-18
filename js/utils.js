@@ -19,9 +19,16 @@ function loadGame() {
         Object.assign(game, saveData.game);
         game.wielder = saveData.wielder;
         gameData = saveData.gameData;
-        loadAchievements();
         const wielderSprite = document.getElementById('wielder-sprite');
         wielderSprite.style.backgroundImage = `url('assets/wielder-${game.wielder.race}.png')`;
+        // Ensure completedAchievements exists
+        if (!game.completedAchievements) {
+            game.completedAchievements = Object.entries(game.achievements)
+                .filter(([key, ach]) => ach.unlocked)
+                .map(([key]) => key);
+        }
+        loadAchievements();
+
     } else {
         console.log('Loading game from scratch');
         loadGameData();
@@ -78,23 +85,69 @@ function importSave() {
 }
 
 function onActionButtonClick(actionType) {
-    const buttons = ['restButton', 'trainButton'];
-    buttons.forEach(id => document.getElementById(id).classList.remove('active-action'));
-
-    switch (actionType) {
-        case 'resting':
-            game.currentAction = game.currentAction === 'resting' ? null : 'resting';
-            if (game.currentAction) document.getElementById('restButton').classList.add('active-action');
-            break;
-        case 'training':
-            game.currentAction = game.currentAction === 'training' ? null : 'training';
-            if (game.currentAction) document.getElementById('trainButton').classList.add('active-action');
-            break;
+    // If clicking the same action, stop it
+    if (game.currentAction === actionType) {
+        stopCurrentAction();
+        return;
     }
+
+    // Stop any existing action and start the new one
+    stopCurrentAction();
+    startAction(actionType);
     updateButtonStates();
     updateEnemyZones();
 }
 
+function startAction(actionType) {
+    const restButton = document.getElementById('restButton');
+    const trainButton = document.getElementById('trainButton');
+    const exploreButton = document.getElementById('exploreButton');
+    const autoCombatButton = document.getElementById('autoCombatButton');
+
+    game.currentAction = actionType;
+
+    if (actionType === 'resting') {
+        restButton.classList.add('pulse-animation');
+        game.actionInterval = setInterval(() => {
+            const hpGain = 5;
+            game.wielder.currentLife = Math.min(game.wielder.currentLife + hpGain, getEffectiveStats.endurance *5);
+            console.log(`Resting: +${hpGain} HP, Current HP: ${game.wielder.currentLife}`);
+            showFloatingNumber(hpGain, 'restButton');
+        }, 5000);
+    } else if (actionType === 'training') {
+        trainButton.classList.add('pulse-animation');
+        game.actionInterval = setInterval(() => {
+            const expGain = 5;
+            game.wielder.exp += expGain;
+            console.log(`Training: +${expGain} EXP, Current EXP: ${game.wielder.exp}`);
+            showFloatingNumber(expGain, 'trainButton');
+
+            if (game.wielder.exp >= game.wielder.level * 100) {
+                game.wielder.exp -= game.wielder.level * 100;
+                game.wielder.level++;
+                console.log(`Level Up! New Level: ${game.wielder.level}`);
+            }
+        }, 5000);
+    }
+}
+function stopCurrentAction() {
+    const restButton = document.getElementById('restButton');
+    const trainButton = document.getElementById('trainButton');
+
+
+    // Clear the interval if it exists
+    if (game.actionInterval !== null) {
+        clearInterval(game.actionInterval);
+        game.actionInterval = null;
+    }
+
+    // Remove animation from all buttons
+    restButton.classList.remove('pulse-animation');
+    trainButton.classList.remove('pulse-animation');
+
+
+    game.currentAction = null;
+}
 function addCombatMessage(text, className) {
     const logElement = document.createElement('div');
     logElement.className = `log-entry ${className}`;

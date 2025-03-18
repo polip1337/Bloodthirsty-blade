@@ -430,12 +430,14 @@ game.achievements = {
 }
 function checkAchievements() {
     Object.entries(game.achievements).forEach(([key, achievement]) => {
-        if (!achievement.unlocked && achievement.condition && achievement.condition()) {
-            achievement.unlocked = true;
+        // Check if not already completed and condition is met
+        if (!game.completedAchievements[key] && achievement.condition && achievement.condition()) {
+            game.completedAchievements[key] = true;
             addCombatMessage(
                 `Achievement Unlocked: ${achievement.name}! Bonus: ${getBonusDescription(achievement.bonus)}`,
                 'achievement'
             );
+            // Recalculate stats if necessary
             if (achievement.bonus.maxEnergyMultiplier) {
                 calculateMaxEnergy();
             }
@@ -447,6 +449,17 @@ function updateAchievementsTab() {
     const list = document.getElementById('achievements-list');
     list.innerHTML = Object.entries(game.achievements).map(([key, ach]) => {
         let progressBar = '';
+        if(game.completedAchievements[key]){
+            return `
+                <div class="achievement-icon tooltip unlocked">
+                    <span>${ach.icon}</span>
+                    <span class="tooltiptext">
+                        ${ach.name}<br>
+                        ${ach.description}<br>
+                        Reward: ${getBonusDescription(ach.bonus)}
+                    </span>
+                </div>
+            `;}
         if (!ach.unlocked && ach.target && ach.progress) {
             const current = ach.progress();
             const percentage = Math.min((current / ach.target) * 100, 100);
@@ -470,7 +483,6 @@ function updateAchievementsTab() {
         `;
     }).join('');
 }
-
 function getBonusDescription(bonus) {
     if (bonus.damageMultiplier) return `+${((bonus.damageMultiplier - 1) * 100).toFixed(0)}% damage`;
     if (bonus.maxEnergyMultiplier) return `+${((bonus.maxEnergyMultiplier - 1) * 100).toFixed(0)}% max energy`;
@@ -501,7 +513,7 @@ function getBonusDescription(bonus) {
 
 function getDamageMultiplier() {
     let multiplier = 1;
-    Object.values(game.achievements).forEach(ach => {
+    Object.values(game.completedAchievements).forEach(ach => {
         if (ach.unlocked && ach.bonus.damageMultiplier) multiplier *= ach.bonus.damageMultiplier;
     });
     ['blood', 'death'].forEach(path => {
@@ -515,7 +527,7 @@ function getDamageMultiplier() {
 
 function getExpMultiplier() {
     let multiplier = 1;
-    Object.values(game.achievements).forEach(ach => {
+    Object.values(game.completedAchievements).forEach(ach => {
         if (ach.unlocked && ach.bonus.expMultiplier) multiplier *= ach.bonus.expMultiplier;
         if (ach.unlocked && ach.bonus.zoneExp) multiplier *= ach.bonus.zoneExp;
     });
@@ -530,7 +542,7 @@ function getExpMultiplier() {
 
 function getMaxEnergyMultiplier() {
     let multiplier = 1;
-    Object.values(game.achievements).forEach(ach => {
+    Object.values(game.completedAchievements).forEach(ach => {
         if (ach.unlocked && ach.bonus.maxEnergyMultiplier) multiplier *= ach.bonus.maxEnergyMultiplier;
     });
     game.pathTiersUnlocked.blood.forEach(tierIdx => {
@@ -542,7 +554,7 @@ function getMaxEnergyMultiplier() {
 
 function getUpgradeCostReduction() {
     let reduction = 0;
-    Object.values(game.achievements).forEach(ach => {
+    Object.values(game.completedAchievements).forEach(ach => {
         if (ach.unlocked && ach.bonus.upgradeCostReduction) reduction += ach.bonus.upgradeCostReduction;
     });
     game.pathTiersUnlocked.blood.forEach(tierIdx => {

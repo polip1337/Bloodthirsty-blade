@@ -25,6 +25,7 @@ function buyUpgrade(name) {
         if (name === 'soul') {
             unlockNextStory();
             showStory();
+            showStoryContent("story" + upgrade.level);
         }
         updateDisplay();
     }

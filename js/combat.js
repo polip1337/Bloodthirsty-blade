@@ -1,6 +1,6 @@
 async function attackEnemy(zoneIndex, enemyIndex) {
+    if (game.isFighting) return; // Prevent new combat if one is active
     if (game.currentAction && game.currentAction !== 'autoFighting') return;
-    const enemyHealthFill = document.querySelector('#enemy-health .health-bar-fill');
     game.wielder.hasFought = true;
     const effectiveStats = getEffectiveStats();
     lastUsedZoneIndex = zoneIndex;
@@ -10,7 +10,7 @@ async function attackEnemy(zoneIndex, enemyIndex) {
     const enemy = gameData.zones[zoneIndex].enemies[enemyIndex];
     let enemyLife = enemy.endurance * 5;
     let wielderMaxLife = wielder.maxLife;
-
+    updateEnemyHealthBar(enemy);
     startCombat(enemy);
     if (wielder.currentLife <= 0) {
         addCombatMessage('Wielder is too injured to fight!', 'damage');
@@ -31,12 +31,12 @@ async function attackEnemy(zoneIndex, enemyIndex) {
     const damageMultiplier = getDamageMultiplier();
     const totalDamage = (baseDamage + lifesteal + controlDamageBonus) * damageMultiplier;
     addCombatMessage(`Engaging ${enemy.name} (${enemy.endurance*5} HP)`, 'player-stat');
-    enemyHealthFill.style.width = '100%';
-
-       updateHealthBar();
+    updateEnemyHealthBar(enemy);
+    updateHealthBar();
 
     while (enemyLife > 0 && wielder.currentLife > 0 && !isAnyModalOpen()) {
-        enemyHealthFill.style.width = `${(enemyLife / enemy.maxLife) * 100}%`;
+        updateEnemyHealthBar(enemy);
+
         document.getElementById('combat-area').classList.add('combat-active');
         const damageDealt = Math.min(totalDamage, enemyLife);
         const lifestealHealing = Math.min(lifesteal, enemyLife);
@@ -45,7 +45,7 @@ async function attackEnemy(zoneIndex, enemyIndex) {
 
         addCombatMessage(
             `Dealt ${damageDealt.toFixed(1)} damage (Base: ${baseDamage}, Control: ${controlDamageBonus.toFixed(1)}) ` +
-            `Lifesteal: +${lifestealHealing} HP | Enemy HP: ${enemyLife}`,
+            `Lifesteal: +${lifestealHealing} HP | Enemy HP: ${enemyLife.toFixed(2)}`,
             'damage'
         );
         const enemyDamage = Math.max(enemy.strength * 2 - Math.floor(wielder.currentStats.swordfighting), 1);
@@ -53,12 +53,11 @@ async function attackEnemy(zoneIndex, enemyIndex) {
 
         addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(wielder.currentStats.swordfighting)}) Player HP left: ${wielder.currentLife}`, 'damage');
         updateHealthBar();
+        updateEnemyHealthBar(enemy);
         await new Promise(resolve => setTimeout(resolve, 900));
-                document.getElementById('combat-area').classList.remove('combat-active');
+        document.getElementById('combat-area').classList.remove('combat-active');
 
         await new Promise(resolve => setTimeout(resolve, 100));
-
-        enemyHealthFill.style.width = `${(enemyLife / (enemy.endurance * 5)) * 100}%`;
 
     }
     if (enemyLife <= 0) {
@@ -81,9 +80,11 @@ async function attackEnemy(zoneIndex, enemyIndex) {
         return;
     }
     if (enemyLife <= 0) {
+        updateEnemyHealthBar(enemy);
+
         defeatEnemy(enemy, zoneIndex);
     }
-    enemyHealthFill.style.width = '0%';
+    updateEnemyHealthBar(enemy);
 
     updateWielderStats();
     updateButtonStates();
@@ -161,6 +162,9 @@ function defeatEnemy(enemy, zoneIndex) {
     if (game.selectedPath === 'death') {
         game.pathProgress.death += 1;
         checkPathRewards('death');
+        const soulTier = getSoulTier(enemy.level);
+        game.souls[soulTier]++;
+        addCombatMessage(`Collected a ${soulTier} soul from ${enemy.name}`, 'player-stat');
     }
     if (game.selectedPath === 'vengeance' && enemy.isBoss) { // Placeholder condition
         game.pathProgress.vengeance += 1;
@@ -218,6 +222,7 @@ function defeatEnemy(enemy, zoneIndex) {
 }
 
 function exploreZone(zoneIndex) {
+    if (game.isFighting) return; // Prevent new combat if one is active
     if (game.currentAction && game.currentAction !== 'autoFighting') return;
     lastUsedZoneIndex = zoneIndex;
     const enemyIndex = Math.floor(Math.random() * gameData.zones[zoneIndex].enemies.length);
@@ -225,6 +230,13 @@ function exploreZone(zoneIndex) {
 }
 
 function toggleAutoFight(zoneIndex) {
+    const connectionLevel = game.sword.upgrades.connection.level || 0;
+    const requiredLevel = zoneIndex + 1;
+    if (connectionLevel < requiredLevel) {
+        addCombatMessage(`Connection level too low for auto explore in this zone.`, 'error');
+        document.getElementById(`auto-${zoneIndex}`).checked = false; // Reset checkbox
+        return;
+    }
     const checkbox = document.getElementById(`auto-${zoneIndex}`);
     if (checkbox.checked) {
         gameData.zones.forEach((_, i) => {
@@ -240,7 +252,7 @@ function toggleAutoFight(zoneIndex) {
 }
 
 function startAutoBattle() {
-    if (!isAnyModalOpen()) {
+    if (!game.isFighting && !isAnyModalOpen()) {
         if (!gameData.zones[lastUsedZoneIndex]) lastUsedZoneIndex = 0;
         const zone = gameData.zones[lastUsedZoneIndex];
         const enemyIndex = Math.floor(Math.random() * zone.enemies.length);

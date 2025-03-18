@@ -18,6 +18,7 @@ async function initGame() {
                     game.wielder.currentLife + regenRate,
                     getEffectiveStats().endurance * 5
                 );
+                updateHealthBar();
                 console.log(`Health regenerated: +${regenRate} HP (Base: 1, Resting: ${game.currentAction === 'resting' ? 4 : 0})`);
             }
         if (game.currentAction === 'training') {

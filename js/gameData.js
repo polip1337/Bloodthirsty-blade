@@ -15,6 +15,7 @@ function loadGameData() {
         swiftKillCount: 0,        // For Swift Killer count
         wasEnergyMaxed: false, // To detect Energy Peak transitions
         achievements:{},
+        completedAchievements: {},
         sword: {
             energy: 0,
             maxEnergy: 100,
@@ -45,6 +46,7 @@ function loadGameData() {
         unlockedUpgrades: [],
         unlockedRaces: ['human'],
         currentAction: null,
+        actionInterval: null, // Store the interval ID
         selectedPath: null,
         unlockedPaths: [],
         pathProgress: {
@@ -67,7 +69,7 @@ function loadGameData() {
 
 
 
-    shopItems = {
+    game.shopItems = {
         3: [
             { type: 'helmet', name: 'Bronze Helmet', stats: { endurance: 1 }, price: 50, icon: 'assets/helmet.png' },
             { type: 'body', name: 'Padded Armor', stats: { endurance: 2 }, price: 80, icon: 'assets/chest.png' },
