@@ -19,8 +19,14 @@ async function initGame() {
             game.statistics.totalAutoExploreTime++;
         }
         checkAchievements();
-        saveGame();
+
     }, 1000);
+    setInterval(() => {
+        game.wielder.currentLife = Math.min(game.wielder.currentLife + 1, getEffectiveStats().endurance *5);
+        updateWielderStats();
+        saveGame();
+        }, 5000);
+
 }
 
 window.onload = initGame;
