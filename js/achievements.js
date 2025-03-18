@@ -432,7 +432,7 @@ function checkAchievements() {
     Object.entries(game.achievements).forEach(([key, achievement]) => {
         // Check if not already completed and condition is met
         if (!game.completedAchievements[key] && achievement.condition && achievement.condition()) {
-            game.completedAchievements[key] = true;
+            game.completedAchievements[key] = achievement;
             addCombatMessage(
                 `Achievement Unlocked: ${achievement.name}! Bonus: ${getBonusDescription(achievement.bonus)}`,
                 'achievement'
@@ -440,6 +440,12 @@ function checkAchievements() {
             // Recalculate stats if necessary
             if (achievement.bonus.maxEnergyMultiplier) {
                 calculateMaxEnergy();
+            }
+            if (achievement.bonus.upgradeCostReductio) {
+                updateDisplay();
+            }
+            if (achievement.bonus.damageMultiplier) {
+                updateWielderStats();
             }
         }
     });
@@ -514,7 +520,7 @@ function getBonusDescription(bonus) {
 function getDamageMultiplier() {
     let multiplier = 1;
     Object.values(game.completedAchievements).forEach(ach => {
-        if (ach.unlocked && ach.bonus.damageMultiplier) multiplier *= ach.bonus.damageMultiplier;
+        if (ach.bonus.damageMultiplier) multiplier *= ach.bonus.damageMultiplier;
     });
     ['blood', 'death'].forEach(path => {
         game.pathTiersUnlocked[path].forEach(tierIdx => {
@@ -528,8 +534,8 @@ function getDamageMultiplier() {
 function getExpMultiplier() {
     let multiplier = 1;
     Object.values(game.completedAchievements).forEach(ach => {
-        if (ach.unlocked && ach.bonus.expMultiplier) multiplier *= ach.bonus.expMultiplier;
-        if (ach.unlocked && ach.bonus.zoneExp) multiplier *= ach.bonus.zoneExp;
+        if (ach.bonus.expMultiplier) multiplier *= ach.bonus.expMultiplier;
+        if (ach.bonus.zoneExp) multiplier *= ach.bonus.zoneExp;
     });
     ['blood', 'vengeance'].forEach(path => {
         game.pathTiersUnlocked[path].forEach(tierIdx => {
@@ -543,11 +549,13 @@ function getExpMultiplier() {
 function getMaxEnergyMultiplier() {
     let multiplier = 1;
     Object.values(game.completedAchievements).forEach(ach => {
-        if (ach.unlocked && ach.bonus.maxEnergyMultiplier) multiplier *= ach.bonus.maxEnergyMultiplier;
+        if (ach.bonus.maxEnergyMultiplier) multiplier *= ach.bonus.maxEnergyMultiplier;
     });
-    game.pathTiersUnlocked.blood.forEach(tierIdx => {
-        const tier = gameData.paths.blood.tiers[tierIdx];
-        if (tier.reward.maxEnergyMultiplier) multiplier *= tier.reward.maxEnergyMultiplier;
+    ['blood', 'death'].forEach(path => {
+        game.pathTiersUnlocked[path].forEach(tierIdx => {
+            const tier = gameData.paths[path].tiers[tierIdx];
+            if (tier.reward.maxEnergyMultiplier) multiplier *= (tier.reward.maxEnergyMultiplier);
+        });
     });
     return multiplier;
 }
@@ -555,11 +563,29 @@ function getMaxEnergyMultiplier() {
 function getUpgradeCostReduction() {
     let reduction = 0;
     Object.values(game.completedAchievements).forEach(ach => {
-        if (ach.unlocked && ach.bonus.upgradeCostReduction) reduction += ach.bonus.upgradeCostReduction;
+        if (ach.bonus.upgradeCostReduction) reduction += ach.bonus.upgradeCostReduction;
     });
-    game.pathTiersUnlocked.blood.forEach(tierIdx => {
-        const tier = gameData.paths.blood.tiers[tierIdx];
-        if (tier.reward.upgradeCostReduction) reduction += tier.reward.upgradeCostReduction;
-    });
+   ['blood', 'death'].forEach(path => {
+           game.pathTiersUnlocked[path].forEach(tierIdx => {
+               const tier = gameData.paths[path].tiers[tierIdx];
+               if (tier.reward.upgradeCostReductio) multiplier *= (tier.reward.upgradeCostReductio);
+           });
+       });
     return reduction;
+}
+function getEnergyGainMultiplier() {
+    let multiplier = 1;
+    Object.values(game.completedAchievements).forEach(key => {
+        const ach = game.achievements[key];
+        if (ach && ach.bonus.energyGainMultiplier) {
+            multiplier *= ach.bonus.energyGainMultiplier;
+        }
+    });
+    ['blood', 'death'].forEach(path => {
+        game.pathTiersUnlocked[path].forEach(tierIdx => {
+            const tier = gameData.paths[path].tiers[tierIdx];
+            if (tier.reward.energyGainMultiplier) multiplier *= (tier.reward.energyGainMultiplier);
+        });
+    });
+    return multiplier;
 }

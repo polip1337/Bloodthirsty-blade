@@ -11,8 +11,8 @@ function updateWielderStats() {
 
     const controlDamageBonus = baseDamage * game.controlBonus;
     const lifesteal = game.sword.upgrades.siphon.level;
-    const totalDamage = (baseDamage + lifesteal + controlDamageBonus) * getDamageMultiplier();
-
+    const totalDamage = (baseDamage + controlDamageBonus) * getDamageMultiplier();
+    const damageFromBonus = totalDamage - (baseDamage + controlDamageBonus);
     let wielderHTML = `
         <div class="stat">Name: <span id="wielderName">${wielder.name}</span></div>
         <div class="stat">Race: <span id="wielderRace">${wielder.race}</span></div>
@@ -44,11 +44,12 @@ function updateWielderStats() {
             Level: ${wielder.level}
         </div><br />
         <div class="stat tooltip">
-            Predicted Damage: ${totalDamage.toFixed(1)}
+            Predicted Damage: ${totalDamage.toFixed(1)} + ${lifesteal} lifesteal
             <span class="tooltiptext">
                 Base: ${baseDamage.toFixed(1)} (Strength: ${effectiveStats.strength.toFixed(1)} × 2 + Swordfighting: ${effectiveStats.swordfighting.toFixed(1)})<br>
                 Control Bonus: +${controlDamageBonus.toFixed(1)} (${(game.controlBonus * 100).toFixed(0)}%)<br>
-                Lifesteal: +${lifesteal} damage & HP per hit
+                Damage multiplier: +${damageFromBonus.toFixed(2)} (${((getDamageMultiplier()-1) * 100).toFixed(0)}%)<br>
+                Lifesteal: +${lifesteal} damage & heal per hit
             </span>
         </div><br />
         <div class="stat tooltip">
@@ -143,9 +144,10 @@ function updateUpgrades(currentEnergy = game.sword.energy) {
     // Skip update if energy hasn't changed and no costs have changed
     let costsChanged = false;
     Object.entries(game.sword.upgrades).forEach(([name, data]) => {
-        if (previousCosts[name] !== data.cost) {
+        let finalCost = calculateFinalCost(name);
+        if (previousCosts[name] !== finalCost) {
             costsChanged = true;
-            previousCosts[name] = data.cost;
+            previousCosts[name] = finalCost;
         }
     });
     if (previousEnergy === currentEnergy && !costsChanged) return;
@@ -154,18 +156,18 @@ function updateUpgrades(currentEnergy = game.sword.energy) {
     Object.entries(game.sword.upgrades).forEach(([name, data]) => {
         const button = upgradeButtons[name];
         if (!button) return;
+        let finalCost = calculateFinalCost(name);
 
         const isMaxLevel = data.level >= gameData.upgradeCaps[name];
-        const wasAffordable = previousEnergy !== null && previousEnergy >= data.cost;
-        const isAffordable = currentEnergy >= data.cost;
-        const costChanged = previousCosts[name] !== data.cost;
+        const wasAffordable = previousEnergy !== null && previousEnergy >= finalCost;
+        const isAffordable = currentEnergy >= finalCost;
 
         // Update if affordability changes or cost changes
-        if (isMaxLevel || wasAffordable !== isAffordable || costChanged) {
+        if (isMaxLevel || wasAffordable !== isAffordable || costsChanged) {
             button.disabled = isMaxLevel || !isAffordable;
             button.textContent = isMaxLevel
                 ? 'Max level'
-                : `Upgrade (${Math.round(data.cost)} energy)`;
+                : `Upgrade (${Math.round(finalCost)} energy)`;
         }
     });
 
@@ -243,7 +245,6 @@ function updateDisplay() {
     updateUpgrades();
     updateEnemyZones();
     updateButtonStates();
-    redrawUpgrades();
     updatePathsTab();
     updateAchievementsTab();
     updateHealthBar();
@@ -342,12 +343,51 @@ function onModalClose(modalId) {
 }
 
 function showStatistics() {
-    document.getElementById('statisticsContent').innerHTML = `
-        <p>Total Kills: ${game.statistics.totalKills}</p>
-        <p>Wielders Used: ${game.statistics.wieldersUsed}</p>
-        <h4>Kills by Enemy:</h4>
-        ${Object.entries(game.statistics.mobKills).map(([mob, count]) => `<p>${mob}: ${count}</p>`).join('')}
-    `;
+const content = document.getElementById('statisticsContent');
+    let html = '<ul>';
+
+    // Wielder Stats
+    html += '<li><strong>Wielder Stats</strong></li>';
+    html += `<li>Current HP: ${game.wielder.currentLife.toFixed(1)} / ${getEffectiveStats().endurance*5}</li>`;
+    html += `<li>Level: ${game.wielder.level}</li>`;
+    html += `<li>Experience: ${game.wielder.exp.toFixed(1)} / ${(game.wielder.level * 100).toFixed(1)}</li>`;
+    html += `<li>Gold: ${game.wielder.gold.toFixed(0)}</li>`;
+    html += `<li>Defeated: ${game.wielder.defeated ? 'Yes' : 'No'}</li>`; // Assumed tracked
+
+    // Sword Stats
+    html += '<li><strong>Sword Stats</strong></li>';
+    html += `<li>Energy: ${game.sword.energy.toFixed(1)} / ${game.sword.maxEnergy.toFixed(1)}</li>`;
+    if (game.sword.upgrades) {
+        Object.entries(game.sword.upgrades).forEach(([key, upgrade]) => {
+            html += `<li>${key.charAt(0).toUpperCase() + key.slice(1)} Level: ${upgrade.level}</li>`;
+        });
+    }
+
+    // General Statistics
+    html += '<li><strong>General Statistics</strong></li>';
+    html += `<li>Total Kills: ${game.statistics.totalKills}</li>`;
+    html += `<li>Total Upgrades Performed: ${game.statistics.totalUpgrades}</li>`;
+    html += `<li>Achievements Completed: ${game.completedAchievements.length}</li>`;
+
+    // Souls (if Path of Death is selected)
+    if (game.selectedPath === 'death' && game.souls) {
+        html += '<li><strong>Souls Collected</strong></li>';
+        html += `<li>Minor Souls: ${game.souls.minor}</li>`;
+        html += `<li>Normal Souls: ${game.souls.normal}</li>`;
+        html += `<li>Major Souls: ${game.souls.major}</li>`;
+        html += `<li>Epic Souls: ${game.souls.epic}</li>`;
+    }
+
+    // Zone Progress (assumed tracked)
+    if (game.zones) {
+        html += '<li><strong>Zone Progress</strong></li>';
+        game.zones.forEach((zone, index) => {
+            html += `<li>Zone ${index + 1} Unlocked: ${zone.unlocked ? 'Yes' : 'No'}</li>`;
+        });
+    }
+
+    html += '</ul>';
+    content.innerHTML = html;
     document.getElementById('statsModal').style.display = 'block';
 }
 

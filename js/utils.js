@@ -110,7 +110,7 @@ function startAction(actionType) {
         restButton.classList.add('pulse-animation');
         game.actionInterval = setInterval(() => {
             const hpGain = 5;
-            game.wielder.currentLife = Math.min(game.wielder.currentLife + hpGain, getEffectiveStats.endurance *5);
+            game.wielder.currentLife = Math.min(game.wielder.currentLife + hpGain, getEffectiveStats().endurance *5);
             console.log(`Resting: +${hpGain} HP, Current HP: ${game.wielder.currentLife}`);
             showFloatingNumber(hpGain, 'restButton');
         }, 5000);

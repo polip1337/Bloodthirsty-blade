@@ -694,3 +694,27 @@ body {
         transform: translateY(-20px); /* Moves up 20px */
     }
 }
+#statsContent ul {
+    list-style: none;
+    padding: 0;
+}
+
+#statsContent li {
+    margin: 5px 0;
+}
+
+#statsContent strong {
+    color: #ff0; /* Yellow for headings */
+}
+.modal {
+    display: none;
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #222;
+    color: #fff;
+    padding: 20px;
+    border: 2px solid #fff;
+    z-index: 1000;
+}

@@ -145,8 +145,7 @@ if (game.sword.energy >= game.sword.maxEnergy && !game.wasEnergyMaxed) {
 function defeatEnemy(enemy, zoneIndex) {
     const wielder = game.wielder;
     const goldMultiplier = Object.values(game.achievements).reduce((mul, ach) => mul * (ach.unlocked && ach.bonus.goldMultiplier ? 1 + ach.bonus.goldMultiplier : 1), 1);
-    const energyGainMultiplier = Object.values(game.achievements).reduce((mul, ach) => mul * (ach.unlocked && ach.bonus.energyGain ? 1 + ach.bonus.energyGain : 1),1);
-    const energyGain = enemy.endurance * 5 * (1 + game.sword.upgrades.siphon.level * 0.1) * energyGainMultiplier;
+    const energyGain = enemy.endurance * 5 * (1 + game.sword.upgrades.siphon.level * 0.1) * getEnergyGainMultiplier();
     game.sword.energy = Math.min(game.sword.energy + energyGain, game.sword.maxEnergy);
     addCombatMessage(`${enemy.name} defeated! +${energyGain.toFixed(1)} energy`, 'enemy-defeated');
 
