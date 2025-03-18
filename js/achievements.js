@@ -235,7 +235,7 @@ game.achievements = {
     pacifist: {
             name: "Pacifist",
             description: "Train to level 5 without fighting",
-            condition: () => game.statistics.hasPacifistLeveled,
+            condition: () => !game.wielder.hasFought && game.wielder.level>=5,
             bonus: { trainingExp: 0.05 },
             unlocked: false,
             icon: "🕊️"

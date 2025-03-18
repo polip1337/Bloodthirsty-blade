@@ -19,6 +19,7 @@ async function initGame() {
             game.statistics.totalAutoExploreTime++;
         }
         checkAchievements();
+        saveGame();
     }, 1000);
 }
 

@@ -10,7 +10,9 @@ function generateWielder(race, isInitial = false) {
     const wielderSprite = document.getElementById('wielder-sprite');
     wielderSprite.style.backgroundImage = `url('assets/wielder-${race}.png')`;
     const raceData = races[race];
-    const startingBonus = Object.values(game.achievements).reduce((sum, ach) => sum + (ach.unlocked && ach.bonus.startingStats ? ach.bonus.startingStats : 0), 0);
+    const startingBonus = Object.values(game.achievements).reduce((sum, ach) =>
+        sum + (game.completedAchievements[Object.keys(game.achievements).find(key => game.achievements[key] === ach)] && ach.bonus.startingStats ? ach.bonus.startingStats : 0),
+    0);
     let baseStats;
     if (isInitial && race === 'goblin') {
         baseStats = {
@@ -24,9 +26,10 @@ function generateWielder(race, isInitial = false) {
             strength: Math.floor(Math.random() * 6 + 1) + (raceData.stats.strength || 0) + startingBonus,
             swordfighting: Math.floor(Math.random() * 6 + 1) + (raceData.stats.swordfighting || 0) + startingBonus,
             endurance: Math.floor(Math.random() * 2 + 1) + (raceData.stats.endurance || 0) + startingBonus,
-            willpower: Math.floor(Math.random() * 50 + 50) + (raceData.stats.willpower || 0) + startingBonus
+            willpower: Math.floor(Math.random() * 50 + 50) + (raceData.stats.willpower || 0) + startingBonus*5
         };
     }
+    updateHealthBar("100%");
     return {
         name: raceData.names[Math.floor(Math.random() * raceData.names.length)],
         race,

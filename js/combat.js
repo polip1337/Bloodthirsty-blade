@@ -32,7 +32,7 @@ async function attackEnemy(zoneIndex, enemyIndex) {
     const totalDamage = (baseDamage + lifesteal + controlDamageBonus) * damageMultiplier;
     addCombatMessage(`Engaging ${enemy.name} (${enemy.endurance*5} HP)`, 'player-stat');
     updateEnemyHealthBar(enemy);
-    updateHealthBar();
+    updateHealthBar(null);
 
     while (enemyLife > 0 && wielder.currentLife > 0 && !isAnyModalOpen()) {
         updateEnemyHealthBar(enemy);
@@ -52,7 +52,7 @@ async function attackEnemy(zoneIndex, enemyIndex) {
         wielder.currentLife -= enemyDamage;
 
         addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(wielder.currentStats.swordfighting)}) Player HP left: ${wielder.currentLife.toFixed(1)}`, 'damage');
-        updateHealthBar();
+        updateHealthBar(null);
         updateEnemyHealthBar(enemy);
         await new Promise(resolve => setTimeout(resolve, 900));
         document.getElementById('combat-area').classList.remove('combat-active');
@@ -201,14 +201,7 @@ function defeatEnemy(enemy, zoneIndex) {
     }
 
     checkAchievements();
-    while (wielder.exp >= wielder.level * 100) {
-        wielder.exp -= wielder.level * 100;
-        wielder.level++;
-
-        wielder.statPoints += calculateStatPointsPerLevel();
-        applyLevelBonuses();
-        showLevelUpModal();
-    }
+    checkLevelUp();
     if (zoneIndex >= 4) {
         const goldDrop = enemy.level * 10 * goldMultiplier;
         game.wielder.gold += goldDrop;
@@ -219,7 +212,18 @@ function defeatEnemy(enemy, zoneIndex) {
     game.isFighting = false;
     if (game.currentAction === 'autoFighting') startAutoBattle();
 }
+function checkLevelUp(){
+    let wielder = game.wielder;
+    while (wielder.exp >= wielder.level * 100) {
+        wielder.exp -= wielder.level * 100;
+        wielder.level++;
 
+        wielder.statPoints += calculateStatPointsPerLevel();
+        applyLevelBonuses();
+        showLevelUpModal();
+    }
+    updateWielderStats();
+}
 function exploreZone(zoneIndex) {
     if (game.isFighting) return; // Prevent new combat if one is active
     if (game.currentAction && game.currentAction !== 'autoFighting') return;

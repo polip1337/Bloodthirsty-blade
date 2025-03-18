@@ -113,6 +113,7 @@ function startAction(actionType) {
             game.wielder.currentLife = Math.min(game.wielder.currentLife + hpGain, getEffectiveStats().endurance *5);
             console.log(`Resting: +${hpGain} HP, Current HP: ${game.wielder.currentLife}`);
             showFloatingNumber(hpGain, 'restButton');
+            updateWielderStats();
         }, 5000);
     } else if (actionType === 'training') {
         trainButton.classList.add('pulse-animation');
@@ -122,11 +123,7 @@ function startAction(actionType) {
             console.log(`Training: +${expGain} EXP, Current EXP: ${game.wielder.exp}`);
             showFloatingNumber(expGain, 'trainButton');
 
-            if (game.wielder.exp >= game.wielder.level * 100) {
-                game.wielder.exp -= game.wielder.level * 100;
-                game.wielder.level++;
-                console.log(`Level Up! New Level: ${game.wielder.level}`);
-            }
+            checkLevelUp();
         }, 5000);
     }
 }

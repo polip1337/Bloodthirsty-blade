@@ -247,7 +247,7 @@ function updateDisplay() {
     updateButtonStates();
     updatePathsTab();
     updateAchievementsTab();
-    updateHealthBar();
+    updateHealthBar(null);
     adjustTooltipPosition();
     const equipmentTabBtn = document.getElementById('equipmentTabBtn');
     equipmentTabBtn.style.display = gameData.zones[3].unlocked ? 'inline' : 'none';
@@ -630,10 +630,11 @@ function showLeftTab(tabName) {
     document.querySelector(`#left-tabs #tabs-left button[onclick="showLeftTab('${tabName}')"]`).classList.add('active');
     updateDisplay();
 }
-function updateHealthBar(){
+function updateHealthBar(setValue){
     const wielderHealthFill = document.querySelector('#wielder-health .health-bar-fill');
+    if(setValue) wielderHealthFill.style.width = setValue;
+    else wielderHealthFill.style.width = `${(game.wielder.currentLife / (getEffectiveStats().endurance *5)) * 100}%`;
 
-    wielderHealthFill.style.width = `${(game.wielder.currentLife / (getEffectiveStats().endurance *5)) * 100}%`;
 }
 function updateEnemyHealthBar(enemy){
     const enemyHealthFill = document.querySelector('#enemy-health .health-bar-fill');
