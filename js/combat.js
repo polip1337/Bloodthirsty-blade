@@ -56,6 +56,7 @@ async function attackEnemy(zoneIndex, enemyIndex) {
             defeatWielder();
         }
         updateEnemyHealthBar(enemy,enemyLife);
+        updateWielderHealth();
         await new Promise(resolve => setTimeout(resolve, 900));
         document.getElementById('combat-area').classList.remove('combat-active');
 
@@ -113,7 +114,6 @@ function endCombat(victory) {
     }
 }
 function swiftKillTracker(){
-game.statistics.totalKills++;
     if (game.currentAction !== 'autoFighting') {
         game.statistics.manualKills++;
     }
@@ -202,10 +202,11 @@ function defeatEnemy(enemy, zoneIndex) {
 
     checkAchievements();
     checkLevelUp();
-    if (zoneIndex >= 4) {
+    if (zoneIndex >= 3) {
         const goldDrop = enemy.level * 10 * goldMultiplier;
         game.wielder.gold += goldDrop;
         addCombatMessage(`Found ${goldDrop} gold`, 'player-stat');
+        updateModalGold();
     }
     swiftKillTracker();
     energyPeakTracker();

@@ -3,7 +3,7 @@ function openShop(zoneIndex) {
     const zoneItems = game.shopItems[zoneIndex] || game.shopItems[4];
     const shopContent = `
         <h3>Shop - ${gameData.zones[zoneIndex].name}</h3>
-        <p>Gold: ${game.wielder.gold}</p>
+        <p id="modal-gold-value">Gold: ${game.wielder.gold}</p>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
         ${zoneItems.map(item => `
             <div class="shop-item tooltip ${getItemBorderClass(item)}">
@@ -29,6 +29,8 @@ function buyItem(itemName, zoneIndex) {
     } else {
         alert('Not enough gold or inventory full');
     }
+    updateModalGold()
+
 }
 
 function handleInventoryClick(index) {

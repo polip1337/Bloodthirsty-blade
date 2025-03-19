@@ -4,6 +4,25 @@ function updateEnergyAndKills() {
     document.getElementById('totalKills').textContent = game.statistics.totalKills;
     updateUpgrades();
 }
+function updateWielderHealth() {
+    const wielder = game.wielder;
+    const effectiveStats = getEffectiveStats();
+    const maxHp = effectiveStats.endurance * 5;
+    const healthDiv = document.getElementById('wielder-health-stat');
+
+    if (healthDiv) {
+        healthDiv.innerHTML = `
+            HP: ${Math.max(wielder.currentLife, 0).toFixed(1)}/${maxHp.toFixed(1)}
+            <span class="tooltiptext">Current/Maximum health (Regenerates 1 HP every 5s)</span>
+        `;
+    }
+}
+function updateModalGold(){
+let innerHTML = `
+Gold: ${game.wielder.gold}
+`;
+document.getElementById('modal-gold-value').innerHTML = innerHTML;
+}
 function updateWielderStats() {
     const wielder = game.wielder;
     const effectiveStats = getEffectiveStats();
@@ -28,7 +47,7 @@ function updateWielderStats() {
             Endurance: ${effectiveStats.endurance.toFixed(1)}
             <span class="tooltiptext">Determines maximum health (HP = Endurance × 5)</span>
         </div><br />
-        <div class="stat tooltip">
+        <div id= "wielder-health-stat" class="stat tooltip">
             HP: ${Math.max(wielder.currentLife, 0).toFixed(1)}/${(effectiveStats.endurance * 5).toFixed(1)}
             <span class="tooltiptext">Current/Maximum health (Regenerates 1 HP every 5s)</span>
         </div><br />
@@ -38,7 +57,7 @@ function updateWielderStats() {
         </div><br />
         <div class="stat tooltip">
             EXP: ${wielder.exp.toFixed(1)}/${(wielder.level * 100).toFixed(1)}
-            <span class="tooltiptext">Gain a level every 100 exp points</span>
+            <span class="tooltiptext">Gain a level every level * 100 exp points</span>
         </div><br />
         <div class="stat tooltip">
             Level: ${wielder.level}

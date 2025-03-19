@@ -146,11 +146,11 @@ function calculateControlBonus(){
 }
 
 function healWielder() {
-    if (game.sword.energy >= 10 && game.wielder.currentLife < game.wielder.currentStats.endurance * 5) {
+    if (game.sword.energy >= 10 && game.wielder.currentLife < getEffectiveStats().endurance * 5) {
         game.sword.energy -= 10;
         game.wielder.currentLife = Math.min(
-            game.wielder.currentLife + Math.floor(game.wielder.currentStats.endurance * 1.25),
-            game.wielder.currentStats.endurance * 5
+            game.wielder.currentLife + Math.floor(getEffectiveStats().endurance * 1.25),
+            getEffectiveStats().endurance * 5
         );
         const wielderHealthFill = document.querySelector('#wielder-health .health-bar-fill');
         wielderHealthFill.style.width = `${(game.wielder.currentLife / (getEffectiveStats().endurance *5)) * 100}%`;
