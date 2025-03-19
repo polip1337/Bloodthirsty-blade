@@ -92,7 +92,7 @@ function updateEquipmentAndInventory() {
         for (let i = game.wielder.inventory.length; i < 9; i++) {
             equipmentHTML += '<div class="inventory-slot"><img src="placeholder.png" alt="empty"></div>';
         }
-        equipmentHTML += '</div>';
+        equipmentHTML += '</div><br/><br/>';
 
         equipmentHTML += `<div class="stat">Gold: ${game.wielder.gold}</div>`;
         equipmentHTML += `
@@ -636,9 +636,9 @@ function updateHealthBar(setValue){
     else wielderHealthFill.style.width = `${(game.wielder.currentLife / (getEffectiveStats().endurance *5)) * 100}%`;
 
 }
-function updateEnemyHealthBar(enemy){
+function updateEnemyHealthBar(enemy,hp){
     const enemyHealthFill = document.querySelector('#enemy-health .health-bar-fill');
-    enemyHealthFill.style.width = `${(enemy.endurance * 5 / enemy.maxLife) * 100}%`;
+    enemyHealthFill.style.width = `${( hp/ (enemy.endurance * 5)) * 100}%`;
 
 }
 function showFloatingNumber(value, elementId) {

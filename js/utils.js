@@ -54,6 +54,8 @@ function clearAllIntervals() {
 }
 function resetSaveGameOver() {
     wipeSave();
+    document.getElementById('inquisitionReset').style.display = 'none';
+
 }
 
 function disableInquisition() {

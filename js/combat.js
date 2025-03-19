@@ -10,7 +10,7 @@ async function attackEnemy(zoneIndex, enemyIndex) {
     const enemy = gameData.zones[zoneIndex].enemies[enemyIndex];
     let enemyLife = enemy.endurance * 5;
     let wielderMaxLife = wielder.maxLife;
-    updateEnemyHealthBar(enemy);
+    updateEnemyHealthBar(enemy,enemyLife);
     startCombat(enemy);
     if (wielder.currentLife <= 0) {
         addCombatMessage('Wielder is too injured to fight!', 'damage');
@@ -31,11 +31,10 @@ async function attackEnemy(zoneIndex, enemyIndex) {
     const damageMultiplier = getDamageMultiplier();
     const totalDamage = (baseDamage + lifesteal + controlDamageBonus) * damageMultiplier;
     addCombatMessage(`Engaging ${enemy.name} (${enemy.endurance*5} HP)`, 'player-stat');
-    updateEnemyHealthBar(enemy);
     updateHealthBar(null);
 
     while (enemyLife > 0 && wielder.currentLife > 0 && !isAnyModalOpen()) {
-        updateEnemyHealthBar(enemy);
+        updateEnemyHealthBar(enemy,enemyLife);
 
         document.getElementById('combat-area').classList.add('combat-active');
         const damageDealt = Math.min(totalDamage, enemyLife);
@@ -53,7 +52,10 @@ async function attackEnemy(zoneIndex, enemyIndex) {
 
         addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(wielder.currentStats.swordfighting)}) Player HP left: ${wielder.currentLife.toFixed(1)}`, 'damage');
         updateHealthBar(null);
-        updateEnemyHealthBar(enemy);
+        if (wielder.currentLife <= 0) {
+            defeatWielder();
+        }
+        updateEnemyHealthBar(enemy,enemyLife);
         await new Promise(resolve => setTimeout(resolve, 900));
         document.getElementById('combat-area').classList.remove('combat-active');
 
@@ -62,6 +64,8 @@ async function attackEnemy(zoneIndex, enemyIndex) {
     }
     if (enemyLife <= 0) {
         endCombat(true);
+        updateEnemyHealthBar(enemy,0);
+        defeatEnemy(enemy, zoneIndex);
     } else {
         endCombat(false);
     }
@@ -70,7 +74,15 @@ async function attackEnemy(zoneIndex, enemyIndex) {
         game.isFighting = false;
         return;
     }
-    if (wielder.currentLife <= 0) {
+
+
+
+    updateWielderStats();
+    updateButtonStates();
+    updateEnergyAndKills();
+
+}
+function defeatWielder(){
         addCombatMessage('Lost the fight! Disengaging. Rest or heal.', 'damage');
         if (game.currentAction === 'autoFighting') onActionButtonClick('autoFighting');
         applyHeavyWound();
@@ -78,18 +90,6 @@ async function attackEnemy(zoneIndex, enemyIndex) {
         updateWielderStats();
         updateButtonStates();
         return;
-    }
-    if (enemyLife <= 0) {
-        updateEnemyHealthBar(enemy);
-
-        defeatEnemy(enemy, zoneIndex);
-    }
-    updateEnemyHealthBar(enemy);
-
-    updateWielderStats();
-    updateButtonStates();
-    updateEnergyAndKills();
-
 }
 function startCombat(enemy) {
 
