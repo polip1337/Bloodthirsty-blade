@@ -1,6 +1,8 @@
 async function attackEnemy(zoneIndex, enemyIndex) {
     if (game.isFighting) return; // Prevent new combat if one is active
     if (game.currentAction && game.currentAction !== 'autoFighting') return;
+    const healthDiv = document.getElementById('wielder-health-stat').img = "assets/area" + zoneIndex +".png" ;
+
     game.wielder.hasFought = true;
     const effectiveStats = getEffectiveStats();
     lastUsedZoneIndex = zoneIndex;
@@ -50,7 +52,7 @@ async function attackEnemy(zoneIndex, enemyIndex) {
         const enemyDamage = Math.max(enemy.strength * 2 - Math.floor(wielder.currentStats.swordfighting), 1);
         wielder.currentLife -= enemyDamage;
 
-        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(wielder.currentStats.swordfighting)}) Player HP left: ${wielder.currentLife.toFixed(1)}`, 'damage');
+        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(getEffectiveStats().swordfighting)}) Player HP left: ${wielder.currentLife.toFixed(1)}`, 'damage');
         updateHealthBar(null);
         if (wielder.currentLife <= 0) {
             defeatWielder();

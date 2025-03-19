@@ -1,4 +1,5 @@
 function openShop(zoneIndex) {
+    closeOtherFooterModals('shopModal');
     document.getElementById('shopModal').style.display = 'block';
     const zoneItems = game.shopItems[zoneIndex] || game.shopItems[4];
     const shopContent = `

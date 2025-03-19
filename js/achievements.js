@@ -198,7 +198,7 @@ game.achievements = {
         condition: () => game.sword.energy >= 500,
         target: 500,
         progress: () => game.sword.energy,
-        bonus: { energyGain: 0.03 },
+        bonus: { energyGainMultiplier: 0.03 },
         unlocked: false,
         icon: "⚡"
     },
@@ -313,10 +313,10 @@ game.achievements = {
     energyPeak: {
             name: "Energy Peak",
             description: "Reach max energy 10 times",
-            condition: () => game.statistics.timesEnergyMaxed >= 10,
+            condition: () => game.timesEnergyMaxed >= 10,
             target: 10,
-            progress: () => game.statistics.timesEnergyMaxed,
-            bonus: { energyGain: 0.07 },
+            progress: () => game.timesEnergyMaxed,
+            bonus: { energyGainMultiplier: 0.07 },
             unlocked: false,
             icon: "🔋"
         },
@@ -412,7 +412,7 @@ game.achievements = {
             condition: () => game.statistics.totalPlayTime >= 3600,
             target: 3600,
             progress: () => game.statistics.totalPlayTime,
-            bonus: { energyGain: 0.06 },
+            bonus: { energyGainMultiplier: 0.06 },
             unlocked: false,
             icon: "🏃"
         },

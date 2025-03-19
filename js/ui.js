@@ -406,6 +406,7 @@ function updateStatsModal() {
     html += '</div>';
 
     content.innerHTML = html;
+    closeOtherFooterModals('statsModal');
     document.getElementById('statsModal').style.display = 'block';
 }
 
@@ -417,6 +418,7 @@ function formatTime(seconds) {
 }
 
 function showStory(viewed) {
+    closeOtherFooterModals('storyModal');
     if (viewed) {
         if (!game.story1Viewed){
             showStory();
@@ -431,7 +433,7 @@ function showStory(viewed) {
     listDiv.innerHTML = stories.map(([key, story]) => `
         <div class="story-title" onclick="showStoryContent('${key}')">${story.title}</div>
     `).join('');
-
+    if(document.querySelector('#storyModal .story-content').innerHTML == '') showStoryContent("story1");
     document.getElementById('storyModal').style.display = 'block';
 }
 function showStoryContent(key) {
@@ -444,6 +446,7 @@ function showStoryContent(key) {
     }
 }
 function showChangelog() {
+    closeOtherFooterModals('changelogModal');
     document.getElementById('changelogContent').innerHTML = `
 
         <p>0.1 - Base Game</p>
@@ -452,6 +455,7 @@ function showChangelog() {
 }
 
 function showOptions() {
+    closeOtherFooterModals('optionsModal');
     document.getElementById('optionsModal').style.display = 'block';
     document.getElementById('saveData').value = '';
 }
@@ -674,4 +678,21 @@ function showFloatingNumber(value, elementId) {
 
     // Remove the element after animation completes
     setTimeout(() => number.remove(), 2000);
+}
+const footerModals = [
+    'statsModal',
+    'optionsModal',
+    'storyModal',
+    'changelogModal',
+    'shopModal'
+];
+
+// Function to close all footer modals except the specified one
+function closeOtherFooterModals(exceptModalId) {
+    footerModals.forEach(modalId => {
+        if (modalId !== exceptModalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'none';
+        }
+    });
 }
