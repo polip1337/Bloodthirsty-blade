@@ -83,9 +83,9 @@ game.achievements = {
     swiftKiller: {
             name: "Swift Killer",
             description: "Defeat 10 enemies in under 10 seconds",
-            condition: () => game.swiftKillMaxCount>=10,
+            condition: () => game.statistics.swiftKillMaxCount>=10,
             target: 10,
-            progress: () => game.swiftKillMaxCount,
+            progress: () => game.statistics.swiftKillMaxCount,
             bonus: { attackSpeed: 0.05 },
             unlocked: false,
             icon: "⏩"
@@ -102,6 +102,8 @@ game.achievements = {
         name: "Trailblazer",
         description: "Unlock zone 5",
         condition: () => gameData.zones[4].unlocked,
+        target: 5,
+        progress: () => game.sword.upgrades["senses"].level,
         bonus: { expMultiplier: 1.03 },
         unlocked: false,
         icon: "🛤️"
@@ -306,9 +308,9 @@ game.achievements = {
     energyPeak: {
             name: "Energy Peak",
             description: "Reach max energy 10 times",
-            condition: () => game.timesEnergyMaxed >= 10,
+            condition: () => game.statistics.timesEnergyMaxed >= 10,
             target: 10,
-            progress: () => game.timesEnergyMaxed,
+            progress: () => game.statistics.timesEnergyMaxed,
             bonus: { energyGainMultiplier: 0.07 },
             unlocked: false,
             icon: "🔋"
@@ -327,6 +329,8 @@ game.achievements = {
             name: "Lucky Strike",
             description: "Kill an enemy in one hit",
             condition: () => game.statistics.hasOneHitKilled,
+            target: 1,
+            progress: () => game.statistics.enemiesKilledInOneRound,
             bonus: { critChance: 0.01 },
             unlocked: false,
             icon: "🍀"

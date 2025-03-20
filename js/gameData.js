@@ -12,10 +12,7 @@ function loadGameData() {
         controlBonus: 0,
         inquisitionEnabled: true,
         swiftKillStartTime: null, // For Swift Killer timing
-        swiftKillCount: 0,        // For Swift Killer count
-        swiftKillMaxCount: 0,        // For Swift Killer count
-        wasEnergyMaxed: false, // To detect Energy Peak transitions
-        timesEnergyMaxed:0,
+
         achievements:{},
         completedAchievements: {},
         sword: {
@@ -42,7 +39,13 @@ function loadGameData() {
             totalRestTime:0,
             totalAutoExploreTime:0,
             manualKills:0,
-            itemsBought:0
+            itemsBought:0,
+            swiftKillCount: 0,        // For Swift Killer count
+            swiftKillMaxCount: 0,        // For Swift Killer count
+            wasEnergyMaxed: false, // To detect Energy Peak transitions
+            highestHitSurvived: 0,      // Tracks largest hit survived
+            survivedHitOf50: false,
+            timesEnergyMaxed:0
         },
         story: [],
         unlockedUpgrades: [],

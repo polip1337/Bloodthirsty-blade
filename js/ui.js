@@ -358,7 +358,7 @@ function showRaceSelection() {
 
 function onModalClose(modalId) {
     document.getElementById(modalId).style.display = 'none';
-    if (game.currentAction === 'autoFighting' && !game.isFighting && !isAnyModalOpen()) {
+    if (game.currentAction === 'autoFighting' && !isAnyModalOpen()) {
         startAutoBattle();
     }
     updateDisplay();

@@ -35,7 +35,9 @@ async function attackEnemy(zoneIndex, enemyIndex) {
     addCombatMessage(`Engaging ${enemy.name} (${enemy.endurance*5} HP)`, 'player-stat');
     updateHealthBar(null);
 
+    let roundCount = 0; // Track combat rounds
     while (enemyLife > 0 && wielder.currentLife > 0 && !isAnyModalOpen()) {
+        roundCount++;
         updateEnemyHealthBar(enemy,enemyLife);
 
         document.getElementById('combat-area').classList.add('combat-active');
@@ -115,34 +117,46 @@ function endCombat(victory) {
        //document.getElementById('combat-sound').play();
     }
 }
-function swiftKillTracker(){
+function achievementTracker(enemy){
+    if (roundCount === 1) {
+        game.statistics.killedInOneRound = true;
+        game.statistics.enemiesKilledInOneRound++;
+    }
+    const enemyDamage = Math.max(enemy.strength * 2 - Math.floor(wielder.currentStats.swordfighting), 1)
     if (game.currentAction !== 'autoFighting') {
         game.statistics.manualKills++;
     }
-
+    // Track highest hit survived and 50+ hit survival
+    if (enemyDamage >= 50 && wielder.currentLife > 0) {
+        game.statistics.survivedHitOf50 = true;
+    }
+    if (wielder.currentLife > 0 && enemyDamage > game.statistics.highestHitSurvived) {
+        game.statistics.highestHitSurvived = enemyDamage;
+    }
+     // Track kills in last 10 seconds
     if (game.swiftKillStartTime === null) {
         game.swiftKillStartTime = Date.now();
-        game.swiftKillCount = 1;
+        game.statistics.swiftKillCount = 1;
     } else {
         const timeElapsed = (Date.now() - game.swiftKillStartTime) / 1000; // Seconds
         if (timeElapsed <= 10) {
-            game.swiftKillCount++;
-            if(game.swiftKillMaxCount< game.swiftKillCount) game.swiftKillMaxCount = game.swiftKillCount
-            if (game.swiftKillCount >= 10) {
+            game.statistics.swiftKillCount++;
+            if(game.statistics.swiftKillMaxCount< game.statistics.swiftKillCount) game.statistics.swiftKillMaxCount = game.statistics.swiftKillCount
+            if (game.statistics.swiftKillCount >= 10) {
                 game.statistics.hasSwiftKilled = true;
             }
         } else {
             game.swiftKillStartTime = Date.now();
-            game.swiftKillCount = 1;
+            game.statistics.swiftKillCount = 1;
         }
     }
 }
 function energyPeakTracker(){
-if (game.sword.energy >= game.sword.maxEnergy && !game.wasEnergyMaxed) {
+if (game.sword.energy >= game.sword.maxEnergy && !game.statistics.wasEnergyMaxed) {
         game.statistics.timesEnergyMaxed++;
-        game.wasEnergyMaxed = true;
+        game.statistics.wasEnergyMaxed = true;
     } else if (game.sword.energy < game.sword.maxEnergy) {
-        game.wasEnergyMaxed = false;
+        game.statistics.wasEnergyMaxed = false;
     }
 }
 function defeatEnemy(enemy, zoneIndex) {
@@ -211,7 +225,7 @@ function defeatEnemy(enemy, zoneIndex) {
         addCombatMessage(`Found ${goldDrop} gold`, 'player-stat');
         updateModalGold();
     }
-    swiftKillTracker();
+    achievementTracker(enemy);
     energyPeakTracker();
     game.isFighting = false;
     if (game.currentAction === 'autoFighting') startAutoBattle();
