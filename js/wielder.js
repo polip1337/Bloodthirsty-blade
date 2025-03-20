@@ -30,6 +30,7 @@ function generateWielder(race, isInitial = false) {
         };
     }
     updateHealthBar("100%");
+    game.statistics.racesUsed[race] = true;
     return {
         name: raceData.names[Math.floor(Math.random() * raceData.names.length)],
         race,

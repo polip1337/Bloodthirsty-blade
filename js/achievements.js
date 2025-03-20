@@ -42,11 +42,11 @@ game.achievements = {
     },
     wielderVeteran: {
         name: "Wielder Veteran",
-        description: "Have 5 different wielders",
-        condition: () => game.statistics.wieldersUsed >= 5,
+        description: "Control wielders of 5 different races",
+        condition: () => Object.keys(game.statistics.racesUsed).length >= 5,
         target: 5,
-        progress: () => game.statistics.wieldersUsed,
-        bonus: { startingStats: 1 },
+        progress: () => Object.keys(game.statistics.racesUsed).length,
+        bonus: { startingStats: 2 },
         unlocked: false,
         icon: "👥"
     },
@@ -291,7 +291,7 @@ game.achievements = {
         condition: () => game.statistics.wieldersUsed >= 10,
         target: 10,
         progress: () => game.statistics.wieldersUsed,
-        bonus: { startingStats: 2 },
+        bonus: { startingStats: 1 },
         unlocked: false,
         icon: "🏃‍♂️"
     },

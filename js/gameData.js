@@ -45,6 +45,7 @@ function loadGameData() {
             wasEnergyMaxed: false, // To detect Energy Peak transitions
             highestHitSurvived: 0,      // Tracks largest hit survived
             survivedHitOf50: false,
+            racesUsed: {},
             timesEnergyMaxed:0
         },
         story: [],
