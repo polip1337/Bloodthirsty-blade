@@ -300,6 +300,7 @@ function showRaceSelection() {
     document.getElementById('wielderDeathModal').style.display = 'none';
     disableBackground();
     const modal = document.getElementById('raceSelectionModal');
+
     gameData.zones = gameData.zones.map((zone, index) => ({
         ...zone,
         unlockRace: Object.keys(races).find(race => races[race].unlockRequirement?.zone === index)
@@ -307,46 +308,48 @@ function showRaceSelection() {
 
     let content = '<div class="race-list">';
     Object.entries(races).forEach(([raceKey, raceData]) => {
-        const zone = gameData.zones[raceData.unlockRequirement?.zone];
-        const kills = raceData.unlockRequirement ? (game.statistics.zoneKills[raceData.unlockRequirement.zone] || 0) : 0;
+        const zoneIndex = raceData.unlockRequirement?.zone;
+        const zone = zoneIndex !== undefined ? gameData.zones[zoneIndex] : null;
+        const kills = zone ? (game.statistics.zoneKills[zoneIndex] || 0) : 0;
         const required = raceData.unlockRequirement?.kills || 0;
         raceData.unlocked = raceData.unlocked || kills >= required;
 
-        const baseRanges = {
-            strength: raceKey === 'goblin' && !game.wielder ? 5 : Math.floor(Math.random() * 6 + 1),
-            swordfighting: raceKey === 'goblin' && !game.wielder ? 5 : Math.floor(Math.random() * 6 + 1),
-            endurance: raceKey === 'goblin' && !game.wielder ? 2 : Math.floor(Math.random() * 2 + 1),
-            willpower: Math.floor(Math.random() * 50 + 50)
+        const zoneName = zone && zone.unlocked !== false ? zone.name : "???";
+        const skillpoints = raceData.skillpoints;
+        const statsBonuses = raceData.stats || {};
+        const bonusRanges = {
+            strength: statsBonuses.strength || 0,
+            swordfighting: statsBonuses.swordfighting || 0,
+            endurance: statsBonuses.endurance || 0,
+            willpower: statsBonuses.willpower || 0
         };
-        const stats = {
-            strength: baseRanges.strength + (raceData.stats.strength || 0),
-            swordfighting: baseRanges.swordfighting + (raceData.stats.swordfighting || 0),
-            endurance: baseRanges.endurance + (raceData.stats.endurance || 0),
-            willpower: baseRanges.willpower + (raceData.stats.willpower || 0)
-        };
+        const levelBonuses = raceData.levelBonuses || {};
+        const levelBonusText = Object.entries(levelBonuses).length > 0
+            ? Object.entries(levelBonuses).map(([stat, value]) => `${stat}: +${value}`).join(', ')
+            : 'None';
 
         const tooltipClass = raceData.unlocked ? 'tooltip' : '';
         content += `
-            <div onclick="selectRace('${raceKey}')" class="race-option ${raceData.unlocked ? '' : 'locked'} ${tooltipClass}">
-                <h4>${raceKey.toUpperCase()}</h4>
-                <div class="stats">
-                    Strength: ${stats.strength.toFixed(1)} | Swordfighting: ${stats.swordfighting.toFixed(1)} |
-                    Endurance: ${stats.endurance.toFixed(1)} | Willpower: ${stats.willpower.toFixed(1)}
+            <div class="race-option ${raceData.unlocked ? '' : 'locked'} ${tooltipClass}" id="race-${raceKey}">
+                <button class="toggle-button" onclick="toggleRaceDetails('${raceKey}', event)">−</button>
+
+                <div class="race-header">
+                    <h4>${raceKey.toUpperCase()}</h4>
                 </div>
-                ${!raceData.unlocked ? `
-                    <div class="unlock-requirement">
-                        ${required} ${zone?.name} kills (${kills}/${required})
-                    </div>
-                ` : ''}
-                ${raceData.unlocked ? `
-                    <span class="tooltiptext">
-                        Starting stats:<br>
-                        Strength: ${stats.strength.toFixed(1)}<br>
-                        Swordfighting: ${stats.swordfighting.toFixed(1)}<br>
-                        Endurance: ${stats.endurance.toFixed(1)}<br>
-                        Willpower: ${stats.willpower.toFixed(1)}
-                    </span>
-                ` : ''}
+                <div class="race-details" id="details-${raceKey}">
+                    ${raceData.unlocked ? `
+                        <p>Skillpoints per Level: ${skillpoints}</p>
+                        <p>Initial Bonus Stats:<br>
+                            Strength: +${bonusRanges.strength} | Swordfighting: +${bonusRanges.swordfighting} |
+                            Endurance: +${bonusRanges.endurance} | Willpower: +${bonusRanges.willpower}
+                        </p>
+                        <p>Auto-Assigned per Level: ${levelBonusText}</p>
+                    ` : `
+                        <p class="unlock-requirement">
+                            ${required} ${zoneName} kills (${kills}/${required})
+                        </p>
+                    `}
+                </div>
             </div>
         `;
     });
@@ -355,7 +358,18 @@ function showRaceSelection() {
     modal.style.display = 'block';
     adjustTooltipPosition();
 }
-
+function toggleRaceDetails(raceKey, event) {
+    event.stopPropagation(); // Prevent race selection when toggling
+    const details = document.getElementById(`details-${raceKey}`);
+    const button = document.querySelector(`#race-${raceKey} .toggle-button`);
+    if (details.style.display === 'none') {
+        details.style.display = 'block';
+        button.textContent = '−'; // Maximize symbol
+    } else {
+        details.style.display = 'none';
+        button.textContent = '+'; // Minimize symbol
+    }
+}
 function disableBackground(){
     document.getElementById('modalOverlay').style.display = 'block'; // Show overlay
     document.body.classList.add('modal-active'); // Disable background
@@ -481,12 +495,13 @@ function showOptions() {
 }
 
 function adjustTooltipPosition() {
-    const tooltips = document.querySelectorAll('.tooltip');
+    // Select only tooltips that are not inside a .modal element
+    const tooltips = document.querySelectorAll('.tooltip:not(.modal .tooltip)');
 
-    console.log(`Found ${tooltips.length} tooltip elements`);
+    console.log(`Found ${tooltips.length} tooltip elements outside modals`);
 
     if (tooltips.length === 0) {
-        console.log('No elements with class "tooltip" found.');
+        console.log('No elements with class "tooltip" found outside modals.');
         return;
     }
 
@@ -547,15 +562,13 @@ function adjustTooltipPosition() {
                 tooltipText.style.transform = 'none';
             } else {
                 tooltipText.style.left = `${left}px`;
-                tooltipText.style.transform = 'none'; // Remove centering transform since we’re using exact pixels
+                tooltipText.style.transform = 'none';
             }
 
             // Debug positioning
             console.log(`Tooltip ${index} positioned at: top=${tooltipText.style.top}, left=${tooltipText.style.left}`);
             console.log(`Tooltip ${index} visibility: ${window.getComputedStyle(tooltipText).visibility}, opacity: ${window.getComputedStyle(tooltipText).opacity}`);
         });
-
-
     });
 }
 

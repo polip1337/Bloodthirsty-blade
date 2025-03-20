@@ -792,3 +792,95 @@ body.modal-active .modal,
 body.modal-active .modal-overlay {
     pointer-events: auto; /* Modals stay clickable */
 }
+.race-scroll-container {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid #ffd700;
+    background: #2a2a2a;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.race-option {
+    margin: 5px 0;
+    background: #333;
+    border: 1px solid #444;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s, padding 0.2s, font-size 0.2s;
+    position: relative; /* For absolute positioning of button */
+}
+
+.race-option:hover {
+    background: #444;
+    transform: scale(1.02);
+}
+
+.race-option.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.race-option.minimized {
+    font-size: 12px; /* Smaller text */
+    transform: scale(0.8); /* Shrink overall size */
+}
+
+.race-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.race-header h4 {
+    margin: 0;
+    flex-grow: 1; /* Ensure name takes available space */
+}
+
+.toggle-button {
+    position: absolute;
+    top: 2px; /* Upper right */
+    right: 2px;
+    width: 16px; /* Smaller size */
+    height: 16px;
+    border: none;
+    border-radius: 3px;
+    font-size: 12px; /* Smaller text */
+    line-height: 16px; /* Center vertically */
+    text-align: center; /* Center horizontally */
+    cursor: pointer;
+    padding: 0px; */
+    margin: 0px;
+}
+
+.race-details {
+    margin-top: 5px;
+}
+
+.race-details p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.unlock-requirement {
+    color: #ff5555;
+    padding-right: 25px;
+}
+
+.tooltip .tooltiptext {
+    width: 250px;
+    /* Existing tooltip styles */
+}
+
+.modal .tooltip {
+    position: relative;
+}
+.modal .tooltip .tooltiptext {
+    position: absolute;
+    top: -100%; /* Above by default */
+    left: 50%;
+    transform: translateX(-50%);
+    /* Adjust as needed */
+}
