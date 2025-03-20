@@ -42,6 +42,7 @@ function wipeSave() {
         localStorage.removeItem('cursedSwordSave');
         clearAllIntervals();
         initGame();
+        document.getElementById('inquisitionReset').style.display = 'none';
     }
 }
 
@@ -54,7 +55,6 @@ function clearAllIntervals() {
 }
 function resetSaveGameOver() {
     wipeSave();
-    document.getElementById('inquisitionReset').style.display = 'none';
 
 }
 
@@ -115,6 +115,7 @@ function startAction(actionType) {
             game.wielder.currentLife = Math.min(game.wielder.currentLife + hpGain, getEffectiveStats().endurance *5);
             console.log(`Resting: +${hpGain} HP, Current HP: ${game.wielder.currentLife}`);
             showFloatingNumber(hpGain, 'restButton');
+            updateHealthBar(null);
             updateWielderStats();
         }, 5000);
     } else if (actionType === 'training') {

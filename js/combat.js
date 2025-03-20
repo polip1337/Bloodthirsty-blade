@@ -269,7 +269,7 @@ function startAutoBattle() {
 function calculateExpGain(baseExp) {
     const enemy = gameData.zones[game.currentEnemy.zoneIndex].enemies[game.currentEnemy.enemyIndex];
     const levelDiff = enemy.level - game.wielder.level;
-    const expMultiplier = 1 + (levelDiff * 0.2);
+    const expMultiplier = Math.max(1 + (levelDiff * 0.2),0);
     const expGained = Math.max(Math.floor(baseExp * expMultiplier), 0) * (1 + game.wielder.currentStats.willpower / 200);
     addCombatMessage(`Gained ${expGained.toFixed(1)} exp. ${(expMultiplier * 100).toFixed(2)}% of base due to level gap.`, 'player-stat');
     return expGained;

@@ -280,16 +280,7 @@ game.achievements = {
         unlocked: false,
         icon: "🛡️"
     },
-    centuryMark: {
-        name: "Century Mark",
-        description: "Reach 100 total kills",
-        condition: () => game.statistics.totalKills >= 100,
-        target: 100,
-        progress: () => game.statistics.totalKills,
-        bonus: { damageMultiplier: 1.01 },
-        unlocked: false,
-        icon: "🎯"
-    },
+
     decathlon: {
         name: "Decathlon",
         description: "Use 10 wielders",

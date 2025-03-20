@@ -18,10 +18,13 @@ function updateWielderHealth() {
     }
 }
 function updateModalGold(){
-let innerHTML = `
-Gold: ${game.wielder.gold}
-`;
-document.getElementById('modal-gold-value').innerHTML = innerHTML;
+    if(document.getElementById('modal-gold-value')){
+        let innerHTML = `
+        Gold: ${game.wielder.gold}
+        `;
+
+        document.getElementById('modal-gold-value').innerHTML = innerHTML;
+    }
 }
 function updateWielderStats() {
     const wielder = game.wielder;
@@ -34,7 +37,7 @@ function updateWielderStats() {
     const damageFromBonus = totalDamage - (baseDamage + controlDamageBonus);
     let wielderHTML = `
         <div class="stat">Name: <span id="wielderName">${wielder.name}</span></div>
-        <div class="stat">Race: <span id="wielderRace">${wielder.race}</span></div>
+        <div class="stat">Race: <span id="wielderRace">${wielder.race.charAt(0).toUpperCase() + wielder.race.slice(1)}</span></div>
         <div class="stat tooltip">
             Strength: ${effectiveStats.strength.toFixed(1)}${wielder.baseStats.strength > effectiveStats.strength ? '⚠' : ''}
             <span class="tooltiptext">Increases damage dealt per strike (+2 Damage)${getWoundText('strength')}</span>
@@ -697,9 +700,7 @@ function closeOtherFooterModals(exceptModalId) {
     });
 }
 function updateBackgroudImage(zoneIndex){
-    if(zoneIndex == 0){
-        const healthDiv = document.getElementById('background-image').src = "assets/area" + zoneIndex +".png" ;
-    }else if(zoneIndex == 1){
-        const healthDiv = document.getElementById('background-image').src = "assets/backgroundLevel2.jpg" ;
-    }
+
+    const healthDiv = document.getElementById('background-image').src = "assets/backgroundLevel" + (zoneIndex +1) +".jpg" ;
+
 }
