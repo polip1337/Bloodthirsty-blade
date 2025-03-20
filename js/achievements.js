@@ -411,7 +411,7 @@ game.achievements = {
         name: "Blade Legacy",
         description: "Unlock all story fragments",
         condition: () => Object.values(gameData.story).every(s => s.unlocked),
-        target: 5, // Assuming 5 story fragments; adjust if dynamic
+        target: 6, // Assuming 5 story fragments; adjust if dynamic
         progress: () => Object.values(gameData.story).filter(s => s.unlocked).length,
         bonus: { damageMultiplier: 1.05 },
         unlocked: false,
