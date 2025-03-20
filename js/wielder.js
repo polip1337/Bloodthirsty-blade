@@ -61,6 +61,7 @@ function generateWielder(race, isInitial = false) {
 }
 
 function showLevelUpModal() {
+    disableBackground();
     updateStatPointsInfo();
     const effectiveStats = getEffectiveStats();
     document.getElementById('currentStatsDisplay').innerHTML = `
@@ -132,6 +133,7 @@ function handleWielderDeath(affectedStat) {
 }
 
 function selectRace(race) {
+    onModalClose('raceSelectionModal');
     if (races[race].unlocked) {
         game.wielder = generateWielder(race);
         checkAchievements();

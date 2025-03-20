@@ -29,10 +29,11 @@ body {
     padding: 15px;
     border-radius: 8px;
     overflow: auto;
+    overflow-x: hidden;
 }
 
 .game-section, .modal {
-    overflow: visible; /* Prevent clipping of tooltips */
+    overflow-x: hidden; /* Prevent clipping of tooltips */
 }
 
 button {
@@ -52,6 +53,7 @@ button:disabled {
 
 /* Grid Sections */
 #gameLogo {
+    overflow:hidden;
     grid-area: logo;
     text-align: center;
 }
