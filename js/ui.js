@@ -298,7 +298,7 @@ function showTab(tabName) {
 
 function showRaceSelection() {
     document.getElementById('wielderDeathModal').style.display = 'none';
-
+    disableBackground();
     const modal = document.getElementById('raceSelectionModal');
     gameData.zones = gameData.zones.map((zone, index) => ({
         ...zone,
@@ -356,15 +356,27 @@ function showRaceSelection() {
     adjustTooltipPosition();
 }
 
+function disableBackground(){
+    document.getElementById('modalOverlay').style.display = 'block'; // Show overlay
+    document.body.classList.add('modal-active'); // Disable background
+}
+
 function onModalClose(modalId) {
     document.getElementById(modalId).style.display = 'none';
-    if (game.currentAction === 'autoFighting' && !isAnyModalOpen()) {
-        startAutoBattle();
+    if (!isAnyModalOpen()) {
+
+        document.getElementById('modalOverlay').style.display = 'none'; // Hide overlay
+        document.body.classList.remove('modal-active'); // Re-enable background
+        if(game.currentAction === 'autoFighting' ){
+            startAutoBattle();
+        }
     }
+
     updateDisplay();
 }
 
 function updateStatsModal() {
+    disableBackground();
     const content = document.getElementById('statsContent');
     let html = '';
 
@@ -421,6 +433,7 @@ function formatTime(seconds) {
 }
 
 function showStory(viewed) {
+
     closeOtherFooterModals('storyModal');
     if (viewed) {
         if (!game.story1Viewed){
@@ -430,6 +443,7 @@ function showStory(viewed) {
         game.story1Viewed = true;
         return;
     }
+    disableBackground();
     const stories = Object.entries(gameData.story).filter(([_, story]) => story.unlocked);
     const listDiv = document.querySelector('#storyModal .story-list');
     const contentDiv = document.querySelector('#storyModal .story-content');
@@ -440,6 +454,7 @@ function showStory(viewed) {
     document.getElementById('storyModal').style.display = 'block';
 }
 function showStoryContent(key) {
+
     const story = gameData.story[key];
     if (story && story.unlocked) {
         document.querySelector('#storyModal .story-content').innerHTML = `
@@ -449,6 +464,7 @@ function showStoryContent(key) {
     }
 }
 function showChangelog() {
+    disableBackground();
     closeOtherFooterModals('changelogModal');
     document.getElementById('changelogContent').innerHTML = `
 
@@ -458,6 +474,7 @@ function showChangelog() {
 }
 
 function showOptions() {
+    disableBackground();
     closeOtherFooterModals('optionsModal');
     document.getElementById('optionsModal').style.display = 'block';
     document.getElementById('saveData').value = '';
@@ -555,6 +572,7 @@ const observer = new MutationObserver(() => {
 });
 observer.observe(document.body, { childList: true, subtree: true });
 function showPathSelectionModal() {
+    disableBackground();
     const modal = document.getElementById('pathSelectionModal');
     const content = `
         <div class="race-list">

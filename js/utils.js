@@ -110,6 +110,7 @@ function startAction(actionType) {
 
     if (actionType === 'resting') {
         restButton.classList.add('pulse-animation');
+        game.isFighting = false;
         game.actionInterval = setInterval(() => {
             const hpGain = 5;
             game.wielder.currentLife = Math.min(game.wielder.currentLife + hpGain, getEffectiveStats().endurance *5);
@@ -119,6 +120,7 @@ function startAction(actionType) {
             updateWielderStats();
         }, 5000);
     } else if (actionType === 'training') {
+        game.isFighting = false;
         trainButton.classList.add('pulse-animation');
         game.actionInterval = setInterval(() => {
             const expGain = 5;

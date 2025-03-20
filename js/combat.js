@@ -71,6 +71,8 @@ async function attackEnemy(zoneIndex, enemyIndex) {
         endCombat(true);
         updateEnemyHealthBar(enemy,0);
         defeatEnemy(enemy, zoneIndex);
+        achievementTracker(enemy,roundCount);
+        energyPeakTracker();
     } else {
         endCombat(false);
     }
@@ -117,12 +119,12 @@ function endCombat(victory) {
        //document.getElementById('combat-sound').play();
     }
 }
-function achievementTracker(enemy){
+function achievementTracker(enemy,roundCount){
     if (roundCount === 1) {
         game.statistics.killedInOneRound = true;
         game.statistics.enemiesKilledInOneRound++;
     }
-    const enemyDamage = Math.max(enemy.strength * 2 - Math.floor(wielder.currentStats.swordfighting), 1)
+    const enemyDamage = Math.max(enemy.strength * 2 - Math.floor(game.wielder.currentStats.swordfighting), 1)
     if (game.currentAction !== 'autoFighting') {
         game.statistics.manualKills++;
     }
@@ -130,7 +132,7 @@ function achievementTracker(enemy){
     if (enemyDamage >= 50 && wielder.currentLife > 0) {
         game.statistics.survivedHitOf50 = true;
     }
-    if (wielder.currentLife > 0 && enemyDamage > game.statistics.highestHitSurvived) {
+    if (game.wielder.currentLife > 0 && enemyDamage > game.statistics.highestHitSurvived) {
         game.statistics.highestHitSurvived = enemyDamage;
     }
      // Track kills in last 10 seconds
@@ -225,8 +227,7 @@ function defeatEnemy(enemy, zoneIndex) {
         addCombatMessage(`Found ${goldDrop} gold`, 'player-stat');
         updateModalGold();
     }
-    achievementTracker(enemy);
-    energyPeakTracker();
+
     game.isFighting = false;
     if (game.currentAction === 'autoFighting') startAutoBattle();
 }
