@@ -72,7 +72,7 @@ game.achievements = {
     },
     zoneDominator: {
         name: "Zone Dominator",
-        description: "Kill 100 enemies in zone 4+",
+        description: "Kill 100 enemies in zone 5+",
         condition: () => Object.entries(game.statistics.zoneKills).some(([z, k]) => z >= 4 && k >= 100),
         target: 100,
         progress: () => Math.max(...Object.entries(game.statistics.zoneKills).filter(([z, k]) => parseInt(z) >= 4).map(([z, k]) => k),0),
@@ -83,7 +83,9 @@ game.achievements = {
     swiftKiller: {
             name: "Swift Killer",
             description: "Defeat 10 enemies in under 10 seconds",
-            condition: () => game.statistics.hasSwiftKilled,
+            condition: () => game.swiftKillMaxCount>=10,
+            target: 10,
+            progress: () => game.swiftKillMaxCount,
             bonus: { attackSpeed: 0.05 },
             unlocked: false,
             icon: "⏩"

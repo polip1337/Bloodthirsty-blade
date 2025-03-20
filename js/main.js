@@ -15,7 +15,7 @@ async function initGame() {
         if (game.currentAction === 'resting') {
             game.statistics.totalRestTime++;
         }
-        if (game.currentAction === 'autoExploring') {
+        if (game.currentAction === 'autoFighting') {
             game.statistics.totalAutoExploreTime++;
         }
         checkAchievements();

@@ -13,6 +13,7 @@ function loadGameData() {
         inquisitionEnabled: true,
         swiftKillStartTime: null, // For Swift Killer timing
         swiftKillCount: 0,        // For Swift Killer count
+        swiftKillMaxCount: 0,        // For Swift Killer count
         wasEnergyMaxed: false, // To detect Energy Peak transitions
         timesEnergyMaxed:0,
         achievements:{},

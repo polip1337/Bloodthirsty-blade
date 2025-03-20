@@ -127,6 +127,7 @@ function swiftKillTracker(){
         const timeElapsed = (Date.now() - game.swiftKillStartTime) / 1000; // Seconds
         if (timeElapsed <= 10) {
             game.swiftKillCount++;
+            if(game.swiftKillMaxCount< game.swiftKillCount) game.swiftKillMaxCount = game.swiftKillCount
             if (game.swiftKillCount >= 10) {
                 game.statistics.hasSwiftKilled = true;
             }
