@@ -1,7 +1,7 @@
 async function attackEnemy(zoneIndex, enemyIndex) {
     if (game.isFighting) return; // Prevent new combat if one is active
     if (game.currentAction && game.currentAction !== 'autoFighting') return;
-    const healthDiv = document.getElementById('wielder-health-stat').img = "assets/area" + zoneIndex +".png" ;
+    updateBackgroudImage(zoneIndex);
 
     game.wielder.hasFought = true;
     const effectiveStats = getEffectiveStats();

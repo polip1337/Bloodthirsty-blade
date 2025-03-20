@@ -696,3 +696,10 @@ function closeOtherFooterModals(exceptModalId) {
         }
     });
 }
+function updateBackgroudImage(zoneIndex){
+    if(zoneIndex == 0){
+        const healthDiv = document.getElementById('background-image').src = "assets/area" + zoneIndex +".png" ;
+    }else if(zoneIndex == 1){
+        const healthDiv = document.getElementById('background-image').src = "assets/backgroundLevel2.jpg" ;
+    }
+}
