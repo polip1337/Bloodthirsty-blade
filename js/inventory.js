@@ -4,11 +4,11 @@ function openShop(zoneIndex) {
     document.getElementById('shopModal').style.display = 'block';
     const zoneItems = game.shopItems[zoneIndex] || game.shopItems[4];
     const shopContent = `
-        <h3>Shop - ${gameData.zones[zoneIndex].name}</h3>
+    <h3>Shop - ${gameData.zones[zoneIndex].name}</h3>
         <p id="modal-gold-value">Gold: ${game.wielder.gold}</p>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-        ${zoneItems.map(item => `
-            <div class="shop-item tooltip ${getItemBorderClass(item)}">
+        ${zoneItems.map((item, index) => `
+            <div class="shop-item tooltip ${getItemBorderClass(item)} ${index % 3 === 0 ? 'left-column' : ''}">
                 <img src="${item.icon}" alt="${item.name}">
                 <span class="tooltiptext">${getItemTooltip(item)}<br>Price: ${item.price} gold</span>
                 <button onclick="buyItem('${item.name}', ${zoneIndex})">Buy</button>
