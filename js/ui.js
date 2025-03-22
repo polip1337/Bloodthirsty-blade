@@ -356,7 +356,19 @@ function showRaceSelection() {
     content += '</div>';
     document.getElementById('raceOptions').innerHTML = content;
     modal.style.display = 'block';
+
+    // Add click event listeners to race options
+    document.querySelectorAll('.race-option').forEach(raceDiv => {
+        raceDiv.addEventListener('click', function() {
+            if (!this.classList.contains('locked')) {
+                const raceKey = this.id.replace('race-', '');
+                selectRace(raceKey);
+            }
+        });
+    });
+
     adjustTooltipPosition();
+
 }
 function toggleRaceDetails(raceKey, event) {
     event.stopPropagation(); // Prevent race selection when toggling
