@@ -117,7 +117,7 @@
     {
       "name": "Rocky Foothills",
       "enemies": [
-        { "name": "A Sneak Goblin", "level": 2, "strength": 5, "defense": 1, "endurance": 10, "exp": 20 },
+        { "name": "A Sneaky Goblin", "level": 2, "strength": 5, "defense": 1, "endurance": 10, "exp": 20 },
         { "name": "A Wild Beastman", "level": 2, "strength": 6, "defense": 1, "endurance": 15, "exp": 20 },
         { "name": "A Goblin Hunting Party", "level": 3, "strength": 7, "defense": 2, "endurance": 20, "exp": 30 },
         { "name": "A Pack of Beastmen", "level": 3, "strength": 8, "defense": 2, "endurance": 25, "exp": 30 }
