@@ -42,11 +42,11 @@ game.achievements = {
     },
     wielderVeteran: {
         name: "Wielder Veteran",
-        description: "Have 5 different wielders",
-        condition: () => game.statistics.wieldersUsed >= 5,
+        description: "Control wielders of 5 different races",
+        condition: () => Object.keys(game.statistics.racesUsed).length >= 5,
         target: 5,
-        progress: () => game.statistics.wieldersUsed,
-        bonus: { startingStats: 1 },
+        progress: () => Object.keys(game.statistics.racesUsed).length,
+        bonus: { startingStats: 2 },
         unlocked: false,
         icon: "👥"
     },
@@ -55,7 +55,7 @@ game.achievements = {
         description: "Defeat 25 enemies in one zone",
         condition: () => Object.values(game.statistics.zoneKills).some(k => k >= 25),
         target: 25,
-        progress: () => Math.max(...Object.values(game.statistics.zoneKills)),
+        progress: () => Math.max(...Object.values(game.statistics.zoneKills), 0),
         bonus: { damageMultiplier: 1.02 },
         unlocked: false,
         icon: "⚔️"
@@ -72,10 +72,10 @@ game.achievements = {
     },
     zoneDominator: {
         name: "Zone Dominator",
-        description: "Kill 100 enemies in zone 4+",
+        description: "Kill 100 enemies in zone 5+",
         condition: () => Object.entries(game.statistics.zoneKills).some(([z, k]) => z >= 4 && k >= 100),
         target: 100,
-        progress: () => Math.max(...Object.entries(game.statistics.zoneKills).filter(([z, k]) => parseInt(z) >= 4).map(([z, k]) => k)),
+        progress: () => Math.max(...Object.entries(game.statistics.zoneKills).filter(([z, k]) => parseInt(z) >= 4).map(([z, k]) => k),0),
         bonus: { goldMultiplier: 1.05 },
         unlocked: false,
         icon: "🏰"
@@ -83,7 +83,9 @@ game.achievements = {
     swiftKiller: {
             name: "Swift Killer",
             description: "Defeat 10 enemies in under 10 seconds",
-            condition: () => game.statistics.hasSwiftKilled,
+            condition: () => game.statistics.swiftKillMaxCount>=10,
+            target: 10,
+            progress: () => game.statistics.swiftKillMaxCount,
             bonus: { attackSpeed: 0.05 },
             unlocked: false,
             icon: "⏩"
@@ -100,6 +102,8 @@ game.achievements = {
         name: "Trailblazer",
         description: "Unlock zone 5",
         condition: () => gameData.zones[4].unlocked,
+        target: 5,
+        progress: () => game.sword.upgrades["senses"].level,
         bonus: { expMultiplier: 1.03 },
         unlocked: false,
         icon: "🛤️"
@@ -119,7 +123,7 @@ game.achievements = {
         description: "Trigger Inquisition warning",
         condition: () => Object.values(game.statistics.zoneKills).some(k => k >= 50),
         target: 50,
-        progress: () => Math.max(...Object.values(game.statistics.zoneKills)),
+        progress: () => Math.max(...Object.values(game.statistics.zoneKills),0),
         bonus: { willpowerBonus: 1 },
         unlocked: false,
         icon: "🕵️"
@@ -198,7 +202,7 @@ game.achievements = {
         condition: () => game.sword.energy >= 500,
         target: 500,
         progress: () => game.sword.energy,
-        bonus: { energyGain: 0.03 },
+        bonus: { energyGainMultiplier: 0.03 },
         unlocked: false,
         icon: "⚡"
     },
@@ -235,7 +239,7 @@ game.achievements = {
     pacifist: {
             name: "Pacifist",
             description: "Train to level 5 without fighting",
-            condition: () => game.statistics.hasPacifistLeveled,
+            condition: () => !game.wielder.hasFought && game.wielder.level>=5,
             bonus: { trainingExp: 0.05 },
             unlocked: false,
             icon: "🕊️"
@@ -280,23 +284,14 @@ game.achievements = {
         unlocked: false,
         icon: "🛡️"
     },
-    centuryMark: {
-        name: "Century Mark",
-        description: "Reach 100 total kills",
-        condition: () => game.statistics.totalKills >= 100,
-        target: 100,
-        progress: () => game.statistics.totalKills,
-        bonus: { damageMultiplier: 1.01 },
-        unlocked: false,
-        icon: "🎯"
-    },
+
     decathlon: {
         name: "Decathlon",
         description: "Use 10 wielders",
         condition: () => game.statistics.wieldersUsed >= 10,
         target: 10,
         progress: () => game.statistics.wieldersUsed,
-        bonus: { startingStats: 2 },
+        bonus: { startingStats: 1 },
         unlocked: false,
         icon: "🏃‍♂️"
     },
@@ -316,7 +311,7 @@ game.achievements = {
             condition: () => game.statistics.timesEnergyMaxed >= 10,
             target: 10,
             progress: () => game.statistics.timesEnergyMaxed,
-            bonus: { energyGain: 0.07 },
+            bonus: { energyGainMultiplier: 0.07 },
             unlocked: false,
             icon: "🔋"
         },
@@ -334,6 +329,8 @@ game.achievements = {
             name: "Lucky Strike",
             description: "Kill an enemy in one hit",
             condition: () => game.statistics.hasOneHitKilled,
+            target: 1,
+            progress: () => game.statistics.enemiesKilledInOneRound,
             bonus: { critChance: 0.01 },
             unlocked: false,
             icon: "🍀"
@@ -371,19 +368,21 @@ game.achievements = {
         description: "Kill 200 enemies in one zone",
         condition: () => Object.values(game.statistics.zoneKills).some(k => k >= 200),
         target: 200,
-        progress: () => Math.max(...Object.values(game.statistics.zoneKills)),
+        progress: () => Math.max(...Object.values(game.statistics.zoneKills), 0),
         bonus: { zoneExp: 0.05 },
         unlocked: false,
         icon: "✅"
     },
     goblinKing: {
-        name: "Goblin King",
-        description: "Use 5 goblin wielders",
-        condition: () => false,
-        bonus: { goblinBonus: 1 },
-        unlocked: false,
-        icon: "👑"
-    },
+            name: "Goblin King",
+            description: "Use 5 goblin wielders",
+            condition: () => game.statistics.goblinWieldersUsed >= 5,
+            target: 5,
+            progress: () => game.statistics.goblinWieldersUsed,
+            bonus: { goblinBonus: 1 },
+            unlocked: false,
+            icon: "👑"
+        },
     minimalist: {
         name: "Minimalist",
         description: "Reach level 10 with no items",
@@ -410,7 +409,7 @@ game.achievements = {
             condition: () => game.statistics.totalPlayTime >= 3600,
             target: 3600,
             progress: () => game.statistics.totalPlayTime,
-            bonus: { energyGain: 0.06 },
+            bonus: { energyGainMultiplier: 0.06 },
             unlocked: false,
             icon: "🏃"
         },
@@ -418,7 +417,7 @@ game.achievements = {
         name: "Blade Legacy",
         description: "Unlock all story fragments",
         condition: () => Object.values(gameData.story).every(s => s.unlocked),
-        target: 5, // Assuming 5 story fragments; adjust if dynamic
+        target: 6, // Assuming 5 story fragments; adjust if dynamic
         progress: () => Object.values(gameData.story).filter(s => s.unlocked).length,
         bonus: { damageMultiplier: 1.05 },
         unlocked: false,
@@ -428,14 +427,22 @@ game.achievements = {
 }
 function checkAchievements() {
     Object.entries(game.achievements).forEach(([key, achievement]) => {
-        if (!achievement.unlocked && achievement.condition && achievement.condition()) {
-            achievement.unlocked = true;
+        // Check if not already completed and condition is met
+        if (!game.completedAchievements[key] && achievement.condition && achievement.condition()) {
+            game.completedAchievements[key] = achievement;
             addCombatMessage(
                 `Achievement Unlocked: ${achievement.name}! Bonus: ${getBonusDescription(achievement.bonus)}`,
                 'achievement'
             );
+            // Recalculate stats if necessary
             if (achievement.bonus.maxEnergyMultiplier) {
                 calculateMaxEnergy();
+            }
+            if (achievement.bonus.upgradeCostReductio) {
+                updateDisplay();
+            }
+            if (achievement.bonus.damageMultiplier) {
+                updateWielderStats();
             }
         }
     });
@@ -445,6 +452,17 @@ function updateAchievementsTab() {
     const list = document.getElementById('achievements-list');
     list.innerHTML = Object.entries(game.achievements).map(([key, ach]) => {
         let progressBar = '';
+        if(game.completedAchievements[key]){
+            return `
+                <div class="achievement-icon tooltip unlocked">
+                    <span>${ach.icon}</span>
+                    <span class="tooltiptext">
+                        ${ach.name}<br>
+                        ${ach.description}<br>
+                        Reward: ${getBonusDescription(ach.bonus)}
+                    </span>
+                </div>
+            `;}
         if (!ach.unlocked && ach.target && ach.progress) {
             const current = ach.progress();
             const percentage = Math.min((current / ach.target) * 100, 100);
@@ -468,7 +486,6 @@ function updateAchievementsTab() {
         `;
     }).join('');
 }
-
 function getBonusDescription(bonus) {
     if (bonus.damageMultiplier) return `+${((bonus.damageMultiplier - 1) * 100).toFixed(0)}% damage`;
     if (bonus.maxEnergyMultiplier) return `+${((bonus.maxEnergyMultiplier - 1) * 100).toFixed(0)}% max energy`;
@@ -499,8 +516,8 @@ function getBonusDescription(bonus) {
 
 function getDamageMultiplier() {
     let multiplier = 1;
-    Object.values(game.achievements).forEach(ach => {
-        if (ach.unlocked && ach.bonus.damageMultiplier) multiplier *= ach.bonus.damageMultiplier;
+    Object.values(game.completedAchievements).forEach(ach => {
+        if (ach.bonus.damageMultiplier) multiplier *= ach.bonus.damageMultiplier;
     });
     ['blood', 'death'].forEach(path => {
         game.pathTiersUnlocked[path].forEach(tierIdx => {
@@ -513,9 +530,9 @@ function getDamageMultiplier() {
 
 function getExpMultiplier() {
     let multiplier = 1;
-    Object.values(game.achievements).forEach(ach => {
-        if (ach.unlocked && ach.bonus.expMultiplier) multiplier *= ach.bonus.expMultiplier;
-        if (ach.unlocked && ach.bonus.zoneExp) multiplier *= ach.bonus.zoneExp;
+    Object.values(game.completedAchievements).forEach(ach => {
+        if (ach.bonus.expMultiplier) multiplier *= ach.bonus.expMultiplier;
+        if (ach.bonus.zoneExp) multiplier *= ach.bonus.zoneExp;
     });
     ['blood', 'vengeance'].forEach(path => {
         game.pathTiersUnlocked[path].forEach(tierIdx => {
@@ -528,24 +545,44 @@ function getExpMultiplier() {
 
 function getMaxEnergyMultiplier() {
     let multiplier = 1;
-    Object.values(game.achievements).forEach(ach => {
-        if (ach.unlocked && ach.bonus.maxEnergyMultiplier) multiplier *= ach.bonus.maxEnergyMultiplier;
+    Object.values(game.completedAchievements).forEach(ach => {
+        if (ach.bonus.maxEnergyMultiplier) multiplier *= ach.bonus.maxEnergyMultiplier;
     });
-    game.pathTiersUnlocked.blood.forEach(tierIdx => {
-        const tier = gameData.paths.blood.tiers[tierIdx];
-        if (tier.reward.maxEnergyMultiplier) multiplier *= tier.reward.maxEnergyMultiplier;
+    ['blood', 'death'].forEach(path => {
+        game.pathTiersUnlocked[path].forEach(tierIdx => {
+            const tier = gameData.paths[path].tiers[tierIdx];
+            if (tier.reward.maxEnergyMultiplier) multiplier *= (tier.reward.maxEnergyMultiplier);
+        });
     });
     return multiplier;
 }
 
 function getUpgradeCostReduction() {
     let reduction = 0;
-    Object.values(game.achievements).forEach(ach => {
-        if (ach.unlocked && ach.bonus.upgradeCostReduction) reduction += ach.bonus.upgradeCostReduction;
+    Object.values(game.completedAchievements).forEach(ach => {
+        if (ach.bonus.upgradeCostReduction) reduction += ach.bonus.upgradeCostReduction;
     });
-    game.pathTiersUnlocked.blood.forEach(tierIdx => {
-        const tier = gameData.paths.blood.tiers[tierIdx];
-        if (tier.reward.upgradeCostReduction) reduction += tier.reward.upgradeCostReduction;
-    });
+   ['blood', 'death'].forEach(path => {
+           game.pathTiersUnlocked[path].forEach(tierIdx => {
+               const tier = gameData.paths[path].tiers[tierIdx];
+               if (tier.reward.upgradeCostReductio) multiplier *= (tier.reward.upgradeCostReductio);
+           });
+       });
     return reduction;
+}
+function getEnergyGainMultiplier() {
+    let multiplier = 1;
+    Object.values(game.completedAchievements).forEach(key => {
+        const ach = game.achievements[key];
+        if (ach && ach.bonus.energyGainMultiplier) {
+            multiplier *= ach.bonus.energyGainMultiplier;
+        }
+    });
+    ['blood', 'death'].forEach(path => {
+        game.pathTiersUnlocked[path].forEach(tierIdx => {
+            const tier = gameData.paths[path].tiers[tierIdx];
+            if (tier.reward.energyGainMultiplier) multiplier *= (tier.reward.energyGainMultiplier);
+        });
+    });
+    return multiplier;
 }

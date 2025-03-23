@@ -7,6 +7,7 @@
 </head>
 <body>
 <!-- Modals -->
+<div id="modalOverlay" class="modal-overlay"></div>
 <div id="raceSelectionModal" class="modal">
     <h3>Choose Your Wielder's Race</h3>
     <div id="raceOptions"></div>
@@ -19,7 +20,7 @@
 </div>
 <div id="statsModal" class="modal">
     <h3>Game Statistics</h3>
-    <div id="statisticsContent"></div>
+    <div id="statsContent" class="stats-grid"></div>
     <button onclick="onModalClose('statsModal')">Close</button>
 </div>
 <div id="optionsModal" class="modal">
@@ -31,7 +32,10 @@
 </div>
 <div id="storyModal" class="modal">
     <h3>Sword's Legacy</h3>
-    <div id="storyContent"></div>
+    <div class="story-library">
+        <div class="story-list"></div>
+        <div class="story-content"></div>
+    </div>
     <button onclick="onModalClose('storyModal')">Close</button>
 </div>
 <div id="changelogModal" class="modal">
@@ -106,7 +110,7 @@
     <div id="tabs-left">
         <button class="active" onclick="showLeftTab('sword')">Sword Upgrades</button>
         <button onclick="showLeftTab('wielder')">Wielder</button>
-        <button onclick="showLeftTab('equipment')">Equipment</button>
+        <button id="equipmentTabBtn" onclick="showLeftTab('equipment')">Equipment</button>
     </div>
     <div id="tab-content-left">
         <div id="sword-content">
@@ -131,7 +135,7 @@
     </div>
 </div>
 <div id="combat-area">
-    <img src="assets\areas\kaladian_bg.png" style="height: 100%; width:100%">
+    <img id="background-image" src="assets\areas\backgroundLevel1.jpg" style="height: 100%; width:100%">
 
     <div id="wielder-sprite">
         <div id="wielder-health" class="health-bar">
@@ -149,7 +153,7 @@
     <div id="tabs">
         <button class="active" onclick="showTab('zones')">Zones</button>
         <button onclick="showTab('achievements')">Achievements</button>
-        <button onclick="showTab('paths')">Paths</button>
+        <button id="pathsTabBtn" onclick="showTab('paths')">Paths</button>
     </div>
     <div id="tab-content">
         <div id="zones-content">
@@ -177,7 +181,7 @@
         </span>
         <span class="tooltip">
             <button id="trainButton" onclick="onActionButtonClick('training')">Train</button>
-            <span class="tooltiptext">Gain 2 EXP/second (disables other actions)</span>
+            <span class="tooltiptext">Gain 1 EXP/second (disables other actions)</span>
         </span>
         <span class="tooltip">
             <button id="healButton" onclick="healWielder()">Heal wielder (10 energy)</button>
@@ -199,10 +203,10 @@
 <footer>
         <span class="tooltip">
             <a href="#" onclick="showStory()">📖</a>
-            <span class="tooltiptext">View Sword's Story</span>
+            <span class="tooltiptext">View Sword's Legacy</span>
         </span>
     <span class="tooltip">
-            <a href="#" onclick="showStatistics()">📊</a>
+            <a href="#" onclick="updateStatsModal()">📊</a>
             <span class="tooltiptext">Game Statistics</span>
         </span>
     <span class="tooltip">

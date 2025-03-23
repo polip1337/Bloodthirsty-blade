@@ -1,9 +1,20 @@
+function calculateFinalCost(upgradeName){
+    const upgrade = game.sword.upgrades[upgradeName];
+
+    const baseCost = upgrade.initialCost * Math.pow(2, upgrade.level-1); // Example scaling
+    const upgradeCostReduction = getUpgradeCostReduction();
+    return  Math.floor(baseCost * (1-upgradeCostReduction));
+}
 function buyUpgrade(name) {
     const upgrade = game.sword.upgrades[name];
-    if (game.sword.energy >= upgrade.cost && upgrade.level < gameData.upgradeCaps[name]) {
-        game.sword.energy -= upgrade.cost;
+
+
+    const finalCost = calculateFinalCost(name);
+
+    if (game.sword.energy >= finalCost && upgrade.level < gameData.upgradeCaps[name]) {
+        game.sword.energy -= finalCost;
         upgrade.level++;
-        upgrade.cost *= 2; // Example cost increase
+        upgrade.cost = calculateFinalCost(name);
         if (name === 'capacity') {
             calculateMaxEnergy();
             updateEnergyAndKills();
@@ -16,6 +27,7 @@ function buyUpgrade(name) {
         }
         updateUpgrades(game.sword.energy);
         if (name === 'capacity') calculateMaxEnergy();
+        if (name === 'control') calculateControlBonus();
         if (name === 'senses'){
             gameData.zones[upgrade.level - 1].unlocked = true;
             updateEnemyZones();
@@ -24,9 +36,11 @@ function buyUpgrade(name) {
         if (name === 'soul') {
             unlockNextStory();
             showStory();
+            showStoryContent("story" + upgrade.level);
         }
         updateDisplay();
     }
+    checkAchievements();
 }
 
 function unlockNextStory() {

@@ -1,12 +1,14 @@
 function openShop(zoneIndex) {
+    closeOtherFooterModals('shopModal');
+    disableBackground();
     document.getElementById('shopModal').style.display = 'block';
-    const zoneItems = shopItems[zoneIndex] || shopItems[4];
+    const zoneItems = game.shopItems[zoneIndex] || game.shopItems[4];
     const shopContent = `
-        <h3>Shop - ${gameData.zones[zoneIndex].name}</h3>
-        <p>Gold: ${game.wielder.gold}</p>
+    <h3>Shop - ${gameData.zones[zoneIndex].name}</h3>
+        <p id="modal-gold-value">Gold: ${game.wielder.gold}</p>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-        ${zoneItems.map(item => `
-            <div class="shop-item tooltip ${getItemBorderClass(item)}">
+        ${zoneItems.map((item, index) => `
+            <div class="shop-item tooltip ${getItemBorderClass(item)} ${index % 3 === 0 ? 'left-column' : ''}">
                 <img src="${item.icon}" alt="${item.name}">
                 <span class="tooltiptext">${getItemTooltip(item)}<br>Price: ${item.price} gold</span>
                 <button onclick="buyItem('${item.name}', ${zoneIndex})">Buy</button>
@@ -17,7 +19,7 @@ function openShop(zoneIndex) {
 }
 
 function buyItem(itemName, zoneIndex) {
-    const zoneItems = shopItems[zoneIndex] || shopItems[4];
+    const zoneItems = game.shopItems[zoneIndex] || game.shopItems[4];
     const item = zoneItems.find(i => i.name === itemName);
     const discount = Object.values(game.achievements).reduce((sum, ach) => sum + (ach.unlocked && ach.bonus.shopDiscount ? ach.bonus.shopDiscount : 0), 0);
     const effectivePrice = item.price * (1 - discount);
@@ -29,6 +31,8 @@ function buyItem(itemName, zoneIndex) {
     } else {
         alert('Not enough gold or inventory full');
     }
+    updateModalGold()
+
 }
 
 function handleInventoryClick(index) {

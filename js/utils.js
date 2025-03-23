@@ -10,63 +10,42 @@ function saveGame() {
 }
 
 function loadGame() {
-    console.log('Loading game');
     const saved = localStorage.getItem('cursedSwordSave');
     if (saved) {
+        console.log('Loading game from Saved state');
+
         const saveData = JSON.parse(saved);
+        game = {};
         Object.assign(game, saveData.game);
         game.wielder = saveData.wielder;
         gameData = saveData.gameData;
         const wielderSprite = document.getElementById('wielder-sprite');
         wielderSprite.style.backgroundImage = `url('assets/characters/wielder-${game.wielder.race}.png')`;
+        // Ensure completedAchievements exists
+        if (!game.completedAchievements) {
+            game.completedAchievements = Object.entries(game.achievements)
+                .filter(([key, ach]) => ach.unlocked)
+                .map(([key]) => key);
+        }
+        loadAchievements();
+
     } else {
+        console.log('Loading game from scratch');
+        loadGameData();
         game.wielder = generateWielder('goblin', true);
+        loadAchievements();
     }
 }
 
 function wipeSave() {
     if (confirm('Permanently delete all progress?')) {
         localStorage.removeItem('cursedSwordSave');
-        // Fully reset game state
-        game.wielder = generateWielder('goblin', true);
-        resetStats();
-        game.sword.energy = 0;
-        game.inquisitionEnabled = true;
-        game.currentAction = null;
-        Object.values(game.sword.upgrades).forEach(upg => { upg.level = 1; upg.cost = upg.initialCost; });
-        game.selectedPath = null;
-        game.pathProgress = { blood: 0, death: 0, vengeance: 0 };
-        game.souls = { minor: 0, normal: 0, major: 0, epic: 0 };
-        game.pathTiersUnlocked = { blood: [], death: [], vengeance: [] };
-        game.unlockedPaths = [];
         clearAllIntervals();
         initGame();
-        loadAchievements();
-        updateDisplay();
-        checkAchievements(); // Safe to call now with reinitialized achievements
+        document.getElementById('inquisitionReset').style.display = 'none';
     }
 }
-function resetStats(){
-game.statistics = {
-    totalKills: 0,          // Existing
-    wieldersUsed: 0,        // Existing
-    zoneKills: {},          // Existing
-    mobKills: {},
-    itemsBought: 0,         // For Shopaholic
-    manualKills: 0,         // For Manual Warrior
-    timesEnergyMaxed: 0,    // For Energy Peak
-    goblinWieldersUsed: 0,  // For Goblin King
-    totalRestTime: 0,       // For Restful (in seconds)
-    totalAutoExploreTime: 0,// For Auto Master (in seconds)
-    totalPlayTime: 0,       // For Marathon (in seconds)
-    hasSwiftKilled: false,  // For Swift Killer
-    hasSurvivedWithOneHP: false, // For Survivor
-    hasOneHitKilled: false, // For Lucky Strike
-    hasTakenFiftyDamage: false, // For Tough Nut
-    hasPacifistLeveled: false, // For Pacifist
-    hasEscapedInquisition: false // For Escape Artist
-};
-}
+
 function clearAllIntervals() {
     let id = setInterval(() => {}, 1000); // Create a dummy interval to get the latest ID
     while (id >= 0) {
@@ -76,6 +55,7 @@ function clearAllIntervals() {
 }
 function resetSaveGameOver() {
     wipeSave();
+
 }
 
 function disableInquisition() {
@@ -107,23 +87,69 @@ function importSave() {
 }
 
 function onActionButtonClick(actionType) {
-    const buttons = ['restButton', 'trainButton'];
-    buttons.forEach(id => document.getElementById(id).classList.remove('active-action'));
-
-    switch (actionType) {
-        case 'resting':
-            game.currentAction = game.currentAction === 'resting' ? null : 'resting';
-            if (game.currentAction) document.getElementById('restButton').classList.add('active-action');
-            break;
-        case 'training':
-            game.currentAction = game.currentAction === 'training' ? null : 'training';
-            if (game.currentAction) document.getElementById('trainButton').classList.add('active-action');
-            break;
+    // If clicking the same action, stop it
+    if (game.currentAction === actionType) {
+        stopCurrentAction();
+        return;
     }
+
+    // Stop any existing action and start the new one
+    stopCurrentAction();
+    startAction(actionType);
     updateButtonStates();
     updateEnemyZones();
 }
 
+function startAction(actionType) {
+    const restButton = document.getElementById('restButton');
+    const trainButton = document.getElementById('trainButton');
+    const exploreButton = document.getElementById('exploreButton');
+    const autoCombatButton = document.getElementById('autoCombatButton');
+
+    game.currentAction = actionType;
+
+    if (actionType === 'resting') {
+        restButton.classList.add('pulse-animation');
+        game.isFighting = false;
+        game.actionInterval = setInterval(() => {
+            const hpGain = 5;
+            game.wielder.currentLife = Math.min(game.wielder.currentLife + hpGain, getEffectiveStats().endurance *5);
+            console.log(`Resting: +${hpGain} HP, Current HP: ${game.wielder.currentLife}`);
+            showFloatingNumber(hpGain, 'restButton');
+            updateHealthBar(null);
+            updateWielderStats();
+        }, 5000);
+    } else if (actionType === 'training') {
+        game.isFighting = false;
+        trainButton.classList.add('pulse-animation');
+        game.actionInterval = setInterval(() => {
+            const expGain = 5;
+            game.wielder.exp += expGain;
+            console.log(`Training: +${expGain} EXP, Current EXP: ${game.wielder.exp}`);
+            showFloatingNumber(expGain, 'trainButton');
+
+            checkLevelUp();
+        }, 5000);
+    }
+}
+function stopCurrentAction() {
+    const restButton = document.getElementById('restButton');
+    const trainButton = document.getElementById('trainButton');
+
+
+    // Clear the interval if it exists
+    if (game.actionInterval !== null) {
+        clearInterval(game.actionInterval);
+        game.actionInterval = null;
+    }
+
+    // Remove animation from all buttons
+    restButton.classList.remove('pulse-animation');
+    trainButton.classList.remove('pulse-animation');
+
+
+    game.currentAction = null;
+}
 function addCombatMessage(text, className) {
     const logElement = document.createElement('div');
     logElement.className = `log-entry ${className}`;
@@ -147,7 +173,7 @@ function updateStatPointsInfo() {
     const race = game.wielder.race;
     const basePoints = gameData.races[race].skillpoints || 1;
     const totalPoints = game.wielder.statPoints;
-    const info = `You have ${totalPoints} stat points to allocate. ` +
+    const info = `You have ${totalPoints.toFixed(0)} stat points to allocate. ` +
         `(Each level grants ${basePoints} point.)`;
     document.getElementById('statPointsInfo').textContent = info;
 }

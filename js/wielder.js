@@ -10,7 +10,9 @@ function generateWielder(race, isInitial = false) {
     const wielderSprite = document.getElementById('wielder-sprite');
     wielderSprite.style.backgroundImage = `url('assets/characters/wielder-${race}.png')`;
     const raceData = races[race];
-    const startingBonus = Object.values(game.achievements).reduce((sum, ach) => sum + (ach.unlocked && ach.bonus.startingStats ? ach.bonus.startingStats : 0), 0);
+    const startingBonus = Object.values(game.achievements).reduce((sum, ach) =>
+        sum + (game.completedAchievements[Object.keys(game.achievements).find(key => game.achievements[key] === ach)] && ach.bonus.startingStats ? ach.bonus.startingStats : 0),
+    0);
     let baseStats;
     if (isInitial && race === 'goblin') {
         baseStats = {
@@ -24,10 +26,11 @@ function generateWielder(race, isInitial = false) {
             strength: Math.floor(Math.random() * 6 + 1) + (raceData.stats.strength || 0) + startingBonus,
             swordfighting: Math.floor(Math.random() * 6 + 1) + (raceData.stats.swordfighting || 0) + startingBonus,
             endurance: Math.floor(Math.random() * 2 + 1) + (raceData.stats.endurance || 0) + startingBonus,
-            willpower: Math.floor(Math.random() * 50 + 50) + (raceData.stats.willpower || 0) + startingBonus
+            willpower: Math.floor(Math.random() * 50 + 50) + (raceData.stats.willpower || 0) + startingBonus*5
         };
     }
-
+    updateHealthBar("100%");
+    game.statistics.racesUsed[race] = true;
     return {
         name: raceData.names[Math.floor(Math.random() * raceData.names.length)],
         race,
@@ -59,6 +62,7 @@ function generateWielder(race, isInitial = false) {
 }
 
 function showLevelUpModal() {
+    disableBackground();
     updateStatPointsInfo();
     const effectiveStats = getEffectiveStats();
     document.getElementById('currentStatsDisplay').innerHTML = `
@@ -76,7 +80,7 @@ function allocatePoint(stat) {
         game.wielder.currentLife += 5;
     }
     if (stat === 'willpower') game.wielder.currentStats.willpower += 4;
-    if (game.wielder.statPoints <= 0) {
+    if (game.wielder.statPoints < 1) {
         onModalClose('levelUpModal');
     } else {
         showLevelUpModal();
@@ -130,23 +134,29 @@ function handleWielderDeath(affectedStat) {
 }
 
 function selectRace(race) {
+    onModalClose('raceSelectionModal');
     if (races[race].unlocked) {
         game.wielder = generateWielder(race);
+        checkAchievements();
         document.getElementById('raceSelectionModal').style.display = 'none';
         updateWielderStats();
     }
 }
+function calculateControlBonus(){
+    const controlLevel = game.sword.upgrades.control.level;
+    const willpower = Math.min(game.wielder.currentStats.willpower, 200);
+    game.controlBonus = controlLevel * 0.2 * (1 - willpower / 200);
+}
 
 function healWielder() {
-    if (game.sword.energy >= 10 && game.wielder.currentLife < game.wielder.currentStats.endurance * 5) {
+    if (game.sword.energy >= 10 && game.wielder.currentLife < getEffectiveStats().endurance * 5) {
         game.sword.energy -= 10;
         game.wielder.currentLife = Math.min(
-            game.wielder.currentLife + Math.floor(game.wielder.currentStats.endurance * 1.25),
-            game.wielder.currentStats.endurance * 5
+            game.wielder.currentLife + Math.floor(getEffectiveStats().endurance * 1.25),
+            getEffectiveStats().endurance * 5
         );
         const wielderHealthFill = document.querySelector('#wielder-health .health-bar-fill');
-
-        wielderHealthFill.style.width = `${(wielder.currentLife / (effectiveStats.endurance *5)) * 100}%`;
+        wielderHealthFill.style.width = `${(game.wielder.currentLife / (getEffectiveStats().endurance *5)) * 100}%`;
 
         updateWielderStats();
         updateEnergyAndKills();
