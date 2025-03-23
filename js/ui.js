@@ -744,6 +744,6 @@ function closeOtherFooterModals(exceptModalId) {
 }
 function updateBackgroudImage(zoneIndex){
 
-    const healthDiv = document.getElementById('background-image').src = "assets/backgroundLevel" + (zoneIndex +1) +".jpg" ;
+    const healthDiv = document.getElementById('background-image').src = "assets/areas/backgroundLevel" + (zoneIndex +1) +".jpg" ;
 
 }

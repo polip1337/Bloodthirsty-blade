@@ -8,7 +8,7 @@ function generateWielder(race, isInitial = false) {
         game.statistics.goblinWieldersUsed++;
     }
     const wielderSprite = document.getElementById('wielder-sprite');
-    wielderSprite.style.backgroundImage = `url('assets/wielder-${race}.png')`;
+    wielderSprite.style.backgroundImage = `url('assets/characters/wielder-${race}.png')`;
     const raceData = races[race];
     const startingBonus = Object.values(game.achievements).reduce((sum, ach) =>
         sum + (game.completedAchievements[Object.keys(game.achievements).find(key => game.achievements[key] === ach)] && ach.bonus.startingStats ? ach.bonus.startingStats : 0),
@@ -47,7 +47,7 @@ function generateWielder(race, isInitial = false) {
             helmet: null,
             body: null,
             gauntlets: null,
-            weapon: { type: 'weapon', name: 'Cursed Sword', stats: { strength: 1 }, icon: 'assets/blade.png', permanent: true }, // Permanent sword
+            weapon: { type: 'weapon', name: 'Cursed Sword', stats: { strength: 1 }, icon: 'assets/equipment/blade.png', permanent: true }, // Permanent sword
             shield: null,
             boots: null,
             ring: null,

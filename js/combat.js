@@ -105,7 +105,7 @@ function startCombat(enemy) {
 
     // Set sprites based on race and enemy
 
-    enemySprite.style.backgroundImage = `url('assets/enemy-${enemy.name.toLowerCase().replace(/\s/g, '-')}.png')`;
+    enemySprite.style.backgroundImage = `url('assets/characters/enemy-${enemy.name.toLowerCase().replace(/\s/g, '-')}.png')`;
     enemySprite.style.display = 'block';
     combatArea.classList.add('combat-active');
 }
