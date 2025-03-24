@@ -15,6 +15,7 @@ function buyUpgrade(name) {
         game.sword.energy -= finalCost;
         upgrade.level++;
         upgrade.cost = calculateFinalCost(name);
+        showEventBackground('assets/cutscenes/powerUp.jpg');
         if (name === 'capacity') {
             calculateMaxEnergy();
             updateEnergyAndKills();

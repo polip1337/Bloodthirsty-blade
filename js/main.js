@@ -1,5 +1,5 @@
 async function initGame() {
-    gameData = await fetch('gameData.json').then(r => r.json());
+    loadGameData();
     races = gameData.races;
     zones = gameData.zones;
     upgradeCaps = gameData.upgradeCaps;
@@ -22,7 +22,11 @@ async function initGame() {
 
     }, 1000);
     setInterval(() => {
-        game.wielder.currentLife = Math.min(game.wielder.currentLife + 1, getEffectiveStats().endurance *5);
+        game.wielder.currentLife = Math.min(game.wielder.currentLife + 1, getEffectiveStats().endurance * 5);
+        const energyRegen = game.pathBonuses?.blood?.energyRegen || 0;
+        if (energyRegen) {
+            game.sword.energy = Math.min(game.sword.energy + energyRegen, game.sword.maxEnergy);
+        }
         updateWielderStats();
         saveGame();
         }, 5000);

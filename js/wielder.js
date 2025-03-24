@@ -108,6 +108,7 @@ function applyHeavyWound() {
         game.wielder.baseStats[affectedStat] - game.wielder.wounds.filter(w => w === affectedStat).length,
         1
     );
+    showEventBackground('assets/cutscenes/wounded.jpg');
     let message = `Heavy wound inflicted! Permanent -1 to ${affectedStat}. This is the ${woundCount}${['st', 'nd', 'rd'][woundCount - 1] || 'th'} wound.`;
     if (woundCount < 3) {
         message += ` If they receive a 3rd wound, they will die.`;
@@ -124,6 +125,11 @@ function handleWielderDeath(affectedStat) {
     game.wielder.defeated = true;
     game.currentAction = null;
     game.sword.energy = 0;
+    Object.keys(game.inquisitionActivity).forEach(zoneIndex => {
+        game.inquisitionActivity[zoneIndex] = Math.max(game.inquisitionActivity[zoneIndex] - 0.1, 0);
+    });
+    updateInquisitionTooltips();
+    showEventBackground('assets/cutscenes/wounded.jpg');
     const message = affectedStat ?
         `Your wielder has succumbed to their wounds after receiving a heavy wound to ${affectedStat}.` :
         'Your wielder has died from their wounds.';
@@ -135,9 +141,13 @@ function handleWielderDeath(affectedStat) {
 
 function selectRace(race) {
     onModalClose('raceSelectionModal');
-    if (races[race].unlocked) {
+    if (game.races[race].unlocked) {
         game.wielder = generateWielder(race);
         checkAchievements();
+        Object.keys(game.inquisitionActivity).forEach(zoneIndex => {
+            game.inquisitionActivity[zoneIndex] = Math.max(game.inquisitionActivity[zoneIndex] - 0.1, 0);
+        });
+        updateInquisitionTooltips();
         document.getElementById('raceSelectionModal').style.display = 'none';
         updateWielderStats();
     }
@@ -149,12 +159,20 @@ function calculateControlBonus(){
 }
 
 function healWielder() {
+    const maxHeals = game.pathBonuses?.death?.maxHealsPerCombat || 1; // For point 7
+    if (game.isFighting && game.healsUsedInCombat >= maxHeals) {
+        addCombatMessage(`You can only heal ${maxHeals} time${maxHeals > 1 ? 's' : ''} per combat.`, 'error');
+        return;
+    }
     if (game.sword.energy >= 10 && game.wielder.currentLife < getEffectiveStats().endurance * 5) {
         game.sword.energy -= 10;
         game.wielder.currentLife = Math.min(
             game.wielder.currentLife + Math.floor(getEffectiveStats().endurance * 1.25),
             getEffectiveStats().endurance * 5
         );
+        if (game.isFighting) {
+            game.healsUsedInCombat++;
+        }
         const wielderHealthFill = document.querySelector('#wielder-health .health-bar-fill');
         wielderHealthFill.style.width = `${(game.wielder.currentLife / (getEffectiveStats().endurance *5)) * 100}%`;
 

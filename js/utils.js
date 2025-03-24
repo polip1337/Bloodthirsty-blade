@@ -3,8 +3,7 @@ function saveGame() {
     const saveData = {
         game,
         wielder: game.wielder,
-        timestamp: Date.now(),
-        gameData
+        timestamp: Date.now()
     };
     localStorage.setItem('cursedSwordSave', JSON.stringify(saveData));
 }
@@ -18,7 +17,6 @@ function loadGame() {
         game = {};
         Object.assign(game, saveData.game);
         game.wielder = saveData.wielder;
-        gameData = saveData.gameData;
         const wielderSprite = document.getElementById('wielder-sprite');
         wielderSprite.style.backgroundImage = `url('assets/characters/wielder-${game.wielder.race}.png')`;
         // Ensure completedAchievements exists

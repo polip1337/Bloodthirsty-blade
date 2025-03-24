@@ -29,8 +29,7 @@ function updateModalGold(){
 function updateWielderStats() {
     const wielder = game.wielder;
     const effectiveStats = getEffectiveStats();
-    const baseDamage = effectiveStats.strength * 2 + effectiveStats.swordfighting;
-
+    const baseDamage = effectiveStats.strength * 2; // Remove swordfighting
     const controlDamageBonus = baseDamage * game.controlBonus;
     const lifesteal = game.sword.upgrades.siphon.level;
     const totalDamage = (baseDamage + controlDamageBonus) * getDamageMultiplier();
@@ -44,13 +43,13 @@ function updateWielderStats() {
         </div><br />
         <div class="stat tooltip">
             Swordfighting: ${effectiveStats.swordfighting.toFixed(1)}${wielder.baseStats.swordfighting > effectiveStats.swordfighting ? '⚠' : ''}
-            <span class="tooltiptext">Reduces incoming damage (+1 resistance) Increases damage (+1)${getWoundText('swordfighting')}</span>
+            <span class="tooltiptext">Reduces incoming damage (+1 resistance)${getWoundText('swordfighting')}</span>
         </div><br />
         <div class="stat tooltip">
             Endurance: ${effectiveStats.endurance.toFixed(1)}
             <span class="tooltiptext">Determines maximum health (HP = Endurance × 5)</span>
         </div><br />
-        <div id= "wielder-health-stat" class="stat tooltip">
+        <div id="wielder-health-stat" class="stat tooltip">
             HP: ${Math.max(wielder.currentLife, 0).toFixed(1)}/${(effectiveStats.endurance * 5).toFixed(1)}
             <span class="tooltiptext">Current/Maximum health (Regenerates 1 HP every 5s)</span>
         </div><br />
@@ -68,7 +67,7 @@ function updateWielderStats() {
         <div class="stat tooltip">
             Predicted Damage: ${totalDamage.toFixed(1)} + ${lifesteal} lifesteal
             <span class="tooltiptext">
-                Base: ${baseDamage.toFixed(1)} (Strength: ${effectiveStats.strength.toFixed(1)} × 2 + Swordfighting: ${effectiveStats.swordfighting.toFixed(1)})<br>
+                Base: ${baseDamage.toFixed(1)} (Strength: ${effectiveStats.strength.toFixed(1)} × 2)<br>
                 Control Bonus: +${controlDamageBonus.toFixed(1)} (${(game.controlBonus * 100).toFixed(0)}%)<br>
                 Damage multiplier: +${damageFromBonus.toFixed(2)} (${((getDamageMultiplier()-1) * 100).toFixed(0)}%)<br>
                 Lifesteal: +${lifesteal} damage & heal per hit
@@ -78,19 +77,17 @@ function updateWielderStats() {
             Damage Reduction: ${effectiveStats.swordfighting.toFixed(1)}
             <span class="tooltiptext">Reduces incoming damage by this amount</span>
         </div>
-        <br />
-        <br />
+        <br /><br />
         <div class="stat tooltip">
             Gold: ${game.wielder.gold}
             <span class="tooltiptext">Your current gold. If the wielder dies you loose it along with any equipment</span>
         </div>
     `;
-
     document.getElementById('statsDiv').innerHTML = wielderHTML;
 }
 function updateEquipmentAndInventory() {
     let equipmentHTML = '';
-    if (gameData.zones[3].unlocked) {
+    if (game.unlockedZones.includes(3)) {
         equipmentHTML += '<div id="equipment-grid">';
         const slots = ['helmet', 'body', 'gauntlets', 'weapon', 'shield', 'boots', 'ring', 'amulet'];
         slots.forEach(slot => {
@@ -196,33 +193,51 @@ function updateUpgrades(currentEnergy = game.sword.energy) {
     previousEnergy = currentEnergy; // Update cached energy
 }
 function updateEnemyZones() {
-    if (gameData.zones[4].unlocked && !game.selectedPath) {
-            showPathSelectionModal();
+    let html = '';
+    gameData.zones.forEach((zone, originalIndex) => {
+        if (game.unlockedZones.includes(originalIndex)) {
+            const activityLevel = game.inquisitionActivity[originalIndex] || 0;
+            const chance = (activityLevel * 30).toFixed(1);
+            const barWidth = (activityLevel * 100).toFixed(0);
+            const inquisitionBar = game.firstInquisitionEncounter ?
+                `<div class="inquisition-bar-container">
+                    <div class="inquisition-bar" style="width: 100%; background: #444; height: 5px; margin-top: 5px;">
+                        <div style="width: ${barWidth}%; background: #ff6666; height: 100%;"></div>
+                    </div>
+                    <span class="tooltiptext">Inquisition activity: ${chance}% chance of encounter</span>
+                </div>` : '';
+            html += `
+                <div class="zone" data-zone-index="${originalIndex}">
+                    <h4>${zone.name}</h4>
+                    <div class="zone-actions">
+                        <span class="tooltip">
+                            <button class="explore-btn" onclick="exploreZone(${originalIndex})">Explore</button>
+                            <span class="tooltiptext">
+                                Possible enemies:<br>
+                                ${zone.enemies.map(e => `${e.name} (Lv. ${e.level}, ${e.endurance*5} HP)`).join('<br>')}
+                            </span>
+                        </span>
+                        <span class="autofight tooltip">
+                            <input type="checkbox" id="auto-${originalIndex}" onchange="toggleAutoFight(${originalIndex})"
+                                ${game.currentAction === 'autoFighting' && lastUsedZoneIndex === originalIndex ? 'checked' : ''}>
+                            <label for="auto-${originalIndex}">Auto explore</label>
+                            <span class="tooltiptext">
+                                Requires connection lvl ${originalIndex + 1}
+                            </span>
+                        </span>
+                        ${inquisitionBar}
+                        ${originalIndex > 2 ? `<button onclick="openShop(${originalIndex})">Shop</button>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+    });
+    document.getElementById('enemies').innerHTML = html;
+
+    // Check for path selection modal
+    if (game.unlockedZones.includes(4) && !game.selectedPath) {
+        showPathSelectionModal();
     }
-    document.getElementById('enemies').innerHTML = gameData.zones
-        .filter(zone => zone.unlocked)
-        .map((zone, zi) => `
-            <div class="zone">
-                <h4>${zone.name}</h4>
-                <span class="tooltip">
-                    <button class="explore-btn" onclick="exploreZone(${zi})">Explore</button>
-                    <span class="tooltiptext">
-                        Possible enemies:<br>
-                        ${zone.enemies.map(e => `${e.name} (Lv. ${e.level}, ${e.endurance*5} HP)`).join('<br>')}
-                    </span>
-                </span>
-                ${zi > 2 ? `<button onclick="openShop(${zi})">Shop</button>` : ''}
-                <span class="autofight tooltip">
-                    <input type="checkbox" id="auto-${zi}" onchange="toggleAutoFight(${zi})"
-                        ${game.currentAction === 'autoFighting' && lastUsedZoneIndex === zi ? 'checked' : ''}>
-                    <label for="auto-${zi}">Auto explore</label>
-                    <span class="tooltiptext">
-                        Requires connection lvl ${zi + 1}
-                    </span>
-                </span>
-            </div>
-        `)
-        .join('');
 }
 function updateButtonStates() {
     const actionInProgress = !!game.currentAction;
@@ -271,12 +286,12 @@ function updateDisplay() {
     updateAchievementsTab();
     updateHealthBar(null);
     adjustTooltipPosition();
-    const equipmentTabBtn = document.getElementById('equipmentTabBtn');
-    equipmentTabBtn.style.display = gameData.zones[3].unlocked ? 'inline' : 'none';
 
-    // Hide/show Paths tab based on Zone 5 unlock
+    const equipmentTabBtn = document.getElementById('equipmentTabBtn');
+    equipmentTabBtn.style.display = game.unlockedZones.includes(3) ? 'inline' : 'none';
+
     const pathsTabBtn = document.getElementById('pathsTabBtn');
-    pathsTabBtn.style.display = gameData.zones[4].unlocked ? 'inline' : 'none';
+    pathsTabBtn.style.display = game.unlockedZones.includes(4) ? 'inline' : 'none';
 }
 
 function showTab(tabName) {
@@ -301,20 +316,14 @@ function showRaceSelection() {
     disableBackground();
     const modal = document.getElementById('raceSelectionModal');
 
-    gameData.zones = gameData.zones.map((zone, index) => ({
-        ...zone,
-        unlockRace: Object.keys(races).find(race => races[race].unlockRequirement?.zone === index)
-    }));
-
     let content = '<div class="race-list">';
-    Object.entries(races).forEach(([raceKey, raceData]) => {
+    Object.entries(gameData.races).forEach(([raceKey, raceData]) => {
+        const isUnlocked = game.unlockedRaces.includes(raceKey);
         const zoneIndex = raceData.unlockRequirement?.zone;
         const zone = zoneIndex !== undefined ? gameData.zones[zoneIndex] : null;
         const kills = zone ? (game.statistics.zoneKills[zoneIndex] || 0) : 0;
         const required = raceData.unlockRequirement?.kills || 0;
-        raceData.unlocked = raceData.unlocked || kills >= required;
-
-        const zoneName = zone && zone.unlocked !== false ? zone.name : "???";
+        const zoneName = zone && game.unlockedZones.includes(zoneIndex) ? zone.name : "???";
         const skillpoints = raceData.skillpoints;
         const statsBonuses = raceData.stats || {};
         const bonusRanges = {
@@ -328,16 +337,15 @@ function showRaceSelection() {
             ? Object.entries(levelBonuses).map(([stat, value]) => `${stat}: +${value}`).join(', ')
             : 'None';
 
-        const tooltipClass = raceData.unlocked ? 'tooltip' : '';
+        const tooltipClass = isUnlocked ? 'tooltip' : '';
         content += `
-            <div class="race-option ${raceData.unlocked ? '' : 'locked'} ${tooltipClass}" id="race-${raceKey}">
+            <div class="race-option ${isUnlocked ? '' : 'locked'} ${tooltipClass}" id="race-${raceKey}">
                 <button class="toggle-button" onclick="toggleRaceDetails('${raceKey}', event)">−</button>
-
                 <div class="race-header">
                     <h4>${raceKey.toUpperCase()}</h4>
                 </div>
                 <div class="race-details" id="details-${raceKey}">
-                    ${raceData.unlocked ? `
+                    ${isUnlocked ? `
                         <p>Skillpoints per Level: ${skillpoints}</p>
                         <p>Initial Bonus Stats:<br>
                             Strength: +${bonusRanges.strength} | Swordfighting: +${bonusRanges.swordfighting} |
@@ -360,15 +368,14 @@ function showRaceSelection() {
     // Add click event listeners to race options
     document.querySelectorAll('.race-option').forEach(raceDiv => {
         raceDiv.addEventListener('click', function() {
-            if (!this.classList.contains('locked')) {
-                const raceKey = this.id.replace('race-', '');
+            const raceKey = this.id.replace('race-', '');
+            if (game.unlockedRaces.includes(raceKey)) {
                 selectRace(raceKey);
             }
         });
     });
 
     adjustTooltipPosition();
-
 }
 function toggleRaceDetails(raceKey, event) {
     event.stopPropagation(); // Prevent race selection when toggling
@@ -677,6 +684,13 @@ function showPathSubtab(path) {
 }
 
 function getPathRewardText(reward) {
+    if (reward.inquisitionGrowthReduction) return `-${(reward.inquisitionGrowthReduction * 100).toFixed(1)}% inquisition growth rate`;
+    if (reward.healPerCombat) return `+${reward.healPerCombat} heal per combat`;
+    if (reward.soulGainMultiplier) return `+${((reward.soulGainMultiplier - 1) * 100).toFixed(0)}% soul gain`;
+    if (reward.siphonCapIncrease) return `+${reward.siphonCapIncrease} siphon upgrade cap`;
+    if (reward.energyGainMultiplier) return `+${((reward.energyGainMultiplier - 1) * 100).toFixed(0)}% energy gain`;
+    if (reward.lifestealBonus) return `+${reward.lifestealBonus} lifesteal`;
+    if (reward.energyRegen) return `+${reward.energyRegen} energy per 5s`;
     if (reward.damageMultiplier) return `+${((reward.damageMultiplier - 1) * 100).toFixed(0)}% damage`;
     if (reward.maxEnergyMultiplier) return `+${((reward.maxEnergyMultiplier - 1) * 100).toFixed(0)}% max energy`;
     if (reward.upgradeCostReduction) return `-${(reward.upgradeCostReduction * 100).toFixed(0)}% upgrade cost`;
@@ -746,4 +760,30 @@ function updateBackgroudImage(zoneIndex){
 
     const healthDiv = document.getElementById('background-image').src = "assets/areas/backgroundLevel" + (zoneIndex +1) +".jpg" ;
 
+}
+function showEventBackground(imageUrl, duration = 2000) {
+    const eventBg = document.getElementById('event-background');
+    eventBg.style.backgroundImage = `url('${imageUrl}')`;
+    eventBg.style.opacity = '1';
+    setTimeout(() => {
+        eventBg.style.opacity = '0';
+    }, duration);
+}
+function updateInquisitionTooltips() {
+    gameData.zones.forEach((zone, zi) => {
+        if (!game.unlockedZones.includes(zi)) return; // Skip locked zones
+        const activityLevel = game.inquisitionActivity[zi] || 0;
+        const chance = (activityLevel * 30).toFixed(1);
+        const zoneElement = document.querySelector(`#enemies .zone[data-zone-index="${zi}"]`);
+        if (zoneElement) {
+            const barFill = zoneElement.querySelector('.inquisition-bar > div');
+            const tooltipElement = zoneElement.querySelector('.inquisition-bar-container .tooltiptext');
+            if (barFill) {
+                barFill.style.width = `${(activityLevel * 100).toFixed(0)}%`; // Update bar width
+            }
+            if (tooltipElement) {
+                tooltipElement.textContent = `Inquisition activity: ${chance}% chance of encounter`; // Update tooltip
+            }
+        }
+    });
 }

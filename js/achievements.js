@@ -579,10 +579,10 @@ function getEnergyGainMultiplier() {
         }
     });
     ['blood', 'death'].forEach(path => {
-        game.pathTiersUnlocked[path].forEach(tierIdx => {
-            const tier = gameData.paths[path].tiers[tierIdx];
-            if (tier.reward.energyGainMultiplier) multiplier *= (tier.reward.energyGainMultiplier);
+            game.pathTiersUnlocked[path].forEach(tierIdx => {
+                const tier = gameData.paths[path].tiers[tierIdx];
+                if (tier.reward.energyGainMultiplier) multiplier *= tier.reward.energyGainMultiplier;
+            });
         });
-    });
     return multiplier;
 }

@@ -100,6 +100,13 @@
     <div id="pathOptions"></div>
     <button onclick="onModalClose('pathSelectionModal')">Close</button>
 </div>
+<div id="inquisitionExplanationModal" class="modal">
+    <div class="modal-content">
+        <h3>The Inquisition</h3>
+        <p>The Inquisition has noticed your activities. They will now actively hunt you in zones where you have caused significant bloodshed. The more you kill in a zone beyond 100 kills, the higher the chance they will find you, up to 30%. Fighting in other zones, changing wielders, or losing a wielder will reduce their activity. Be careful, as their agents are powerful and relentless.</p>
+        <button onclick="onModalClose('inquisitionExplanationModal')">Close</button>
+    </div>
+</div>
 <audio id="combat-sound" src="combat-win.mp3"></audio>
 <!-- Game Sections -->
 <div id="gameLogo" class="game-section">
@@ -136,7 +143,6 @@
 </div>
 <div id="combat-area">
     <img id="background-image" src="assets\areas\backgroundLevel1.jpg" style="height: 100%; width:100%">
-
     <div id="wielder-sprite">
         <div id="wielder-health" class="health-bar">
             <div class="health-bar-fill"></div>
@@ -147,7 +153,7 @@
             <div class="health-bar-fill"></div>
         </div>
     </div>
-
+    <div id="event-background" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: 100% 100%; background-position: center; opacity: 0; transition: opacity 1s; z-index: 99;"></div>
 </div>
 <div id="zonesSection" class="game-section">
     <div id="tabs">
@@ -233,6 +239,7 @@
 <script src="js/achievements.js"></script>
 <script src="js/combat.js"></script>
 <script src="js/gameData.js"></script>
+<script src="js/inquisition.js"></script>
 <script src="js/inventory.js"></script>
 <script src="js/main.js"></script>
 <script src="js/paths.js"></script>

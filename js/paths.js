@@ -29,6 +29,51 @@
     }
 
     function applyPathReward(path, reward, tierIndex) {
+        if (path === 'death') {
+            if (reward.souls) {
+                for (let type in reward.souls) {
+                    game.souls[type] += reward.souls[type];
+                }
+            }
+            if (reward.inquisitionGrowthReduction) {
+                if (!game.pathBonuses) game.pathBonuses = {};
+                if (!game.pathBonuses.death) game.pathBonuses.death = {};
+                game.pathBonuses.death.inquisitionGrowthReduction = (game.pathBonuses.death.inquisitionGrowthReduction || 0) + reward.inquisitionGrowthReduction;
+            }
+            if (reward.healPerCombat) {
+                if (!game.pathBonuses.death) game.pathBonuses.death = {};
+                game.pathBonuses.death.maxHealsPerCombat = (game.pathBonuses.death.maxHealsPerCombat || 1) + reward.healPerCombat;
+            }
+            if (reward.soulGainMultiplier) {
+                if (!game.pathBonuses.death) game.pathBonuses.death = {};
+                game.pathBonuses.death.soulGainMultiplier = (game.pathBonuses.death.soulGainMultiplier || 1) * reward.soulGainMultiplier;
+            }
+            if (reward.damageMultiplier) {
+                // Applied via getDamageMultiplier()
+            }
+        }
+        if (path === 'blood') {
+            if (reward.siphonCapIncrease) {
+                gameData.upgradeCaps.siphon += reward.siphonCapIncrease;
+                addCombatMessage(`Siphon upgrade cap increased to ${gameData.upgradeCaps.siphon}`, 'achievement');
+            }
+            if (reward.energyGainMultiplier) {
+                if (!game.pathBonuses) game.pathBonuses = {};
+                if (!game.pathBonuses.blood) game.pathBonuses.blood = {};
+                game.pathBonuses.blood.energyGainMultiplier = (game.pathBonuses.blood.energyGainMultiplier || 1) * reward.energyGainMultiplier;
+            }
+            if (reward.lifestealBonus) {
+                if (!game.pathBonuses.blood) game.pathBonuses.blood = {};
+                game.pathBonuses.blood.lifestealBonus = (game.pathBonuses.blood.lifestealBonus || 0) + reward.lifestealBonus;
+            }
+            if (reward.maxEnergyMultiplier) {
+                calculateMaxEnergy();
+            }
+            if (reward.energyRegen) {
+                if (!game.pathBonuses.blood) game.pathBonuses.blood = {};
+                game.pathBonuses.blood.energyRegen = (game.pathBonuses.blood.energyRegen || 0) + reward.energyRegen;
+            }
+        }
         if (reward.damageMultiplier) {
             // Applied via getDamageMultiplier()
         }

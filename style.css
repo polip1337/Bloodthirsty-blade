@@ -781,3 +781,33 @@ body.modal-active .modal-overlay {
     margin: 5px 0;
     font-size: 14px;
 }
+.inquisition-bar-container {
+    position: relative;
+    margin-top: 5px;
+}
+
+.inquisition-bar-container .tooltiptext {
+    visibility: hidden;
+    position: absolute;
+    bottom: 100%; /* Position above the bar */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 3px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+
+.inquisition-bar-container:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+#event-background {
+    background-size: contain; /* Fits the image to the box, distorting if necessary */
+    background-repeat: no-repeat;
+    background-position: center;
+}

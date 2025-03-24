@@ -1,4 +1,4 @@
-async function attackEnemy(zoneIndex, enemyIndex) {
+async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
     if (game.isFighting) return; // Prevent new combat if one is active
     if (game.currentAction && game.currentAction !== 'autoFighting') return;
     updateBackgroudImage(zoneIndex);
@@ -8,8 +8,9 @@ async function attackEnemy(zoneIndex, enemyIndex) {
     lastUsedZoneIndex = zoneIndex;
     const wielder = game.wielder;
     game.isFighting = true;
-    game.currentEnemy = { zoneIndex, enemyIndex };
-    const enemy = gameData.zones[zoneIndex].enemies[enemyIndex];
+    game.healsUsedInCombat = 0;
+    game.currentEnemy = specialEnemy ? { zoneIndex, enemyIndex: -1 } : { zoneIndex, enemyIndex };
+    const enemy = specialEnemy || gameData.zones[zoneIndex].enemies[enemyIndex];
     let enemyLife = enemy.endurance * 5;
     let wielderMaxLife = wielder.maxLife;
     updateEnemyHealthBar(enemy,enemyLife);
@@ -26,12 +27,13 @@ async function attackEnemy(zoneIndex, enemyIndex) {
     const willpower = Math.min(wielder.currentStats.willpower, 200);
     game.controlBonus = controlLevel * 0.2 * (1 - willpower / 200);
 
-    const baseDamage = effectiveStats.strength * 2 + effectiveStats.swordfighting;
+    const baseDamage = effectiveStats.strength * 2;
     const controlDamageBonus = baseDamage * game.controlBonus;
     const lifestealBonus = Object.values(game.achievements).reduce((sum, ach) => sum + (ach.unlocked && ach.bonus.lifestealBonus ? ach.bonus.lifestealBonus : 0), 0);
     const lifesteal = game.sword.upgrades.siphon.level + lifestealBonus;
     const damageMultiplier = getDamageMultiplier();
-    const totalDamage = (baseDamage + lifesteal + controlDamageBonus) * damageMultiplier;
+    const physicalDamage = (baseDamage + controlDamageBonus) * damageMultiplier;
+
     addCombatMessage(`Engaging ${enemy.name} (${enemy.endurance*5} HP)`, 'player-stat');
     updateHealthBar(null);
 
@@ -41,21 +43,23 @@ async function attackEnemy(zoneIndex, enemyIndex) {
         updateEnemyHealthBar(enemy,enemyLife);
 
         document.getElementById('combat-area').classList.add('combat-active');
-        const damageDealt = Math.min(totalDamage, enemyLife);
-        const lifestealHealing = Math.min(lifesteal, enemyLife);
-        enemyLife -= damageDealt;
-        wielder.currentLife = Math.min(effectiveStats.endurance * 5, wielder.currentLife + lifestealHealing);
+
+        const physicalDamageAfterDefense = Math.max(physicalDamage - enemy.defense, 0);
+        const physicalDamageDealt = Math.min(physicalDamageAfterDefense, enemyLife);
+        enemyLife -= physicalDamageDealt;
+        const lifestealDamageDealt = Math.min(lifesteal, enemyLife);
+        enemyLife -= lifestealDamageDealt;
+        const totalDamageDealt = physicalDamageDealt + lifestealDamageDealt;
+        wielder.currentLife = Math.min(effectiveStats.endurance * 5, wielder.currentLife + lifestealDamageDealt);
 
         addCombatMessage(
-            `Dealt ${damageDealt.toFixed(1)} damage (Base: ${baseDamage}, Control: ${controlDamageBonus.toFixed(1)}) ` +
-            `Lifesteal: +${lifestealHealing} HP | Enemy HP: ${enemyLife.toFixed(2)}`,
+            `Dealt ${totalDamageDealt.toFixed(1)} damage (Physical: ${physicalDamageDealt.toFixed(1)}, Lifesteal: ${lifestealDamageDealt.toFixed(1)}). Enemy HP: ${enemyLife.toFixed(2)}`,
             'damage'
         );
         const enemyDamage = Math.max(enemy.strength * 2 - Math.floor(wielder.currentStats.swordfighting), 1);
         wielder.currentLife -= enemyDamage;
 
-        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(getEffectiveStats().swordfighting)}) Player HP left: ${wielder.currentLife.toFixed(1)}`, 'damage');
-        updateHealthBar(null);
+        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(effectiveStats.swordfighting)}) Player HP left: ${wielder.currentLife.toFixed(1)}`, 'damage');        updateHealthBar(null);
         if (wielder.currentLife <= 0) {
             defeatWielder();
         }
@@ -115,6 +119,7 @@ function endCombat(victory) {
     const combatArea = document.getElementById('combat-area');
     enemySprite.style.display = 'none';
     combatArea.classList.remove('combat-active');
+    game.healsUsedInCombat = 0;
     if (victory) {
        //document.getElementById('combat-sound').play();
     }
@@ -181,44 +186,26 @@ function defeatEnemy(enemy, zoneIndex) {
         game.pathProgress.death += 1;
         checkPathRewards('death');
         const soulTier = getSoulTier(enemy.level);
-        game.souls[soulTier]++;
-        addCombatMessage(`Collected a ${soulTier} soul from ${enemy.name}`, 'player-stat');
+        const soulMultiplier = game.pathBonuses?.death?.soulGainMultiplier || 1;
+        const soulsGained = Math.floor(1 * soulMultiplier);
+        game.souls[soulTier] += soulsGained;
+        addCombatMessage(`Collected ${soulsGained} ${soulTier} soul${soulsGained > 1 ? 's' : ''} from ${enemy.name}`, 'player-stat');
     }
     if (game.selectedPath === 'vengeance' && enemy.isBoss) { // Placeholder condition
         game.pathProgress.vengeance += 1;
         checkPathRewards('vengeance');
     }
-    if (game.inquisitionEnabled) {
-        const zoneKills = game.statistics.zoneKills[zoneIndex];
-        const modal = document.getElementById('inquisitionModal');
-        const message = document.getElementById('inquisitionMessage');
-        const closeBtn = document.getElementById('inquisitionClose');
-        const resetBtn = document.getElementById('inquisitionReset');
-        const continueBtn = document.getElementById('inquisitionContinue');
-
-        if (zoneKills === 50) {
-            message.textContent = `The Inquisition has taken notice of the bloodshed in ${gameData.zones[zoneIndex].name}. They are searching for the blade. Move to another area to avoid detection!`;
-            closeBtn.style.display = 'inline';
-            resetBtn.style.display = 'none';
-            continueBtn.style.display = 'none';
-            modal.style.display = 'block';
-        } else if (zoneKills === 75) {
-            message.textContent = `The Inquisition is closing in on ${gameData.zones[zoneIndex].name}! Their pursuit grows relentless. Leave this zone now, or the blade will be captured!`;
-            closeBtn.style.display = 'inline';
-            resetBtn.style.display = 'none';
-            continueBtn.style.display = 'none';
-            modal.style.display = 'block';
-        } else if (zoneKills >= 100) {
-            message.textContent = `The Inquisition has caught the blade in ${gameData.zones[zoneIndex].name}! It has been hidden away, ending your journey. Game Over.`;
-            closeBtn.style.display = 'none';
-            resetBtn.style.display = 'inline';
-            continueBtn.style.display = 'inline';
-            modal.style.display = 'block';
-            game.currentAction = null;
-            game.wielder.defeated = true;
-        }
+    game.statistics.zoneKills[zoneIndex] = (game.statistics.zoneKills[zoneIndex] || 0) + 1;
+    if (game.statistics.zoneKills[zoneIndex] > 100) {
+        const growthRate = 0.01 - (game.pathBonuses?.death?.inquisitionGrowthReduction || 0);
+        game.inquisitionActivity[zoneIndex] = (game.inquisitionActivity[zoneIndex] || 0) + growthRate;
     }
-
+    gameData.zones.forEach((_, otherZoneIndex) => {
+        if (otherZoneIndex !== zoneIndex) {
+            game.inquisitionActivity[otherZoneIndex] = Math.max((game.inquisitionActivity[otherZoneIndex] || 0) - 0.005, 0);
+        }
+    });
+    updateInquisitionTooltips();
     checkAchievements();
     checkLevelUp();
     if (zoneIndex >= 3) {
@@ -236,7 +223,7 @@ function checkLevelUp(){
     while (wielder.exp >= wielder.level * 100) {
         wielder.exp -= wielder.level * 100;
         wielder.level++;
-
+        showEventBackground('assets/cutscenes/levelUp.jpg');
         wielder.statPoints += calculateStatPointsPerLevel();
         applyLevelBonuses();
         showLevelUpModal();
@@ -247,8 +234,12 @@ function exploreZone(zoneIndex) {
     if (game.isFighting) return; // Prevent new combat if one is active
     if (game.currentAction && game.currentAction !== 'autoFighting') return;
     lastUsedZoneIndex = zoneIndex;
-    const enemyIndex = Math.floor(Math.random() * gameData.zones[zoneIndex].enemies.length);
-    attackEnemy(zoneIndex, enemyIndex);
+    if (checkInquisitionEncounter(zoneIndex)) {
+        handleInquisitionEncounter(zoneIndex);
+    } else {
+        const enemyIndex = Math.floor(Math.random() * gameData.zones[zoneIndex].enemies.length);
+        attackEnemy(zoneIndex, enemyIndex);
+    }
 }
 
 function toggleAutoFight(zoneIndex) {
@@ -277,8 +268,12 @@ function startAutoBattle() {
     if (!game.isFighting && !isAnyModalOpen()) {
         if (!gameData.zones[lastUsedZoneIndex]) lastUsedZoneIndex = 0;
         const zone = gameData.zones[lastUsedZoneIndex];
-        const enemyIndex = Math.floor(Math.random() * zone.enemies.length);
-        attackEnemy(lastUsedZoneIndex, enemyIndex);
+        if (checkInquisitionEncounter(lastUsedZoneIndex)) {
+                handleInquisitionEncounter(lastUsedZoneIndex);
+        }else{
+            const enemyIndex = Math.floor(Math.random() * zone.enemies.length);
+            attackEnemy(lastUsedZoneIndex, enemyIndex);
+        }
     }
 }
 
