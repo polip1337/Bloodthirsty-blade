@@ -310,7 +310,11 @@ function showTab(tabName) {
     if (tabName === 'achievements') updateAchievementsTab();
     if (tabName === 'paths') updatePathsTab();
 }
-
+function checkUnlockRace(race, raceData){
+    if(game.unlockedRaces.includes(race)) return;
+    if(raceData.unlockRequirement?.kills || 0 > zone ? (game.statistics.zoneKills[raceData.unlockRequirement?.zone] || 0) : 0)
+        game.unlockedRaces.push(race);
+}
 function showRaceSelection() {
     document.getElementById('wielderDeathModal').style.display = 'none';
     disableBackground();
@@ -336,7 +340,7 @@ function showRaceSelection() {
         const levelBonusText = Object.entries(levelBonuses).length > 0
             ? Object.entries(levelBonuses).map(([stat, value]) => `${stat}: +${value}`).join(', ')
             : 'None';
-
+        checkUnlockRace(raceKey, raceData);
         const tooltipClass = isUnlocked ? 'tooltip' : '';
         content += `
             <div class="race-option ${game.unlockedRaces.includes(raceKey) ? '' : 'locked'} ${tooltipClass}" id="race-${raceKey}">
@@ -477,7 +481,7 @@ function showStory(viewed) {
         return;
     }
     disableBackground();
-    const stories = Object.entries(gameData.story).filter(([_, story]) => story.unlocked);
+    const stories = Object.entries(gameData.story).filter(([key, story]) => game.unlockedStory.includes(key));
     const listDiv = document.querySelector('#storyModal .story-list');
     const contentDiv = document.querySelector('#storyModal .story-content');
     listDiv.innerHTML = stories.map(([key, story]) => `
@@ -489,7 +493,7 @@ function showStory(viewed) {
 function showStoryContent(key) {
 
     const story = gameData.story[key];
-    if (story && story.unlocked) {
+    if (story && game.unlockedStory.includes(key)) {
         document.querySelector('#storyModal .story-content').innerHTML = `
             <h4>${story.title}</h4>
             <p>${story.entry.join('</p><p>')}</p>
@@ -604,21 +608,21 @@ const observer = new MutationObserver(() => {
 });
 observer.observe(document.body, { childList: true, subtree: true });
 function showPathSelectionModal() {
-    disableBackground();
+disableBackground();
     const modal = document.getElementById('pathSelectionModal');
     const content = `
         <div class="race-list">
-            <div onclick="selectPath('blood')" class="race-option tooltip">
+            <div class="race-option tooltip" data-path="blood">
                 <h4>Path of Blood</h4>
                 <p>Harness the energy absorbed by the sword.</p>
                 <span class="tooltiptext">${gameData.paths.blood.description}</span>
             </div>
-            <div onclick="selectPath('death')" class="race-option tooltip">
+            <div class="race-option tooltip" data-path="death">
                 <h4>Path of Death</h4>
                 <p>Revel in the slaughter and collect souls.</p>
                 <span class="tooltiptext">${gameData.paths.death.description}</span>
             </div>
-            <div onclick="selectPath('vengeance')" class="race-option tooltip">
+            <div class="race-option tooltip" data-path="vengeance">
                 <h4>Path of Vengeance</h4>
                 <p>Seek retribution against mighty foes.</p>
                 <span class="tooltiptext">${gameData.paths.vengeance.description}</span>
@@ -627,6 +631,15 @@ function showPathSelectionModal() {
     `;
     document.getElementById('pathOptions').innerHTML = content;
     modal.style.display = 'block';
+
+    // Attach click event listeners to each path option
+    const pathDivs = document.querySelectorAll('#pathOptions .race-option');
+    pathDivs.forEach(div => {
+        const path = div.getAttribute('data-path');
+        div.addEventListener('click', () => {
+            selectPath(path);
+        });
+    });
 }
 function updatePathsTab() {
     const display = document.getElementById('paths-display');

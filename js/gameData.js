@@ -19,6 +19,7 @@ function loadGameData() {
         firstInquisitionEncounter: false,
         unlockedRaces: ['goblin'],
         unlockedZones: [0],
+        unlockedStory: ['story1'],
         sword: {
             energy: 0,
             maxEnergy: 100,

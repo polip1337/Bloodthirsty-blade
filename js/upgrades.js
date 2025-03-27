@@ -30,7 +30,7 @@ function buyUpgrade(name) {
         if (name === 'capacity') calculateMaxEnergy();
         if (name === 'control') calculateControlBonus();
         if (name === 'senses'){
-            game.unlockedZones.push[upgrade.level];
+            game.unlockedZones.push(upgrade.level-1);
             updateEnemyZones();
             updateButtonStates();
         }
@@ -45,11 +45,9 @@ function buyUpgrade(name) {
 }
 
 function unlockNextStory() {
-    const stories = gameData.story;
-    const nextLockedStory = Object.entries(stories).find(([_, story]) => !story.unlocked);
-    if (nextLockedStory) {
-        const [storyKey] = nextLockedStory;
-        stories[storyKey].unlocked = true;
+    const nextLockedKey = Object.keys(gameData.story).find(key => !game.unlockedStory.includes(key));
+    if (nextLockedKey) {
+        game.unlockedStory.push(nextLockedKey);
         return true;
     }
     return false;
