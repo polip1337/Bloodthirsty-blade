@@ -30,7 +30,7 @@ function buyUpgrade(name) {
         if (name === 'capacity') calculateMaxEnergy();
         if (name === 'control') calculateControlBonus();
         if (name === 'senses'){
-            gameData.zones[upgrade.level - 1].unlocked = true;
+            game.unlockedZones.push[upgrade.level - 1];
             updateEnemyZones();
             updateButtonStates();
         }

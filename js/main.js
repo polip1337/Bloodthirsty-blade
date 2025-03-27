@@ -23,6 +23,7 @@ async function initGame() {
     }, 1000);
     setInterval(() => {
         game.wielder.currentLife = Math.min(game.wielder.currentLife + 1, getEffectiveStats().endurance * 5);
+        updateHealthBar();
         const energyRegen = game.pathBonuses?.blood?.energyRegen || 0;
         if (energyRegen) {
             game.sword.energy = Math.min(game.sword.energy + energyRegen, game.sword.maxEnergy);

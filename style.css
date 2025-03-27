@@ -495,19 +495,17 @@ footer a {
 
 #wielder-sprite, #enemy-sprite {
     position: absolute;
-    width: 100px;
-    height: 200px;
-    top: 50%;
+    width: 400px;
+    height: 400px;
+    top: 30%;
     transform: translateY(-50%);
     background-size: cover;
 }
 
-#wielder-sprite {
-    left: 10%;
-}
+
 
 #enemy-sprite {
-    right: 10%;
+    right: 0%;
     background-image: url('enemy-default.png');
     display: none;
 }
