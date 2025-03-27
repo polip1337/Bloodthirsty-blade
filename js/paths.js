@@ -1,5 +1,5 @@
     function selectPath(path) {
-        if (gameData.zones[4].unlocked && !game.selectedPath) {
+        if (game.unlockedZones.includes(4) && !game.selectedPath) {
             game.selectedPath = path;
             if (!game.unlockedPaths.includes(path)) {
                 game.unlockedPaths.push(path);
