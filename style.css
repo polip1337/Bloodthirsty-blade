@@ -570,11 +570,13 @@ footer a {
 }
 
 #wielder-health {
-    left: 10%;
+    left: 30%;
+    top: 100%
 }
 
 #enemy-health {
-    right: 10%;
+    right: 35%;
+    top: 100%
 }
 
 #actionsSection .button-container {
