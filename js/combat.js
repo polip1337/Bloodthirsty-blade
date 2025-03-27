@@ -223,6 +223,7 @@ function checkLevelUp(){
     while (wielder.exp >= wielder.level * 100) {
         wielder.exp -= wielder.level * 100;
         wielder.level++;
+        if(!game.wielder.hasFought) game.statistics.maxLevelWithoutCombat = wielder.level;
         showEventBackground('assets/cutscenes/levelUp.jpg');
         wielder.statPoints += calculateStatPointsPerLevel();
         applyLevelBonuses();

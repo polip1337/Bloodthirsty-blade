@@ -36,6 +36,7 @@ function loadGameData() {
         },
         wielder: null,
         statistics: {
+            maxLevelWithoutCombat:0,
             totalKills: 0,
             wieldersUsed: 0,
             mobKills: {},

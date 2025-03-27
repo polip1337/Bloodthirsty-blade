@@ -241,6 +241,8 @@ game.achievements = {
             description: "Train to level 5 without fighting",
             condition: () => !game.wielder.hasFought && game.wielder.level>=5,
             bonus: { trainingExp: 0.05 },
+            target: 5,
+            progress: () => game.statistics.maxLevelWithoutCombat,
             unlocked: false,
             icon: "🕊️"
         },
@@ -328,7 +330,7 @@ game.achievements = {
     luckyStrike: {
             name: "Lucky Strike",
             description: "Kill an enemy in one hit",
-            condition: () => game.statistics.hasOneHitKilled,
+            condition: () => game.statistics.killedInOneRound,
             target: 1,
             progress: () => game.statistics.enemiesKilledInOneRound,
             bonus: { critChance: 0.01 },
