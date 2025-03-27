@@ -141,7 +141,7 @@ function handleWielderDeath(affectedStat) {
 
 function selectRace(race) {
     onModalClose('raceSelectionModal');
-    if (game.races[race].unlocked) {
+    if (game.unlockedRaces.includes(race)) {
         game.wielder = generateWielder(race);
         checkAchievements();
         Object.keys(game.inquisitionActivity).forEach(zoneIndex => {

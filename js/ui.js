@@ -339,7 +339,7 @@ function showRaceSelection() {
 
         const tooltipClass = isUnlocked ? 'tooltip' : '';
         content += `
-            <div class="race-option ${isUnlocked ? '' : 'locked'} ${tooltipClass}" id="race-${raceKey}">
+            <div class="race-option ${game.unlockedRaces.includes(raceKey) ? '' : 'locked'} ${tooltipClass}" id="race-${raceKey}">
                 <button class="toggle-button" onclick="toggleRaceDetails('${raceKey}', event)">−</button>
                 <div class="race-header">
                     <h4>${raceKey.toUpperCase()}</h4>

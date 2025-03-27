@@ -54,7 +54,6 @@ function loadGameData() {
         },
         story: [],
         unlockedUpgrades: [],
-        unlockedRaces: ['human'],
         currentAction: null,
         actionInterval: null, // Store the interval ID
         selectedPath: null,
