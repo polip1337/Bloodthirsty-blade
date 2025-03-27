@@ -2,7 +2,7 @@ function openShop(zoneIndex) {
     closeOtherFooterModals('shopModal');
     disableBackground();
     document.getElementById('shopModal').style.display = 'block';
-    const zoneItems = game.shopItems[zoneIndex] || game.shopItems[4];
+    const zoneItems = gameData.shopItems[zoneIndex] || gameData.shopItems[4];
     const shopContent = `
     <h3>Shop - ${gameData.zones[zoneIndex].name}</h3>
         <p id="modal-gold-value">Gold: ${game.wielder.gold}</p>
@@ -19,7 +19,7 @@ function openShop(zoneIndex) {
 }
 
 function buyItem(itemName, zoneIndex) {
-    const zoneItems = game.shopItems[zoneIndex] || game.shopItems[4];
+    const zoneItems = gameData.shopItems[zoneIndex] || gameData.shopItems[4];
     const item = zoneItems.find(i => i.name === itemName);
     const discount = Object.values(game.achievements).reduce((sum, ach) => sum + (ach.unlocked && ach.bonus.shopDiscount ? ach.bonus.shopDiscount : 0), 0);
     const effectivePrice = item.price * (1 - discount);

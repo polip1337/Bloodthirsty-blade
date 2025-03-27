@@ -322,6 +322,7 @@ function showRaceSelection() {
 
     let content = '<div class="race-list">';
     Object.entries(gameData.races).forEach(([raceKey, raceData]) => {
+        checkUnlockRace(raceKey, raceData);
         const isUnlocked = game.unlockedRaces.includes(raceKey);
         const zoneIndex = raceData.unlockRequirement?.zone;
         const zone = zoneIndex !== undefined ? gameData.zones[zoneIndex] : null;
@@ -340,7 +341,6 @@ function showRaceSelection() {
         const levelBonusText = Object.entries(levelBonuses).length > 0
             ? Object.entries(levelBonuses).map(([stat, value]) => `${stat}: +${value}`).join(', ')
             : 'None';
-        checkUnlockRace(raceKey, raceData);
         const tooltipClass = isUnlocked ? 'tooltip' : '';
         content += `
             <div class="race-option ${game.unlockedRaces.includes(raceKey) ? '' : 'locked'} ${tooltipClass}" id="race-${raceKey}">
@@ -608,32 +608,36 @@ const observer = new MutationObserver(() => {
 });
 observer.observe(document.body, { childList: true, subtree: true });
 function showPathSelectionModal() {
-disableBackground();
+    disableBackground();
     const modal = document.getElementById('pathSelectionModal');
+    const paths = [
+        { key: 'blood', name: 'Path of Blood', desc: 'Harness the energy absorbed by the sword.' },
+        { key: 'death', name: 'Path of Death', desc: 'Revel in the slaughter and collect souls.' },
+        { key: 'vengeance', name: 'Path of Vengeance', desc: 'Seek retribution against mighty foes.' }
+    ];
     const content = `
         <div class="race-list">
-            <div class="race-option tooltip" data-path="blood">
-                <h4>Path of Blood</h4>
-                <p>Harness the energy absorbed by the sword.</p>
-                <span class="tooltiptext">${gameData.paths.blood.description}</span>
-            </div>
-            <div class="race-option tooltip" data-path="death">
-                <h4>Path of Death</h4>
-                <p>Revel in the slaughter and collect souls.</p>
-                <span class="tooltiptext">${gameData.paths.death.description}</span>
-            </div>
-            <div class="race-option tooltip" data-path="vengeance">
-                <h4>Path of Vengeance</h4>
-                <p>Seek retribution against mighty foes.</p>
-                <span class="tooltiptext">${gameData.paths.vengeance.description}</span>
-            </div>
+            ${paths.map(path => {
+                // Check if the path is completed
+                const isCompleted = game.completedPaths.includes(path.key);
+                // A path is locked if it's completed, or if it's Vengeance and both Blood and Death aren't completed
+                const isLocked = isCompleted || (path.key === 'vengeance' && !(game.completedPaths.includes('blood') && game.completedPaths.includes('death')));
+                return `
+                    <div class="race-option tooltip ${isLocked ? 'locked' : 'selectable'} ${isCompleted ? 'completed' : ''}" data-path="${path.key}">
+                        <h4>${path.name}</h4>
+                        <p>${path.desc}</p>
+                        ${isCompleted ? '<span class="completed-marker">Completed</span>' : isLocked ? '<span class="locked-marker">Locked</span>' : ''}
+                        <span class="tooltiptext">${gameData.paths[path.key].description}</span>
+                    </div>
+                `;
+            }).join('')}
         </div>
     `;
     document.getElementById('pathOptions').innerHTML = content;
     modal.style.display = 'block';
 
-    // Attach click event listeners to each path option
-    const pathDivs = document.querySelectorAll('#pathOptions .race-option');
+    // Attach click event listeners only to selectable path options
+    const pathDivs = document.querySelectorAll('#pathOptions .race-option.selectable');
     pathDivs.forEach(div => {
         const path = div.getAttribute('data-path');
         div.addEventListener('click', () => {
@@ -657,43 +661,28 @@ function updatePathsTab() {
 }
 
 function showPathSubtab(path) {
+    game.selectedPathsubtab = path;
     const contentDiv = document.getElementById('path-subtab-content');
     const pathData = gameData.paths[path];
-    const progress = game.pathProgress[path];
-    const tiersUnlocked = game.pathTiersUnlocked[path];
+
+    // Base content: path name, description, and any path-specific stats
     let content = `<h3>${pathData.name}</h3><p>${pathData.description}</p>`;
+
+    // Example: souls stat for the 'death' path
     if (path === 'death') {
         content += `
             <div class="stat tooltip">
-                Souls: ${game.souls.minor}/${game.souls.normal}/${game.souls.major}/${game.souls.epic}
+                Souls: <span class="souls-value">${game.souls.minor}/${game.souls.normal}/${game.souls.major}/${game.souls.epic}</span>
                 <span class="tooltiptext">Minor/Normal/Major/Epic souls collected</span>
             </div>`;
     }
-    const nextTierIndex = pathData.tiers.findIndex((tier, idx) => !tiersUnlocked.includes(idx));
-    content += '<h4>Progress</h4>';
-    if (nextTierIndex !== -1) {
-        const nextTier = pathData.tiers[nextTierIndex];
-        content += `
-            <div class="upgrade">
-                Tier ${nextTierIndex + 1}: ${progress}/${nextTier.threshold}
-            </div>`;
-    } else {
-        content += '<p>All tiers unlocked for this path.</p>';
-    }
-    content += '<h4>Unlocked Tiers</h4>';
-    tiersUnlocked.forEach(idx => {
-        const tier = pathData.tiers[idx];
-        content += `
-            <div class="upgrade unlocked">
-                Tier ${idx + 1}: Unlocked<br>
-                Reward: ${getPathRewardText(tier.reward)}
-            </div>`;
-    });
+
+    // Add a container for progress and tiers
+    content += '<div id="path-progress-container"></div>';
+
+    // Set the content and update the progress section
     contentDiv.innerHTML = content;
-    document.querySelectorAll('#path-subtabs button').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.textContent === pathData.name) btn.classList.add('active');
-    });
+    updatePathProgress(path);
 }
 
 function getPathRewardText(reward) {

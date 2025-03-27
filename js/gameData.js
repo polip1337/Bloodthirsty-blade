@@ -20,6 +20,7 @@ function loadGameData() {
         unlockedRaces: ['goblin'],
         unlockedZones: [0],
         unlockedStory: ['story1'],
+        completedPaths:[],
         sword: {
             energy: 0,
             maxEnergy: 100,
@@ -257,7 +258,7 @@ gameData = {
     }
   }
 };
-shopItems = {
+gameData.shopItems = {
         3: [
             { type: 'helmet', name: 'Bronze Helmet', stats: { endurance: 1 }, price: 50, icon: 'assets/equipment/helmet.png' },
             { type: 'body', name: 'Padded Armor', stats: { endurance: 2 }, price: 80, icon: 'assets/equipment/chest.png' },

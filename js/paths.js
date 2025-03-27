@@ -105,3 +105,55 @@
         if (enemyLevel <= 15) return 'major';
         return 'epic';
     }
+    function updateCollectedEnergy() {
+        const energyElement = document.querySelector('#path-subtab-content .energy-stat .energy-value');
+        if (energyElement && game.collectedEnergy !== undefined) {
+            energyElement.textContent = game.collectedEnergy.toFixed(0);
+        }
+    }
+    function updateSoulsCount() {
+        const soulsElement = document.querySelector('#path-subtab-content .stat .souls-value');
+        if (soulsElement && game.souls) {
+            soulsElement.textContent = `${game.souls.minor}/${game.souls.normal}/${game.souls.major}/${game.souls.epic}`;
+        }
+    }
+    function updatePathProgress(path) {
+        if (path !== game.selectedPathsubtab) {
+            return; // Exit if the subtab is not selected
+        }
+        const progressContainer = document.getElementById('path-progress-container');
+        if (!progressContainer) return; // Exit if the container isn’t found
+
+        const pathData = gameData.paths[path];
+        const progress = game.pathProgress[path];
+        const tiersUnlocked = game.pathTiersUnlocked[path];
+
+        // Start building the content for progress and tiers
+        let content = '<h4>Progress</h4>';
+
+        // Check for the next tier to unlock
+        const nextTierIndex = pathData.tiers.findIndex((tier, idx) => !tiersUnlocked.includes(idx));
+        if (nextTierIndex !== -1) {
+            const nextTier = pathData.tiers[nextTierIndex];
+            content += `
+                <div class="upgrade">
+                    Tier ${nextTierIndex + 1}: ${progress}/${nextTier.threshold}
+                </div>`;
+        } else {
+            content += '<p>All tiers unlocked for this path.</p>';
+        }
+
+        // Add unlocked tiers
+        content += '<h4>Unlocked Tiers</h4>';
+        tiersUnlocked.forEach(idx => {
+            const tier = pathData.tiers[idx];
+            content += `
+                <div class="upgrade unlocked">
+                    Tier ${idx + 1}: Unlocked<br>
+                    Reward: ${getPathRewardText(tier.reward)}
+                </div>`;
+        });
+
+        // Update the container’s content
+        progressContainer.innerHTML = content;
+    }
