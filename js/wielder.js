@@ -42,7 +42,6 @@ function generateWielder(race, isInitial = false) {
         exp: 0,
         currentLife: baseStats.endurance * 5,
         hasFought: false,         // For Pacifist
-        currentFightDamageTaken: 0, // For Tough Nut
         equipment: {
             helmet: null,
             body: null,

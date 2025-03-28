@@ -94,6 +94,8 @@ game.achievements = {
             name: "Survivor",
             description: "Win a fight with 1 HP left",
             condition: () => game.statistics.hasSurvivedWithOneHP,
+            target: 1,
+            progress: () => 0,
             bonus: { regenBonus: 0.1 },
             unlocked: false,
             icon: "❤️"
@@ -121,21 +123,14 @@ game.achievements = {
     inquisitive: {
         name: "Inquisitive",
         description: "Trigger Inquisition warning",
-        condition: () => Object.values(game.statistics.zoneKills).some(k => k >= 50),
-        target: 50,
-        progress: () => Math.max(...Object.values(game.statistics.zoneKills),0),
+        condition: () => game.firstInquisitionEncounter,
+        target: 1,
+        progress: () => 0,
         bonus: { willpowerBonus: 1 },
         unlocked: false,
         icon: "🕵️"
     },
-    escapeArtist: {
-            name: "Escape Artist",
-            description: "Avoid Inquisition at 75 kills",
-            condition: () => game.statistics.hasEscapedInquisition,
-            bonus: { moveSpeed: 0.1 },
-            unlocked: false,
-            icon: "🏃‍♂️"
-        },
+
     veteranWielder: {
         name: "Veteran Wielder",
         description: "Reach level 10 with a wielder",
@@ -340,8 +335,10 @@ game.achievements = {
     toughNut: {
             name: "Tough Nut",
             description: "Survive 50 damage in one fight",
-            condition: () => game.statistics.hasTakenFiftyDamage,
+            condition: () => game.statistics.currentHighestDamageTaken >= 50,
             bonus: { enduranceBonus: 2 },
+            target: 1,
+            progress: () => game.statistics.currentHighestDamageTaken,
             unlocked: false,
             icon: "🥜"
         },

@@ -35,7 +35,12 @@ function loadGameData() {
             }
         },
         wielder: null,
+        bonus:{
+        lifesteal:0,
+        inventorySize:0
+        },
         statistics: {
+            currentHighestDamageTaken: 0,
             maxLevelWithoutCombat:0,
             totalKills: 0,
             wieldersUsed: 0,

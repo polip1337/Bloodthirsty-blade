@@ -32,6 +32,8 @@ function updateWielderStats() {
     const baseDamage = effectiveStats.strength * 2; // Remove swordfighting
     const controlDamageBonus = baseDamage * game.controlBonus;
     const lifesteal = game.sword.upgrades.siphon.level;
+    const bonusLifesteal = Object.values(game.completedAchievements).reduce((sum, ach) => sum + ( ach.bonus.lifestealBonus ? ach.bonus.lifestealBonus : 0), 0);
+    const lifestealTotal = lifesteal +bonusLifesteal;
     const totalDamage = (baseDamage + controlDamageBonus) * getDamageMultiplier();
     const damageFromBonus = totalDamage - (baseDamage + controlDamageBonus);
     let wielderHTML = `
@@ -65,12 +67,12 @@ function updateWielderStats() {
             Level: ${wielder.level}
         </div><br />
         <div class="stat tooltip">
-            Predicted Damage: ${totalDamage.toFixed(1)} + ${lifesteal} lifesteal
+            Predicted Damage: ${totalDamage.toFixed(1)} + ${lifestealTotal} lifesteal
             <span class="tooltiptext">
                 Base: ${baseDamage.toFixed(1)} (Strength: ${effectiveStats.strength.toFixed(1)} × 2)<br>
                 Control Bonus: +${controlDamageBonus.toFixed(1)} (${(game.controlBonus * 100).toFixed(0)}%)<br>
                 Damage multiplier: +${damageFromBonus.toFixed(2)} (${((getDamageMultiplier()-1) * 100).toFixed(0)}%)<br>
-                Lifesteal: +${lifesteal} damage & heal per hit
+                Lifesteal: +${lifesteal} from siphon level, +${bonusLifesteal} from bonuses (damage & heal per hit)
             </span>
         </div><br />
         <div class="stat tooltip">

@@ -29,7 +29,7 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
 
     const baseDamage = effectiveStats.strength * 2;
     const controlDamageBonus = baseDamage * game.controlBonus;
-    const lifestealBonus = Object.values(game.achievements).reduce((sum, ach) => sum + (ach.unlocked && ach.bonus.lifestealBonus ? ach.bonus.lifestealBonus : 0), 0);
+    const lifestealBonus = Object.values(game.completedAchievements).reduce((sum, ach) => sum + ( ach.bonus.lifestealBonus ? ach.bonus.lifestealBonus : 0), 0);
     const lifesteal = game.sword.upgrades.siphon.level + lifestealBonus;
     const damageMultiplier = getDamageMultiplier();
     const physicalDamage = (baseDamage + controlDamageBonus) * damageMultiplier;
@@ -60,8 +60,11 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
         wielder.currentLife -= enemyDamage;
 
         addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(effectiveStats.swordfighting)}) Player HP left: ${wielder.currentLife.toFixed(1)}`, 'damage');        updateHealthBar(null);
+
         if (wielder.currentLife <= 0) {
             defeatWielder();
+        }else{
+            game.statistics.currentHighestDamageTaken = enemy.strength * 2;
         }
         updateEnemyHealthBar(enemy,enemyLife);
         updateWielderHealth();
@@ -144,11 +147,14 @@ function achievementTracker(enemy,roundCount){
     if (game.swiftKillStartTime === null) {
         game.swiftKillStartTime = Date.now();
         game.statistics.swiftKillCount = 1;
+        if(game.statistics.swiftKillMaxCount == 0){
+            game.statistics.swiftKillMaxCount =1;
+        }
     } else {
         const timeElapsed = (Date.now() - game.swiftKillStartTime) / 1000; // Seconds
         if (timeElapsed <= 10) {
             game.statistics.swiftKillCount++;
-            if(game.statistics.swiftKillMaxCount< game.statistics.swiftKillCount) game.statistics.swiftKillMaxCount = game.statistics.swiftKillCount
+            if(game.statistics.swiftKillMaxCount < game.statistics.swiftKillCount){ game.statistics.swiftKillMaxCount = game.statistics.swiftKillCount;}
             if (game.statistics.swiftKillCount >= 10) {
                 game.statistics.hasSwiftKilled = true;
             }
