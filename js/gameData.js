@@ -81,6 +81,11 @@ function loadGameData() {
             blood: [],
             death: [],
             vengeance: []
+        },
+        pathSelections: {
+            blood: [],
+            death: [],
+            vengeance: []
         }
     };
 
@@ -226,42 +231,173 @@ gameData = {
         { name: "An Orcish Hunting Party", level: 5, strength: 12, defense: 2, endurance: 100, exp: 60 },
         { name: "A Young Dragon", level: 6, strength: 15, defense: 2, endurance: 200, exp: 100 }
       ]
-    }
-  ],
-  paths: {
-    blood: {
-      name: "Path of Blood",
-      description: "Tracks total energy gained",
-      tiers: [
-        { threshold: 1000, reward: { damageMultiplier: 1.05 } },
-        { threshold: 5000, reward: { maxEnergyMultiplier: 1.10 } },
-        { threshold: 10000, reward: { upgradeCostReduction: 0.05 } },
-        { threshold: 20000, reward: { expMultiplier: 1.10 } },
-        { threshold: 50000, reward: { startingStats: 1 } }
-      ]
     },
-    death: {
-      name: "Path of Death",
-      description: "Tracks total kills and collects souls",
-      tiers: [
-          { threshold: 100, reward: { souls: { minor: 10 } } },
-          { threshold: 500, reward: { inquisitionGrowthReduction: 0.005 } }, // Growth from 0.01 to 0.005
-          { threshold: 1000, reward: { healPerCombat: 1 } }, // +1 heal (total 2)
-          { threshold: 2000, reward: { soulGainMultiplier: 1.10 } }, // +10% soul gain
-          { threshold: 5000, reward: { damageMultiplier: 1.10 } }
+    {
+        name: "Placeholder",
+        enemies: [
+            { name: "Placeholder", level: 7, strength: 17, defense: 3, endurance: 220, exp: 110 },
+            { name: "Placeholder", level: 7, strength: 18, defense: 4, endurance: 240, exp: 120 },
+            { name: "Placeholder", level: 8, strength: 20, defense: 5, endurance: 300, exp: 150 },
+            { name: "Placeholder", level: 9, strength: 22, defense: 6, endurance: 400, exp: 200 }
         ]
     },
-    vengeance: {
-      name: "Path of Vengeance",
-      description: "Tracks boss kills",
-      tiers: [
-        { threshold: 1, reward: { bossDamage: 1.05 } },
-        { threshold: 5, reward: { bossExp: 1.10 } },
-        { threshold: 10, reward: { bossGold: 1.10 } },
-        { threshold: 20, reward: { bossSouls: 1.05 } },
-        { threshold: 50, reward: { ultimateReward: true } }
-      ]
+    {
+        name: "Placeholder",
+        enemies: [
+            { name: "Placeholder", level: 9, strength: 24, defense: 7, endurance: 350, exp: 220 },
+            { name: "Placeholder", level: 10, strength: 26, defense: 8, endurance: 450, exp: 250 },
+            { name: "Placeholder", level: 10, strength: 28, defense: 9, endurance: 500, exp: 280 },
+            { name: "Placeholder", level: 11, strength: 30, defense: 10, endurance: 600, exp: 350 }
+        ]
+    },
+    {
+        name: "Placeholder",
+        enemies: [
+            { name: "Placeholder", level: 12, strength: 35, defense: 12, endurance: 800, exp: 400 },
+            { name: "Placeholder", level: 13, strength: 38, defense: 15, endurance: 1000, exp: 500 },
+            { name: "Placeholder", level: 14, strength: 42, defense: 18, endurance: 1500, exp: 600 }
+        ]
     }
+],
+  paths: {
+      blood: {
+          name: "Path of Blood",
+          description: "Tracks total energy gained",
+          tiers: [
+              {
+                  threshold: 1000,
+                  choices: [
+                      { reward: { damageMultiplier: 1.05 }, description: "Increase damage by 5%" },
+                      { reward: { maxEnergyMultiplier: 1.05 }, description: "Increase max energy by 5%" },
+                      { reward: { energyGainMultiplier: 1.05 }, description: "Increase energy gain by 5%" }
+                  ]
+              },
+              {
+                  threshold: 5000,
+                  choices: [
+                      { reward: { maxEnergyMultiplier: 1.10 }, description: "Increase max energy by 10%" },
+                      { reward: { upgradeCostReduction: 0.05 }, description: "Reduce upgrade costs by 5%" },
+                      { reward: { expMultiplier: 1.05 }, description: "Increase EXP gain by 5%" }
+                  ]
+              },
+              {
+                  threshold: 10000,
+                  choices: [
+                      { reward: { upgradeCostReduction: 0.05 }, description: "Reduce upgrade costs by 5%" },
+                      { reward: { damageMultiplier: 1.10 }, description: "Increase damage by 10%" },
+                      { reward: { startingStats: 1 }, description: "Add +1 to all starting stats" }
+                  ]
+              },
+              {
+                  threshold: 20000,
+                  choices: [
+                      { reward: { expMultiplier: 1.10 }, description: "Increase EXP gain by 10%" },
+                      { reward: { energyGainMultiplier: 1.10 }, description: "Increase energy gain by 10%" },
+                      { reward: { maxEnergyMultiplier: 1.15 }, description: "Increase max energy by 15%" }
+                  ]
+              },
+              {
+                  threshold: 50000,
+                  choices: [
+                      { reward: { startingStats: 1 }, description: "Add +1 to all starting stats" },
+                      { reward: { damageMultiplier: 1.15 }, description: "Increase damage by 15%" },
+                      { reward: { expMultiplier: 1.15 }, description: "Increase EXP gain by 15%" }
+                  ]
+              }
+          ]
+      },
+      death: {
+          name: "Path of Death",
+          description: "Tracks total kills and collects souls",
+          tiers: [
+              {
+                  threshold: 100,
+                  choices: [
+                      { reward: { damageMultiplier: 1.02 }, description: "Increase damage by 2%" },
+                      { reward: { expMultiplier: 1.05 }, description: "Increase EXP gain by 5%" },
+                      { reward: { energyGainMultiplier: 1.05 }, description: "Increase energy gain by 5%" }
+                  ]
+              },
+              {
+                  threshold: 500,
+                  choices: [
+                      { reward: { inquisitionGrowthReduction: 0.005 }, description: "Reduce inquisition growth by 0.5%" },
+                      { reward: { maxEnergyMultiplier: 1.05 }, description: "Increase max energy by 5%" },
+                      { reward: { healPerCombat: 1 }, description: "Add +1 heal per combat" }
+                  ]
+              },
+              {
+                  threshold: 1000,
+                  choices: [
+                      { reward: { healPerCombat: 1 }, description: "Add +1 heal per combat" },
+                      { reward: { soulGainMultiplier: 1.10 }, description: "Increase soul gain by 10%" },
+                      { reward: { canChangePathChoices: true }, description: "Unlock ability to change path choices" }
+                  ]
+              },
+              {
+                  threshold: 2000,
+                  choices: [
+                      { reward: { soulGainMultiplier: 1.10 }, description: "Increase soul gain by 10%" },
+                      { reward: { damageMultiplier: 1.05 }, description: "Increase damage by 5%" },
+                      { reward: { expMultiplier: 1.10 }, description: "Increase EXP gain by 10%" }
+                  ]
+              },
+              {
+                  threshold: 5000,
+                  choices: [
+                      { reward: { damageMultiplier: 1.10 }, description: "Increase damage by 10%" },
+                      { reward: { maxEnergyMultiplier: 1.10 }, description: "Increase max energy by 10%" },
+                      { reward: { soulGainMultiplier: 1.15 }, description: "Increase soul gain by 15%" }
+                  ]
+              }
+          ]
+      },
+      vengeance: {
+          name: "Path of Vengeance",
+          description: "Tracks boss kills",
+          tiers: [
+              {
+                  threshold: 1,
+                  choices: [
+                      { reward: { bossDamage: 1.05 }, description: "Increase boss damage by 5%" },
+                      { reward: { bossExp: 1.05 }, description: "Increase boss EXP by 5%" },
+                      { reward: { bossGold: 1.05 }, description: "Increase boss gold by 5%" }
+                  ]
+              },
+              {
+                  threshold: 5,
+                  choices: [
+                      { reward: { bossExp: 1.10 }, description: "Increase boss EXP by 10%" },
+                      { reward: { bossGold: 1.10 }, description: "Increase boss gold by 10%" },
+                      { reward: { bossSouls: 1.05 }, description: "Increase boss souls by 5%" }
+                  ]
+              },
+              {
+                  threshold: 10,
+                  choices: [
+                      { reward: { bossGold: 1.10 }, description: "Increase boss gold by 10%" },
+                      { reward: { bossDamage: 1.10 }, description: "Increase boss damage by 10%" },
+                      { reward: { bossExp: 1.15 }, description: "Increase boss EXP by 15%" }
+                  ]
+              },
+              {
+                  threshold: 20,
+                  choices: [
+                      { reward: { bossSouls: 1.05 }, description: "Increase boss souls by 5%" },
+                      { reward: { bossDamage: 1.15 }, description: "Increase boss damage by 15%" },
+                      { reward: { bossGold: 1.15 }, description: "Increase boss gold by 15%" }
+                  ]
+              },
+              {
+                  threshold: 50,
+                  choices: [
+                      { reward: { ultimateReward: true }, description: "Unlock ultimate vengeance reward" },
+                      { reward: { bossDamage: 1.20 }, description: "Increase boss damage by 20%" },
+                      { reward: { bossSouls: 1.15 }, description: "Increase boss souls by 15%" }
+                  ]
+              }
+          ]
+      }
   }
 };
 gameData.shopItems = {
@@ -293,5 +429,46 @@ gameData.shopItems = {
             { type: 'amulet', name: 'Emerald Amulet', stats: { endurance: 3, willpower: 2 }, price: 260, icon: 'assets/equipment/neck.png' }
         ]
     };
-}
 
+gameData.events = [
+ {
+     id: 'treasureChest',
+     hasTriggeredBefore:false,
+     condition: () => Math.random() < 1.00, // 5% chance per kill
+     effect: () => {
+         const choices = [
+             {
+                 label: 'Open the chest',
+                 action: () => {
+                     const goldGained = Math.floor(Math.random() * 100) + 50;
+                     game.wielder.gold += goldGained;
+                     addCombatMessage('You found '+ goldGained + ' gold in the chest!', 'player-stat');
+                 }
+             },
+             {
+                 label: 'Leave it alone',
+                 action: () => {
+                     addCombatMessage('You decided to leave the chest alone.', 'player-stat');
+                 }
+             },
+             {
+                 label: 'Disarm trap',
+                 action: () => {
+                     if (Math.random() < 0.5) {
+                         const goldGained = Math.floor(Math.random() * 200) + 100;
+                         game.wielder.gold += goldGained;
+                         addCombatMessage('You disarmed the trap and found ${goldGained} gold!', 'player-stat');
+                     } else {
+                         const damage = Math.floor(Math.random() * 20) + 10;
+                         game.wielder.currentLife -= damage;
+                         addCombatMessage('The trap triggered! You took ${damage} damage.', 'player-stat');
+                     }
+                 }
+             }
+         ];
+         showEventModal('Treasure Chest', 'You found a mysterious treasure chest. What will you do?', choices);
+     }
+ },
+
+];
+}

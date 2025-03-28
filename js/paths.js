@@ -12,22 +12,44 @@
     function checkPathRewards(path) {
         const pathData = gameData.paths[path];
         const progress = game.pathProgress[path];
-        const tiersUnlocked = game.pathTiersUnlocked[path];
-        pathData.tiers.forEach((tier, index) => {
-            if (progress >= tier.threshold && !tiersUnlocked.includes(index)) {
-                applyPathReward(path, tier.reward, index);
-                tiersUnlocked.push(index);
-                addCombatMessage(`Unlocked ${pathData.name} Tier ${index + 1}!`, 'achievement');
+        let tiersUnlocked = 0;
+        for (let i = 0; i < pathData.tiers.length; i++) {
+            if (progress >= pathData.tiers[i].threshold) {
+                tiersUnlocked = i + 1;
+            } else {
+                break;
             }
-        });
-        if (tiersUnlocked.length === pathData.tiers.length && game.selectedPath === path) {
-            addCombatMessage(`You have completed the ${pathData.name}! You can now select a new path.`, 'achievement');
-            game.selectedPath = null;
-            showPathSelectionModal();
         }
-        updatePathsTab();
+        if (tiersUnlocked > game.pathTiersUnlocked[path]) {
+            const oldTiers = game.pathTiersUnlocked[path];
+            game.pathTiersUnlocked[path] = tiersUnlocked;
+            while (game.pathSelections[path].length < tiersUnlocked) {
+                game.pathSelections[path].push(null);
+            }
+            addCombatMessage(`New tier${tiersUnlocked - oldTiers > 1 ? 's' : ''} unlocked for ${pathData.name}! Choose your reward in the Paths tab.`, 'player-stat');
+            updatePathsTab();
+        }
+        if(tiersUnlocked == 5 && !game.completedPaths.includes(path)) game.completedPaths.push(path);
+
     }
 
+
+// Select a path choice and apply its reward
+function selectPathChoice(path, tierIndex, choiceIndex) {
+    if (game.pathSelections[path][tierIndex] !== null) return;
+    const choice = gameData.paths[path].tiers[tierIndex].choices[choiceIndex];
+    game.pathSelections[path][tierIndex] = choiceIndex;
+    applyPathReward(choice.reward);
+    addCombatMessage(`Selected: ${choice.description} for ${path} Tier ${tierIndex + 1}`, 'player-stat');
+    updatePathsTab();
+    updateMultipliers();
+}
+
+// Apply one-time rewards (if any)
+function applyPathReward(reward) {
+    // For now, assuming all rewards are persistent and handled by multipliers
+    // One-time rewards like souls would be applied here if reintroduced
+}
     function applyPathReward(path, reward, tierIndex) {
         if (path === 'death') {
             if (reward.souls) {

@@ -220,7 +220,7 @@ function defeatEnemy(enemy, zoneIndex) {
         addCombatMessage(`Found ${goldDrop} gold`, 'player-stat');
         updateModalGold();
     }
-
+    checkEvents();
     game.isFighting = false;
     if (game.currentAction === 'autoFighting') startAutoBattle();
 }

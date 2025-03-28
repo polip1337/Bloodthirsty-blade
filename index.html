@@ -107,6 +107,13 @@
         <button onclick="onModalClose('inquisitionExplanationModal')">Close</button>
     </div>
 </div>
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <h3 id="eventTitle"></h3>
+        <p id="eventDescription"></p>
+        <div id="eventChoices"></div>
+    </div>
+</div>
 <audio id="combat-sound" src="combat-win.mp3"></audio>
 <!-- Game Sections -->
 <div id="gameLogo" class="game-section">
@@ -171,7 +178,7 @@
             <div id="achievements-list"></div>
         </div>
         <div id="paths-content" style="display: none;">
-            <h2>Paths</h2>
+
             <div id="paths-display"></div>
         </div>
     </div>
@@ -238,6 +245,7 @@
 </footer>
 <script src="js/achievements.js"></script>
 <script src="js/combat.js"></script>
+<script src="js/events.js"></script>
 <script src="js/gameData.js"></script>
 <script src="js/inquisition.js"></script>
 <script src="js/inventory.js"></script>

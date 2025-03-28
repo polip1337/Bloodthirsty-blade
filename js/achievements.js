@@ -518,12 +518,12 @@ function getDamageMultiplier() {
     Object.values(game.completedAchievements).forEach(ach => {
         if (ach.bonus.damageMultiplier) multiplier *= ach.bonus.damageMultiplier;
     });
-    ['blood', 'death'].forEach(path => {
+   /* ['blood', 'death'].forEach(path => {
         game.pathTiersUnlocked[path].forEach(tierIdx => {
             const tier = gameData.paths[path].tiers[tierIdx];
             if (tier.reward.damageMultiplier) multiplier *= tier.reward.damageMultiplier;
         });
-    });
+    });*/
     return multiplier;
 }
 
@@ -533,12 +533,15 @@ function getExpMultiplier() {
         if (ach.bonus.expMultiplier) multiplier *= ach.bonus.expMultiplier;
         if (ach.bonus.zoneExp) multiplier *= ach.bonus.zoneExp;
     });
-    ['blood', 'vengeance'].forEach(path => {
-        game.pathTiersUnlocked[path].forEach(tierIdx => {
-            const tier = gameData.paths[path].tiers[tierIdx];
-            if (tier.reward.expMultiplier || tier.reward.bossExp) multiplier *= (tier.reward.expMultiplier || tier.reward.bossExp);
+    Object.keys(game.pathSelections).forEach(path => {
+            game.pathSelections[path].forEach((choiceIndex, tierIndex) => {
+                if (choiceIndex !== null) {
+                    const reward = gameData.paths[path].tiers[tierIndex].choices[choiceIndex].reward;
+                    if (reward.damageMultiplier) multiplier *= reward.damageMultiplier;
+                    if (reward.bossDamage) multiplier *= reward.bossDamage;
+                }
+            });
         });
-    });
     return multiplier;
 }
 
@@ -547,12 +550,15 @@ function getMaxEnergyMultiplier() {
     Object.values(game.completedAchievements).forEach(ach => {
         if (ach.bonus.maxEnergyMultiplier) multiplier *= ach.bonus.maxEnergyMultiplier;
     });
-    ['blood', 'death'].forEach(path => {
-        game.pathTiersUnlocked[path].forEach(tierIdx => {
-            const tier = gameData.paths[path].tiers[tierIdx];
-            if (tier.reward.maxEnergyMultiplier) multiplier *= (tier.reward.maxEnergyMultiplier);
+    Object.keys(game.pathSelections).forEach(path => {
+            game.pathSelections[path].forEach((choiceIndex, tierIndex) => {
+                if (choiceIndex !== null) {
+                    const reward = gameData.paths[path].tiers[tierIndex].choices[choiceIndex].reward;
+                    if (reward.expMultiplier) multiplier *= reward.expMultiplier;
+                    if (reward.bossExp) multiplier *= reward.bossExp;
+                }
+            });
         });
-    });
     return multiplier;
 }
 
@@ -561,10 +567,12 @@ function getUpgradeCostReduction() {
     Object.values(game.completedAchievements).forEach(ach => {
         if (ach.bonus.upgradeCostReduction) reduction += ach.bonus.upgradeCostReduction;
     });
-   ['blood', 'death'].forEach(path => {
-           game.pathTiersUnlocked[path].forEach(tierIdx => {
-               const tier = gameData.paths[path].tiers[tierIdx];
-               if (tier.reward.upgradeCostReductio) multiplier *= (tier.reward.upgradeCostReductio);
+   Object.keys(game.pathSelections).forEach(path => {
+           game.pathSelections[path].forEach((choiceIndex, tierIndex) => {
+               if (choiceIndex !== null) {
+                   const reward = gameData.paths[path].tiers[tierIndex].choices[choiceIndex].reward;
+                   if (reward.upgradeCostReduction) reduction += reward.upgradeCostReduction;
+               }
            });
        });
     return reduction;
@@ -577,10 +585,12 @@ function getEnergyGainMultiplier() {
             multiplier *= ach.bonus.energyGainMultiplier;
         }
     });
-    ['blood', 'death'].forEach(path => {
-            game.pathTiersUnlocked[path].forEach(tierIdx => {
-                const tier = gameData.paths[path].tiers[tierIdx];
-                if (tier.reward.energyGainMultiplier) multiplier *= tier.reward.energyGainMultiplier;
+    Object.keys(game.pathSelections).forEach(path => {
+            game.pathSelections[path].forEach((choiceIndex, tierIndex) => {
+                if (choiceIndex !== null) {
+                    const reward = gameData.paths[path].tiers[tierIndex].choices[choiceIndex].reward;
+                    if (reward.energyGainMultiplier) multiplier *= reward.energyGainMultiplier;
+                }
             });
         });
     return multiplier;

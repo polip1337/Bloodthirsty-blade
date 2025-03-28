@@ -211,6 +211,7 @@ function updateEnemyZones() {
             html += `
                 <div class="zone" data-zone-index="${originalIndex}">
                     <h4>${zone.name}</h4>
+                    ${originalIndex > 2 ? `<button onclick="openShop(${originalIndex})">Shop</button>` : ''}
                     <div class="zone-actions">
                         <span class="tooltip">
                             <button class="explore-btn" onclick="exploreZone(${originalIndex})">Explore</button>
@@ -226,9 +227,10 @@ function updateEnemyZones() {
                             <span class="tooltiptext">
                                 Requires connection lvl ${originalIndex + 1}
                             </span>
+
                         </span>
                         ${inquisitionBar}
-                        ${originalIndex > 2 ? `<button onclick="openShop(${originalIndex})">Shop</button>` : ''}
+
                     </div>
                 </div>
             `;
@@ -523,10 +525,10 @@ function adjustTooltipPosition() {
     // Select only tooltips that are not inside a .modal element
     const tooltips = document.querySelectorAll('.tooltip:not(.modal .tooltip)');
 
-    console.log(`Found ${tooltips.length} tooltip elements outside modals`);
+    //console.log(`Found ${tooltips.length} tooltip elements outside modals`);
 
     if (tooltips.length === 0) {
-        console.log('No elements with class "tooltip" found outside modals.');
+        //console.log('No elements with class "tooltip" found outside modals.');
         return;
     }
 
@@ -590,9 +592,9 @@ function adjustTooltipPosition() {
                 tooltipText.style.transform = 'none';
             }
 
-            // Debug positioning
-            console.log(`Tooltip ${index} positioned at: top=${tooltipText.style.top}, left=${tooltipText.style.left}`);
-            console.log(`Tooltip ${index} visibility: ${window.getComputedStyle(tooltipText).visibility}, opacity: ${window.getComputedStyle(tooltipText).opacity}`);
+//            // Debug positioning
+//            console.log(`Tooltip ${index} positioned at: top=${tooltipText.style.top}, left=${tooltipText.style.left}`);
+//            console.log(`Tooltip ${index} visibility: ${window.getComputedStyle(tooltipText).visibility}, opacity: ${window.getComputedStyle(tooltipText).opacity}`);
         });
     });
 }
@@ -605,7 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Handle dynamic content
 const observer = new MutationObserver(() => {
-    console.log('DOM changed, re-initializing tooltips');
+    //console.log('DOM changed, re-initializing tooltips');
     adjustTooltipPosition();
 });
 observer.observe(document.body, { childList: true, subtree: true });
@@ -647,45 +649,119 @@ function showPathSelectionModal() {
         });
     });
 }
-function updatePathsTab() {
-    const display = document.getElementById('paths-display');
-    if (!game.unlockedPaths.length) {
-        display.innerHTML = '<p>Reach Zone 5 to unlock the Path mechanic.</p>';
-        return;
-    }
-    let content = '<div id="path-subtabs">';
-    game.unlockedPaths.forEach(path => {
-        content += `<button onclick="showPathSubtab('${path}')">${gameData.paths[path].name}</button>`;
-    });
-    content += '</div><div id="path-subtab-content"></div>';
-    display.innerHTML = content;
-    showPathSubtab(game.selectedPath || game.unlockedPaths[0]);
-}
 
-function showPathSubtab(path) {
-    game.selectedPathsubtab = path;
-    const contentDiv = document.getElementById('path-subtab-content');
-    const pathData = gameData.paths[path];
 
-    // Base content: path name, description, and any path-specific stats
-    let content = `<h3>${pathData.name}</h3><p>${pathData.description}</p>`;
+        // Function to update the Paths tab with subtabs
+        function updatePathsTab() {
+            const pathsDisplay = document.getElementById('paths-display');
+            pathsDisplay.innerHTML = `
+                <div id="path-subtabs"></div>
+                <div id="path-subtab-content"></div>
+            `;
+            updatePathSubtabs();
+        }
 
-    // Example: souls stat for the 'death' path
-    if (path === 'death') {
-        content += `
-            <div class="stat tooltip">
-                Souls: <span class="souls-value">${game.souls.minor}/${game.souls.normal}/${game.souls.major}/${game.souls.epic}</span>
-                <span class="tooltiptext">Minor/Normal/Major/Epic souls collected</span>
-            </div>`;
-    }
+        // Function to update subtabs for unlocked paths
+        function updatePathSubtabs() {
+            const subtabsDiv = document.getElementById('path-subtabs');
+            subtabsDiv.innerHTML = '';
+            game.unlockedPaths.forEach(path => {
+                const button = document.createElement('button');
+                button.textContent = gameData.paths[path].name;
+                button.onclick = () => {
+                    document.querySelectorAll('#path-subtabs button').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    showPathSubtab(path);
+                };
+                if (path === game.selectedPathsubtab) {
+                    button.classList.add('active');
+                }
+                subtabsDiv.appendChild(button);
+            });
+            if (!game.selectedPathsubtab && game.unlockedPaths.length > 0) {
+                game.selectedPathsubtab = game.unlockedPaths[0];
+                showPathSubtab(game.unlockedPaths[0]);
+            } else if (game.unlockedPaths.length > 0) {
+                showPathSubtab(game.selectedPathsubtab);
+            }
+        }
 
-    // Add a container for progress and tiers
-    content += '<div id="path-progress-container"></div>';
+        // Function to show a specific path subtab
+        function showPathSubtab(path) {
+            game.selectedPathsubtab = path;
+            const contentDiv = document.getElementById('path-subtab-content');
+            const pathData = gameData.paths[path];
+            const unlockedTiers = game.pathTiersUnlocked[path] || [];
+            const selections = game.pathSelections[path] || [];
+            let content = `<p>${pathData.description}</p>`;
+            if (path === 'death') {
+                content += `<p>Souls: ${game.souls.minor} minor / ${game.souls.normal} normal / ${game.souls.major} major / ${game.souls.epic} epic</p>`;
+            }
+            content += '<div class="tiers">';
+            pathData.tiers.forEach((tier, tierIndex) => {
+                const isUnlocked = unlockedTiers > tierIndex;
+                const selectedChoice = selections[tierIndex];
 
-    // Set the content and update the progress section
-    contentDiv.innerHTML = content;
-    updatePathProgress(path);
-}
+                if (isUnlocked) {
+                    content += `
+                        <div class="tier ${isUnlocked ? 'unlocked' : 'locked'}">
+                            <h4>Tier ${tierIndex + 1} (Threshold: ${tier.threshold})</h4>
+                    `;
+                    if (selectedChoice !== null && selectedChoice !== undefined) {
+                        content += `<p class="selected-choice">${tier.choices[selectedChoice].description}</p>`;
+                        if (canChangePathChoices()) {
+                            content += `<button onclick="showChangeChoiceModal('${path}', ${tierIndex})">Change (10 souls)</button>`;
+                        }
+                    } else {
+                        content += `<p>Select a reward:</p><div class="choice-buttons">`;
+                        tier.choices.forEach((choice, choiceIndex) => {
+                            content += `
+                                <button onclick="selectPathChoice('${path}', ${tierIndex}, ${choiceIndex})">${choice.description}</button>
+                            `;
+                        });
+                        content += `</div>`;
+                    }
+                } else if (unlockedTiers == tierIndex){
+                content += `
+                    <div class="tier ${isUnlocked ? 'unlocked' : 'locked'}">
+                        <h4>Tier ${tierIndex + 1} (Threshold: ${tier.threshold})</h4>
+                `;
+                const progressNeeded = tier.threshold - (game.pathProgress[path] || 0);
+                                    content += `<p>Locked (Progress needed: ${progressNeeded > 0 ? progressNeeded : 0})</p>`;
+
+                }
+                content += `</div>`;
+            });
+            content += `</div>`;
+            contentDiv.innerHTML = content;
+        }
+
+        // Function to check if player can change path choices (Death path ability)
+        function canChangePathChoices() {
+            // Assuming this ability is unlocked in Death path, tier 1, choice 1 as an example
+            return true;
+        }
+
+        // Function to select a path choice
+        function selectPathChoice(path, tierIndex, choiceIndex) {
+            if (game.pathSelections[path][tierIndex] !== null) return;
+            const choice = gameData.paths[path].tiers[tierIndex].choices[choiceIndex];
+            game.pathSelections[path][tierIndex] = choiceIndex;
+            console.log(`Selected: ${choice.description} for ${path} Tier ${tierIndex + 1}`);
+            showPathSubtab(path); // Refresh UI
+        }
+
+        // Function to simulate changing a choice (modal placeholder)
+        function showChangeChoiceModal(path, tierIndex) {
+            if (game.souls.minor < 10) {
+                alert('Not enough minor souls (need 10)');
+                return;
+            }
+            game.souls.minor -= 10;
+            game.pathSelections[path][tierIndex] = null;
+            console.log(`Changed choice for ${path} Tier ${tierIndex + 1}`);
+            showPathSubtab(path); // Refresh UI
+        }
 
 function getPathRewardText(reward) {
     if (reward.inquisitionGrowthReduction) return `-${(reward.inquisitionGrowthReduction * 100).toFixed(1)}% inquisition growth rate`;
@@ -743,16 +819,19 @@ function showFloatingNumber(value, elementId) {
     // Remove the element after animation completes
     setTimeout(() => number.remove(), 2000);
 }
-const footerModals = [
-    'statsModal',
-    'optionsModal',
-    'storyModal',
-    'changelogModal',
-    'shopModal'
-];
+
 
 // Function to close all footer modals except the specified one
 function closeOtherFooterModals(exceptModalId) {
+
+    const footerModals = [
+        'statsModal',
+        'optionsModal',
+        'storyModal',
+        'changelogModal',
+        'shopModal'
+    ];
+
     footerModals.forEach(modalId => {
         if (modalId !== exceptModalId) {
             const modal = document.getElementById(modalId);
