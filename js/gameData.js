@@ -434,7 +434,7 @@ gameData.events = [
  {
      id: 'treasureChest',
      hasTriggeredBefore:false,
-     condition: () => Math.random() < 1.00, // 5% chance per kill
+     condition: () => Math.random() < 0.03, // 5% chance per kill
      effect: () => {
          const choices = [
              {
