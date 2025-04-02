@@ -187,7 +187,28 @@ gameData = {
         "You learned much in Kalraka, both from the living and the dead. Your path leads no the east and the north, to the inner kingdoms. There is where your vengeance awaits. It won’t be an easy road, though.",
         "Between here and there lie the razor peaks and forested valleys of the Greenstone mountains. They aren’t named for the color of their granite spine but for the sheer number of orcs and goblins that dwell within them. Too wild to be tamed by civilization, the region is swarming with greenskins and worse. Here, there are griffons and dragons, but none of that scares you. You were made for dragon slaying."
       ]
-    }
+    },
+      story7: {
+        title: "It's Been A long Way",
+        entry: [
+          "On the far side of the mountains lie the verdant lands you have been aiming for, for so long. You have finally arrived at the edge of the Inner Kingdoms, and endless grasslands have been replaced with green fields, and instead of monsters, the land is dotted with villages that are ripe for plunder.",
+          "Their populations have heard that you are coming. Some flee before your fearsome wielder, and others prepare to fight. In the end, neither group will live much longer."
+        ]
+      },
+        story8: {
+          title: "Revenge is at Hand",
+          entry: [
+            "Behind you, lie the shattered wreckage of the Inner Kingdoms. The blood flowed freely there, but no matter how many towns you put to the sword, it would never equal the prize that lies ahead of you.",
+            "Severon is a city with hundreds of thousands of souls. More importantly, though, it is where this nightmare began for you. Their thick walls will not save them. You will have your revenge here, and everyone who gets in your way will pay the price for their folly."
+          ]
+        },
+          story9: {
+            title: "Where it all Began",
+            entry: [
+              "The castle rises before you, but not all the defenders have fled. Still, you do not fear them. As the memories of what happened here spring into your mind at the sight of this place, though, and you remember how you were forged in the darkest basements with forbidden magics, it's impossible to ignore the streak of fear that surges through your anger.",
+              "After all this time you have arrived, and you will not rest until the king is dead, his family’s souls have been devoured and the ancient castle is nothing but a flaming heap of rubble."
+            ]
+            }
   },
   zones: [
     {
@@ -233,29 +254,27 @@ gameData = {
       ]
     },
     {
-        name: "Placeholder",
+        name: "The Inner Kingdoms",
         enemies: [
-            { name: "Placeholder", level: 7, strength: 17, defense: 3, endurance: 220, exp: 110 },
-            { name: "Placeholder", level: 7, strength: 18, defense: 4, endurance: 240, exp: 120 },
-            { name: "Placeholder", level: 8, strength: 20, defense: 5, endurance: 300, exp: 150 },
-            { name: "Placeholder", level: 9, strength: 22, defense: 6, endurance: 400, exp: 200 }
+            { name: "A Wandering Hero", level: 7, strength: 17, defense: 3, endurance: 220, exp: 110 },
+            { name: "A Powerful Mage", level: 8, strength: 20, defense: 5, endurance: 300, exp: 150 },
+            { name: "A Guard Patrol", level: 9, strength: 22, defense: 6, endurance: 400, exp: 200 }
         ]
     },
     {
-        name: "Placeholder",
+        name: "The Capital City",
         enemies: [
-            { name: "Placeholder", level: 9, strength: 24, defense: 7, endurance: 350, exp: 220 },
-            { name: "Placeholder", level: 10, strength: 26, defense: 8, endurance: 450, exp: 250 },
-            { name: "Placeholder", level: 10, strength: 28, defense: 9, endurance: 500, exp: 280 },
-            { name: "Placeholder", level: 11, strength: 30, defense: 10, endurance: 600, exp: 350 }
+            { name: "A Well Armed Knight", level: 9, strength: 24, defense: 7, endurance: 350, exp: 220 },
+            { name: "A Squad of Warriors", level: 10, strength: 28, defense: 9, endurance: 500, exp: 280 },
+            { name: "An Warpriest", level: 11, strength: 30, defense: 10, endurance: 600, exp: 350 }
         ]
     },
     {
-        name: "Placeholder",
+        name: "Altbearstein Keep",
         enemies: [
-            { name: "Placeholder", level: 12, strength: 35, defense: 12, endurance: 800, exp: 400 },
-            { name: "Placeholder", level: 13, strength: 38, defense: 15, endurance: 1000, exp: 500 },
-            { name: "Placeholder", level: 14, strength: 42, defense: 18, endurance: 1500, exp: 600 }
+            { name: "A Guardian Golem", level: 12, strength: 35, defense: 12, endurance: 800, exp: 400 },
+            { name: "A Royal Guard", level: 13, strength: 38, defense: 15, endurance: 1000, exp: 500 },
+            { name: "An Archmage", level: 14, strength: 42, defense: 18, endurance: 1500, exp: 600 }
         ]
     }
 ],
