@@ -874,3 +874,6 @@ body.modal-active .modal-overlay {
             color: white;
             font-family: Arial, sans-serif;
         }
+        .invisible {
+            display: none;
+        }

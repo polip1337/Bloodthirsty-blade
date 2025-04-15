@@ -212,6 +212,11 @@ function updateEnemyZones() {
                 <div class="zone" data-zone-index="${originalIndex}">
                     <h4>${zone.name}</h4>
                     ${originalIndex > 2 ? `<button onclick="openShop(${originalIndex})">Shop</button>` : ''}
+                    ${zone.boss && game.selectedPath === 'vengeance' ? `
+                        <button class="boss-btn" onclick="fightBoss(${originalIndex})">
+                            Fight ${zone.boss.name}
+                        </button>
+                    ` : ''}
                     <div class="zone-actions">
                         <span class="tooltip">
                             <button class="explore-btn" onclick="exploreZone(${originalIndex})">Explore</button>
@@ -869,4 +874,8 @@ function updateInquisitionTooltips() {
             }
         }
     });
+}
+function fightBoss(zoneIndex) {
+    const boss = gameData.zones[zoneIndex].boss;
+    attackEnemy(zoneIndex, -1, boss);
 }

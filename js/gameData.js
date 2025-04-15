@@ -21,6 +21,8 @@ function loadGameData() {
         unlockedZones: [0],
         unlockedStory: ['story1'],
         completedPaths:[],
+        dodgeActive: false,
+        lastDodgeTime: 0,
         sword: {
             energy: 0,
             maxEnergy: 100,
@@ -242,7 +244,21 @@ gameData = {
         { name: "A fearful Guardsman", level: 4, strength: 7, defense: 2, endurance: 15, exp: 30 },
         { name: "A Prepared Knight", level: 4, strength: 8, defense: 3, endurance: 20, exp: 30 },
         { name: "A Pack of Goat Men", level: 5, strength: 10, defense: 1, endurance: 30, exp: 40 }
-      ]
+      ],
+         boss: {
+             name: "Troll",
+             level: 6,
+             strength: 15,
+             defense: 2,
+             endurance: 200,
+             exp: 150,
+             gold: 100,
+             isBoss: true,
+             mechanics: {
+                 regenPerTurn: 100,
+                 lifestealImmuneRegen: true
+             }
+         }
     },
     {
       name: "High Mountains",
@@ -251,7 +267,20 @@ gameData = {
         { name: "An Orc", level: 4, strength: 10, defense: 1, endurance: 60, exp: 50 },
         { name: "An Orcish Hunting Party", level: 5, strength: 12, defense: 2, endurance: 100, exp: 60 },
         { name: "A Young Dragon", level: 6, strength: 15, defense: 2, endurance: 200, exp: 100 }
-      ]
+      ],
+         boss: {
+             name: "Forge Guardian",
+             level: 9,
+             strength: 22,
+             defense: 6,
+             endurance: 400,
+             exp: 300,
+             gold: 250,
+             isBoss: true,
+             mechanics: {
+                 dwarfRequired: true
+             }
+         }
     },
     {
         name: "The Inner Kingdoms",
@@ -259,7 +288,20 @@ gameData = {
             { name: "A Wandering Hero", level: 7, strength: 17, defense: 3, endurance: 220, exp: 110 },
             { name: "A Powerful Mage", level: 8, strength: 20, defense: 5, endurance: 300, exp: 150 },
             { name: "A Guard Patrol", level: 9, strength: 22, defense: 6, endurance: 400, exp: 200 }
-        ]
+        ],
+         boss: {
+             name: "Armored Sentinel",
+             level: 7,
+             strength: 18,
+             defense: 75,
+             endurance: 1,
+             exp: 200,
+             gold: 150,
+             isBoss: true,
+             mechanics: {
+                 lifestealImmune: true
+             }
+         }
     },
     {
         name: "The Capital City",
@@ -267,7 +309,20 @@ gameData = {
             { name: "A Well Armed Knight", level: 9, strength: 24, defense: 7, endurance: 350, exp: 220 },
             { name: "A Squad of Warriors", level: 10, strength: 28, defense: 9, endurance: 500, exp: 280 },
             { name: "An Warpriest", level: 11, strength: 30, defense: 10, endurance: 600, exp: 350 }
-        ]
+        ],
+         boss: {
+             name: "Resonating Golem",
+             level: 8,
+             strength: 20,
+             defense: 5,
+             endurance: 300,
+             exp: 250,
+             gold: 200,
+             isBoss: true,
+             mechanics: {
+                 tenthAttackMultiplier: 10
+             }
+         }
     },
     {
         name: "Altbearstein Keep",
@@ -275,7 +330,20 @@ gameData = {
             { name: "A Guardian Golem", level: 12, strength: 35, defense: 12, endurance: 800, exp: 400 },
             { name: "A Royal Guard", level: 13, strength: 38, defense: 15, endurance: 1000, exp: 500 },
             { name: "An Archmage", level: 14, strength: 42, defense: 18, endurance: 1500, exp: 600 }
-        ]
+        ],
+             boss: {
+                 name: "Cursed King",
+                 level: 11,
+                 strength: 30,
+                 defense: 10,
+                 endurance: 600,
+                 exp: 400,
+                 gold: 300,
+                 isBoss: true,
+                 mechanics: {
+                     requiredItem: "King's Bane"
+                 }
+             }
     }
 ],
   paths: {
@@ -286,41 +354,41 @@ gameData = {
               {
                   threshold: 1000,
                   choices: [
-                      { reward: { damageMultiplier: 1.05 }, description: "Increase damage by 5%" },
-                      { reward: { maxEnergyMultiplier: 1.05 }, description: "Increase max energy by 5%" },
-                      { reward: { energyGainMultiplier: 1.05 }, description: "Increase energy gain by 5%" }
+                      { reward: { lifestealBonus: 2 }, description: "Increase lifesteal by 2" },
+                      { reward: { energyGainMultiplier: 1.1 }, description: "10% more energy from kills" },
+                      { reward: { regenBonus: 0.5 }, description: "Regenerate 0.5 HP per 5s" }
                   ]
               },
               {
                   threshold: 5000,
                   choices: [
-                      { reward: { maxEnergyMultiplier: 1.10 }, description: "Increase max energy by 10%" },
-                      { reward: { upgradeCostReduction: 0.05 }, description: "Reduce upgrade costs by 5%" },
-                      { reward: { expMultiplier: 1.05 }, description: "Increase EXP gain by 5%" }
+                      { reward: { maxEnergyMultiplier: 1.15 }, description: "15% more max energy" },
+                      { reward: { lifestealBleed: 0.1 }, description: "Lifesteal applies 10% bleed damage" },
+                      { reward: { energyBurst: 50 }, description: "Killing blows release 50 bonus energy" }
                   ]
               },
               {
                   threshold: 10000,
                   choices: [
-                      { reward: { upgradeCostReduction: 0.05 }, description: "Reduce upgrade costs by 5%" },
-                      { reward: { damageMultiplier: 1.10 }, description: "Increase damage by 10%" },
-                      { reward: { startingStats: 1 }, description: "Add +1 to all starting stats" }
+                      { reward: { lifestealOverheal: true }, description: "Lifesteal can overheal up to 25% max HP" },
+                      { reward: { energyGainMultiplier: 1.2 }, description: "20% more energy from kills" },
+                      { reward: { bloodFrenzy: 0.1 }, description: "10% damage bonus when HP below 50%" }
                   ]
               },
               {
                   threshold: 20000,
                   choices: [
-                      { reward: { expMultiplier: 1.10 }, description: "Increase EXP gain by 10%" },
-                      { reward: { energyGainMultiplier: 1.10 }, description: "Increase energy gain by 10%" },
-                      { reward: { maxEnergyMultiplier: 1.15 }, description: "Increase max energy by 15%" }
+                      { reward: { lifestealBonus: 5 }, description: "Increase lifesteal by 5" },
+                      { reward: { energyShield: 0.2 }, description: "20% of energy gained shields HP" },
+                      { reward: { regenBonus: 1 }, description: "Regenerate 1 HP per 5s" }
                   ]
               },
               {
                   threshold: 50000,
                   choices: [
-                      { reward: { startingStats: 1 }, description: "Add +1 to all starting stats" },
-                      { reward: { damageMultiplier: 1.15 }, description: "Increase damage by 15%" },
-                      { reward: { expMultiplier: 1.15 }, description: "Increase EXP gain by 15%" }
+                      { reward: { bloodMastery: true }, description: "Double lifesteal when HP below 25%" },
+                      { reward: { energyGainMultiplier: 1.5 }, description: "50% more energy from kills" },
+                      { reward: { maxEnergyMultiplier: 1.25 }, description: "25% more max energy" }
                   ]
               }
           ]
@@ -332,41 +400,41 @@ gameData = {
               {
                   threshold: 100,
                   choices: [
-                      { reward: { damageMultiplier: 1.02 }, description: "Increase damage by 2%" },
-                      { reward: { expMultiplier: 1.05 }, description: "Increase EXP gain by 5%" },
-                      { reward: { energyGainMultiplier: 1.05 }, description: "Increase energy gain by 5%" }
+                      { reward: { soulDamage: 0.05 }, description: "5% bonus damage per soul type held" },
+                      { reward: { deathSpeed: 0.1 }, description: "10% faster attack speed" },
+                      { reward: { soulGainMultiplier: 1.2 }, description: "20% more souls from kills" }
                   ]
               },
               {
                   threshold: 500,
                   choices: [
-                      { reward: { inquisitionGrowthReduction: 0.005 }, description: "Reduce inquisition growth by 0.5%" },
-                      { reward: { maxEnergyMultiplier: 1.05 }, description: "Increase max energy by 5%" },
-                      { reward: { healPerCombat: 1 }, description: "Add +1 heal per combat" }
+                      { reward: { soulShield: 5 }, description: "5 HP shield per soul type" },
+                      { reward: { deathCrit: 0.05 }, description: "5% crit chance" },
+                      { reward: { soulBurst: 10 }, description: "10 damage burst per kill" }
                   ]
               },
               {
                   threshold: 1000,
                   choices: [
-                      { reward: { healPerCombat: 1 }, description: "Add +1 heal per combat" },
-                      { reward: { soulGainMultiplier: 1.10 }, description: "Increase soul gain by 10%" },
-                      { reward: { canChangePathChoices: true }, description: "Unlock ability to change path choices" }
+                      { reward: { soulConversion: true }, description: "Convert souls to energy (1:10)" },
+                      { reward: { deathSpeed: 0.15 }, description: "15% faster attack speed" },
+                      { reward: { soulGainMultiplier: 1.3 }, description: "30% more souls from kills" }
                   ]
               },
               {
                   threshold: 2000,
                   choices: [
-                      { reward: { soulGainMultiplier: 1.10 }, description: "Increase soul gain by 10%" },
-                      { reward: { damageMultiplier: 1.05 }, description: "Increase damage by 5%" },
-                      { reward: { expMultiplier: 1.10 }, description: "Increase EXP gain by 10%" }
+                      { reward: { soulDamage: 0.1 }, description: "10% bonus damage per soul type" },
+                      { reward: { deathCrit: 0.1 }, description: "10% crit chance" },
+                      { reward: { soulReaper: true }, description: "Chance to gain extra soul on kill" }
                   ]
               },
               {
                   threshold: 5000,
                   choices: [
-                      { reward: { damageMultiplier: 1.10 }, description: "Increase damage by 10%" },
-                      { reward: { maxEnergyMultiplier: 1.10 }, description: "Increase max energy by 10%" },
-                      { reward: { soulGainMultiplier: 1.15 }, description: "Increase soul gain by 15%" }
+                      { reward: { deathMastery: true }, description: "Double soul effects" },
+                      { reward: { soulShield: 10 }, description: "10 HP shield per soul type" },
+                      { reward: { soulBurst: 25 }, description: "25 damage burst per kill" }
                   ]
               }
           ]
@@ -445,7 +513,9 @@ gameData.shopItems = {
             { type: 'shield', name: 'Tower Shield', stats: { swordfighting: 3 }, price: 230, icon: 'assets/equipment/shield.png' },
             { type: 'boots', name: 'Plated Boots', stats: { endurance: 3 }, price: 210, icon: 'assets/equipment/boots.png' },
             { type: 'ring', name: 'Gold Ring', stats: { willpower: 6 }, price: 240, icon: 'assets/equipment/ring.png' },
-            { type: 'amulet', name: 'Emerald Amulet', stats: { endurance: 3, willpower: 2 }, price: 260, icon: 'assets/equipment/neck.png' }
+            { type: 'amulet', name: 'Emerald Amulet', stats: { endurance: 3, willpower: 2 }, price: 260, icon: 'assets/equipment/neck.png' },
+            { type: 'weapon', name: "King's Bane", stats: { strength: 5 }, price: 500, icon: 'assets/equipment/kings_bane.png' }
+
         ]
     };
 
