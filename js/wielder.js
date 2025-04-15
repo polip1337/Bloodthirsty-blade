@@ -104,7 +104,7 @@ function applyHeavyWound() {
     game.wielder.wounds.push(affectedStat);
     const woundCount = game.wielder.wounds.length;
     game.wielder.currentStats[affectedStat] = Math.max(
-        game.wielder.baseStats[affectedStat] - game.wielder.wounds.filter(w => w === affectedStat).length,
+        game.wielder.currentStats[affectedStat] - game.wielder.wounds.filter(w => w === affectedStat).length,
         1
     );
     showEventBackground('assets/cutscenes/wounded.jpg');

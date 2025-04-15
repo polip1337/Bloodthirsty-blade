@@ -224,9 +224,9 @@ game.achievements = {
     soulSeeker: {
         name: "Soul Seeker",
         description: "Unlock 3 story fragments",
-        condition: () => Object.values(gameData.story).filter(s => s.unlocked).length >= 3,
+        condition: () => Object.values(game.unlockedStory).length >= 3,
         target: 3,
-        progress: () => Object.values(gameData.story).filter(s => s.unlocked).length,
+        progress: () => Object.values(game.unlockedStory).length,
         bonus: { expMultiplier: 1.05 },
         unlocked: false,
         icon: "📜"
@@ -337,7 +337,7 @@ game.achievements = {
             description: "Survive 50 damage in one fight",
             condition: () => game.statistics.currentHighestDamageTaken >= 50,
             bonus: { enduranceBonus: 2 },
-            target: 1,
+            target: 50,
             progress: () => game.statistics.currentHighestDamageTaken,
             unlocked: false,
             icon: "🥜"
@@ -415,9 +415,9 @@ game.achievements = {
     bladeLegacy: {
         name: "Blade Legacy",
         description: "Unlock all story fragments",
-        condition: () => Object.values(gameData.story).every(s => s.unlocked),
+        condition: () => Object.values(game.unlockedStory).length >= 6,
         target: 6, // Assuming 5 story fragments; adjust if dynamic
-        progress: () => Object.values(gameData.story).filter(s => s.unlocked).length,
+        progress: () => Object.values(game.unlockedStory).length,
         bonus: { damageMultiplier: 1.05 },
         unlocked: false,
         icon: "📖"
