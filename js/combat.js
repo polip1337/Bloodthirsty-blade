@@ -1,47 +1,53 @@
 function isEligibleForCombat() {
     if (game.isFighting) return; // Prevent new combat if one is active
     if (game.currentAction && game.currentAction !== 'autoFighting') return;
+        if (game.wielder.currentLife <= 0) {
+            addCombatMessage('Wielder is too injured to fight!', 'damage');
+            game.isFighting = false;
+            updateWielderStats();
+            updateButtonStates();
+            return;
+        }
 }
+
 function startAchievementTracker(){
     game.wielder.hasFought = true;
 }
 
+function combatInitialization(zoneIndex, enemyIndex,specialEnemy = null) {
+    game.isFighting = true;
+    game.healsUsedInCombat = 0;
+    game.currentEnemy = specialEnemy ? { zoneIndex, enemyIndex: -1 } : { zoneIndex, enemyIndex };
+}
+
+function calculatePhysicalDamage(effectiveStats) {
+    game.controlBonus = game.sword.upgrades.control.level * 0.2 * (1 - Math.min(game.wielder.currentStats.willpower, 200) / 200);
+    const baseDamage = effectiveStats.strength * 2;
+    const controlDamageBonus = baseDamage * game.controlBonus;
+    const damageMultiplier = getDamageMultiplier();
+    return (baseDamage + controlDamageBonus) * damageMultiplier;
+}
+
+function calculateLifesteal() {
+    const lifestealBonus = Object.values(game.completedAchievements).reduce((sum, ach) => sum + ( ach.bonus.lifestealBonus ? ach.bonus.lifestealBonus : 0), 0);
+    return game.sword.upgrades.siphon.level + lifestealBonus;
+}
+
 async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
     isEligibleForCombat();
+    combatInitialization();
 
     const effectiveStats = getEffectiveStats();
     const enemy = specialEnemy || gameData.zones[zoneIndex].enemies[enemyIndex];
-    const controlLevel = game.sword.upgrades.control.level;
-    const willpower = Math.min(game.wielder.currentStats.willpower, 200);
 
     startAchievementTracker();
     updateBackgroudImage(zoneIndex);
 
-    game.isFighting = true;
-    game.healsUsedInCombat = 0;
-    game.currentEnemy = specialEnemy ? { zoneIndex, enemyIndex: -1 } : { zoneIndex, enemyIndex };
-
     let enemyLife = enemy.endurance * 5;
-    let wielderMaxLife = game.wielder.maxLife;
     updateEnemyHealthBar(enemy,enemyLife);
-    startCombat(enemy);
-    if (game.wielder.currentLife <= 0) {
-        addCombatMessage('Wielder is too injured to fight!', 'damage');
-        game.isFighting = false;
-        updateWielderStats();
-        updateButtonStates();
-        return;
-    }
-
-
-    game.controlBonus = controlLevel * 0.2 * (1 - willpower / 200);
-
-    const baseDamage = effectiveStats.strength * 2;
-    const controlDamageBonus = baseDamage * game.controlBonus;
-    const lifestealBonus = Object.values(game.completedAchievements).reduce((sum, ach) => sum + ( ach.bonus.lifestealBonus ? ach.bonus.lifestealBonus : 0), 0);
-    const lifesteal = game.sword.upgrades.siphon.level + lifestealBonus;
-    const damageMultiplier = getDamageMultiplier();
-    const physicalDamage = (baseDamage + controlDamageBonus) * damageMultiplier;
+    startCombatAnimation(enemy);
+    let physicalDamage = calculatePhysicalDamage(effectiveStats);
+    let lifesteal = calculateLifesteal();
 
     addCombatMessage(`Engaging ${enemy.name} (${enemy.endurance*5} HP)`, 'player-stat');
     updateHealthBar(null);
@@ -98,14 +104,11 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
         game.isFighting = false;
         return;
     }
-
-
-
     updateWielderStats();
     updateButtonStates();
     updateEnergyAndKills();
-
 }
+
 function defeatWielder(){
         addCombatMessage('Lost the fight! Disengaging. Rest or heal.', 'damage');
         if (game.currentAction === 'autoFighting') onActionButtonClick('autoFighting');
@@ -115,8 +118,8 @@ function defeatWielder(){
         updateButtonStates();
         return;
 }
-function startCombat(enemy) {
 
+function startCombatAnimation(enemy) {
     const enemySprite = document.getElementById('enemy-sprite');
     const combatArea = document.getElementById('combat-area');
 
