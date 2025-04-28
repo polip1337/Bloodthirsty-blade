@@ -15,6 +15,7 @@ function startAchievementTracker(){
 }
 
 function combatInitialization(zoneIndex, enemyIndex,specialEnemy = null) {
+    roundCount = 0; // Track combat rounds
     game.isFighting = true;
     game.healsUsedInCombat = 0;
     game.currentEnemy = specialEnemy ? { zoneIndex, enemyIndex: -1 } : { zoneIndex, enemyIndex };
@@ -52,20 +53,17 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
     addCombatMessage(`Engaging ${enemy.name} (${enemy.endurance*5} HP)`, 'player-stat');
     updateHealthBar(null);
 
-    let roundCount = 0; // Track combat rounds
-    let attackCount = 0; // For Boss 3
     let dodgeAvailable = game.selectedPath === 'vengeance';
     let lastDodgeTime = 0;
     while (enemyLife > 0 && game.wielder.currentLife > 0 && !isAnyModalOpen()) {
         roundCount++;
-        attackCount++;
         updateEnemyHealthBar(enemy,enemyLife);
 
         document.getElementById('combat-area').classList.add('combat-active');
 
         // Boss 3: Tenth attack multiplier
         let attackMultiplier = 1;
-        if (enemy.mechanics?.tenthAttackMultiplier && attackCount % 10 === 0) {
+        if (enemy.mechanics?.tenthAttackMultiplier && roundCount % 10 === 0) {
             attackMultiplier *= enemy.mechanics.tenthAttackMultiplier;
             addCombatMessage("CRITICAL STRIKE! Damage x10 this round!", 'warning');
         }
@@ -83,7 +81,7 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
             'damage'
         );
         // Enemy attack with dodge mechanic
-        let enemyDamage = Math.max(enemy.strength * 2 - Math.floor(wielder.currentStats.swordfighting), 1);
+        let enemyDamage = Math.max(enemy.strength * 2 - Math.floor(game.wielder.currentStats.swordfighting), 1);
         if (game.dodgeActive) {
             addCombatMessage("Attack dodged!", 'player-stat');
             enemyDamage = 0;
@@ -92,7 +90,7 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
 
         game.wielder.currentLife -= enemyDamage;
 
-        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(effectiveStats.swordfighting)}) Player HP left: ${wielder.currentLife.toFixed(1)}`, 'damage');        updateHealthBar(null);
+        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(effectiveStats.swordfighting)}) Player HP left: ${game.wielder.currentLife.toFixed(1)}`, 'damage');        updateHealthBar(null);
         if (enemy.mechanics?.regenPerTurn) {
             const regenAmount = Math.min(enemy.mechanics.regenPerTurn, (enemy.endurance * 5) - enemyLife - physicalDamageDealt);
             enemyLife += regenAmount;
@@ -173,7 +171,7 @@ function achievementTracker(enemy,roundCount){
         game.statistics.manualKills++;
     }
     // Track highest hit survived and 50+ hit survival
-    if (enemyDamage >= 50 && wielder.currentLife > 0) {
+    if (enemyDamage >= 50 && game.wielder.currentLife > 0) {
         game.statistics.survivedHitOf50 = true;
     }
     if (game.wielder.currentLife > 0 && enemyDamage > game.statistics.highestHitSurvived) {

@@ -2,6 +2,7 @@ let gameData, races, zones, upgradeCaps, game,shopItems;
 let lastUsedZoneIndex;
 function loadGameData() {
     lastUsedZoneIndex = 0;
+    roundCount = 0;
     game = null;
     gameData = null;
      game = {
