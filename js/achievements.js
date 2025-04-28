@@ -518,12 +518,12 @@ function getDamageMultiplier() {
     Object.values(game.completedAchievements).forEach(ach => {
         if (ach.bonus.damageMultiplier) multiplier *= ach.bonus.damageMultiplier;
     });
-   /* ['blood', 'death'].forEach(path => {
+    ['blood', 'death'].forEach(path => {
         game.pathTiersUnlocked[path].forEach(tierIdx => {
             const tier = gameData.paths[path].tiers[tierIdx];
             if (tier.reward.damageMultiplier) multiplier *= tier.reward.damageMultiplier;
         });
-    });*/
+    });
     return multiplier;
 }
 

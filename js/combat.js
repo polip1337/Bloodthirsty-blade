@@ -53,17 +53,28 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
     updateHealthBar(null);
 
     let roundCount = 0; // Track combat rounds
+    let attackCount = 0; // For Boss 3
+    let dodgeAvailable = game.selectedPath === 'vengeance';
+    let lastDodgeTime = 0;
     while (enemyLife > 0 && game.wielder.currentLife > 0 && !isAnyModalOpen()) {
         roundCount++;
+        attackCount++;
         updateEnemyHealthBar(enemy,enemyLife);
 
         document.getElementById('combat-area').classList.add('combat-active');
 
-        const physicalDamageAfterDefense = Math.max(physicalDamage - enemy.defense, 0);
+        // Boss 3: Tenth attack multiplier
+        let attackMultiplier = 1;
+        if (enemy.mechanics?.tenthAttackMultiplier && attackCount % 10 === 0) {
+            attackMultiplier *= enemy.mechanics.tenthAttackMultiplier;
+            addCombatMessage("CRITICAL STRIKE! Damage x10 this round!", 'warning');
+        }
+        const physicalDamageAfterDefense = Math.max(physicalDamage * attackMultiplier - enemy.defense, 0);
         const physicalDamageDealt = Math.min(physicalDamageAfterDefense, enemyLife);
-        enemyLife -= physicalDamageDealt;
-        const lifestealDamageDealt = Math.min(lifesteal, enemyLife);
-        enemyLife -= lifestealDamageDealt;
+
+        const lifestealDamageDealt = enemy.mechanics?.lifestealImmune ? 0 : Math.min(lifesteal, enemyLife);
+        enemyLife -= physicalDamageDealt + lifestealDamageDealt;
+
         const totalDamageDealt = physicalDamageDealt + lifestealDamageDealt;
         game.wielder.currentLife = Math.min(effectiveStats.endurance * 5, game.wielder.currentLife + lifestealDamageDealt);
 
@@ -71,12 +82,24 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
             `Dealt ${totalDamageDealt.toFixed(1)} damage (Physical: ${physicalDamageDealt.toFixed(1)}, Lifesteal: ${lifestealDamageDealt.toFixed(1)}). Enemy HP: ${enemyLife.toFixed(2)}`,
             'damage'
         );
-        const enemyDamage = Math.max(enemy.strength * 2 - Math.floor(game.wielder.currentStats.swordfighting), 1);
+        // Enemy attack with dodge mechanic
+        let enemyDamage = Math.max(enemy.strength * 2 - Math.floor(wielder.currentStats.swordfighting), 1);
+        if (game.dodgeActive) {
+            addCombatMessage("Attack dodged!", 'player-stat');
+            enemyDamage = 0;
+            game.dodgeActive = false;
+        }
+
         game.wielder.currentLife -= enemyDamage;
 
-        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(effectiveStats.swordfighting)}) Player HP left: ${game.wielder.currentLife.toFixed(1)}`, 'damage');
-        updateHealthBar(null);
-
+        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(effectiveStats.swordfighting)}) Player HP left: ${wielder.currentLife.toFixed(1)}`, 'damage');        updateHealthBar(null);
+        if (enemy.mechanics?.regenPerTurn) {
+            const regenAmount = Math.min(enemy.mechanics.regenPerTurn, (enemy.endurance * 5) - enemyLife - physicalDamageDealt);
+            enemyLife += regenAmount;
+            if (regenAmount > 0) {
+                addCombatMessage(`Troll regenerates ${regenAmount} HP!`, 'enemy-stat');
+            }
+        }
         if (game.wielder.currentLife <= 0) {
             defeatWielder();
         }else{
@@ -302,4 +325,24 @@ function calculateExpGain(baseExp) {
     const expGained = Math.max(Math.floor(baseExp * expMultiplier), 0) * (1 + game.wielder.currentStats.willpower / 200);
     addCombatMessage(`Gained ${expGained.toFixed(1)} exp. ${(expMultiplier * 100).toFixed(2)}% of base due to level gap.`, 'player-stat');
     return expGained;
+}
+
+function toggleDodge() {
+    const now = Date.now();
+    const button = document.getElementById('dodgeButton');
+    if (now - game.lastDodgeTime >= 5000 && !game.dodgeActive) {
+        game.dodgeActive = true;
+        button.disabled = true;
+        button.classList.add('pulse-animation');
+        game.lastDodgeTime = now;
+        addCombatMessage("Dodge activated! Next attack will be ignored.", 'player-stat');
+        setTimeout(() => {
+            if (game.dodgeActive) {
+                game.dodgeActive = false;
+                button.disabled = false;
+                button.classList.remove('pulse-animation');
+                addCombatMessage("Dodge is now available again.", 'player-stat');
+            }
+        }, 5000);
+    }
 }
