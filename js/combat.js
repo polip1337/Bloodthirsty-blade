@@ -1,21 +1,31 @@
-async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
+function isEligibleForCombat() {
     if (game.isFighting) return; // Prevent new combat if one is active
     if (game.currentAction && game.currentAction !== 'autoFighting') return;
+}
+function startAchievementTracker(){
+    game.wielder.hasFought = true;
+}
+
+async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
+    isEligibleForCombat();
+
+    const effectiveStats = getEffectiveStats();
+    const enemy = specialEnemy || gameData.zones[zoneIndex].enemies[enemyIndex];
+    const controlLevel = game.sword.upgrades.control.level;
+    const willpower = Math.min(game.wielder.currentStats.willpower, 200);
+
+    startAchievementTracker();
     updateBackgroudImage(zoneIndex);
 
-    game.wielder.hasFought = true;
-    const effectiveStats = getEffectiveStats();
-    lastUsedZoneIndex = zoneIndex;
-    const wielder = game.wielder;
     game.isFighting = true;
     game.healsUsedInCombat = 0;
     game.currentEnemy = specialEnemy ? { zoneIndex, enemyIndex: -1 } : { zoneIndex, enemyIndex };
-    const enemy = specialEnemy || gameData.zones[zoneIndex].enemies[enemyIndex];
+
     let enemyLife = enemy.endurance * 5;
-    let wielderMaxLife = wielder.maxLife;
+    let wielderMaxLife = game.wielder.maxLife;
     updateEnemyHealthBar(enemy,enemyLife);
     startCombat(enemy);
-    if (wielder.currentLife <= 0) {
+    if (game.wielder.currentLife <= 0) {
         addCombatMessage('Wielder is too injured to fight!', 'damage');
         game.isFighting = false;
         updateWielderStats();
@@ -23,8 +33,7 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
         return;
     }
 
-    const controlLevel = game.sword.upgrades.control.level;
-    const willpower = Math.min(wielder.currentStats.willpower, 200);
+
     game.controlBonus = controlLevel * 0.2 * (1 - willpower / 200);
 
     const baseDamage = effectiveStats.strength * 2;
@@ -38,7 +47,7 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
     updateHealthBar(null);
 
     let roundCount = 0; // Track combat rounds
-    while (enemyLife > 0 && wielder.currentLife > 0 && !isAnyModalOpen()) {
+    while (enemyLife > 0 && game.wielder.currentLife > 0 && !isAnyModalOpen()) {
         roundCount++;
         updateEnemyHealthBar(enemy,enemyLife);
 
@@ -50,18 +59,19 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
         const lifestealDamageDealt = Math.min(lifesteal, enemyLife);
         enemyLife -= lifestealDamageDealt;
         const totalDamageDealt = physicalDamageDealt + lifestealDamageDealt;
-        wielder.currentLife = Math.min(effectiveStats.endurance * 5, wielder.currentLife + lifestealDamageDealt);
+        game.wielder.currentLife = Math.min(effectiveStats.endurance * 5, game.wielder.currentLife + lifestealDamageDealt);
 
         addCombatMessage(
             `Dealt ${totalDamageDealt.toFixed(1)} damage (Physical: ${physicalDamageDealt.toFixed(1)}, Lifesteal: ${lifestealDamageDealt.toFixed(1)}). Enemy HP: ${enemyLife.toFixed(2)}`,
             'damage'
         );
-        const enemyDamage = Math.max(enemy.strength * 2 - Math.floor(wielder.currentStats.swordfighting), 1);
-        wielder.currentLife -= enemyDamage;
+        const enemyDamage = Math.max(enemy.strength * 2 - Math.floor(game.wielder.currentStats.swordfighting), 1);
+        game.wielder.currentLife -= enemyDamage;
 
-        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(effectiveStats.swordfighting)}) Player HP left: ${wielder.currentLife.toFixed(1)}`, 'damage');        updateHealthBar(null);
+        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(effectiveStats.swordfighting)}) Player HP left: ${game.wielder.currentLife.toFixed(1)}`, 'damage');
+        updateHealthBar(null);
 
-        if (wielder.currentLife <= 0) {
+        if (game.wielder.currentLife <= 0) {
             defeatWielder();
         }else{
             game.statistics.currentHighestDamageTaken = enemy.strength * 2;
@@ -240,7 +250,6 @@ function checkLevelUp(){
 function exploreZone(zoneIndex) {
     if (game.isFighting) return; // Prevent new combat if one is active
     if (game.currentAction && game.currentAction !== 'autoFighting') return;
-    lastUsedZoneIndex = zoneIndex;
     if (checkInquisitionEncounter(zoneIndex)) {
         handleInquisitionEncounter(zoneIndex);
     } else {
@@ -263,23 +272,22 @@ function toggleAutoFight(zoneIndex) {
             if (i !== zoneIndex && document.getElementById(`auto-${i}`)) document.getElementById(`auto-${i}`).checked = false;
         });
         game.currentAction = 'autoFighting';
-        lastUsedZoneIndex = zoneIndex;
-        startAutoBattle();
+        startAutoBattle(zoneIndex);
     } else {
         game.currentAction = null;
     }
     updateButtonStates();
 }
 
-function startAutoBattle() {
+function startAutoBattle(zoneIndex) {
     if (!game.isFighting && !isAnyModalOpen()) {
-        if (!gameData.zones[lastUsedZoneIndex]) lastUsedZoneIndex = 0;
-        const zone = gameData.zones[lastUsedZoneIndex];
-        if (checkInquisitionEncounter(lastUsedZoneIndex)) {
-                handleInquisitionEncounter(lastUsedZoneIndex);
+
+        const zone = gameData.zones[zoneIndex];
+        if (checkInquisitionEncounter(zoneIndex)) {
+                handleInquisitionEncounter(zoneIndex);
         }else{
             const enemyIndex = Math.floor(Math.random() * zone.enemies.length);
-            attackEnemy(lastUsedZoneIndex, enemyIndex);
+            attackEnemy(zoneIndex, enemyIndex);
         }
     }
 }
