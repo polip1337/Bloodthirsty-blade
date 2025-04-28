@@ -19,19 +19,48 @@ function combatInitialization(zoneIndex, enemyIndex,specialEnemy = null) {
     game.isFighting = true;
     game.healsUsedInCombat = 0;
     game.currentEnemy = specialEnemy ? { zoneIndex, enemyIndex: -1 } : { zoneIndex, enemyIndex };
+    let dodgeAvailable = game.selectedPath === 'vengeance';
+    let lastDodgeTime = 0;
 }
 
-function calculatePhysicalDamage(effectiveStats) {
+function calculatePhysicalDamage(enemyLife, enemy, effectiveStats) {
     game.controlBonus = game.sword.upgrades.control.level * 0.2 * (1 - Math.min(game.wielder.currentStats.willpower, 200) / 200);
     const baseDamage = effectiveStats.strength * 2;
     const controlDamageBonus = baseDamage * game.controlBonus;
     const damageMultiplier = getDamageMultiplier();
-    return (baseDamage + controlDamageBonus) * damageMultiplier;
+    const physicalDamage = (baseDamage + controlDamageBonus) * damageMultiplier;
+    const physicalDamageAfterDefense = Math.max(physicalDamage - enemy.defense, 0);
+    return Math.min(physicalDamageAfterDefense, enemyLife);
 }
 
-function calculateLifesteal() {
+function calculateLifesteal(enemy,enemyLife) {
     const lifestealBonus = Object.values(game.completedAchievements).reduce((sum, ach) => sum + ( ach.bonus.lifestealBonus ? ach.bonus.lifestealBonus : 0), 0);
-    return game.sword.upgrades.siphon.level + lifestealBonus;
+    const lifesteal = game.sword.upgrades.siphon.level + lifestealBonus;
+    return enemy.mechanics?.lifestealImmune ? 0 : Math.min(lifesteal, enemyLife);
+}
+
+function calculateEnemyDamage(enemy){
+        let enemyDamage = Math.max(enemy.strength * 2 - Math.floor(game.wielder.currentStats.swordfighting), 1);
+        return dodgeMechanic(enemyDamage);
+}
+
+function dodgeMechanic(enemyDamage){
+        if (game.dodgeActive) {
+            addCombatMessage("Attack dodged!", 'player-stat');
+            enemyDamage = 0;
+            game.dodgeActive = false;
+        }
+return enemyDamage;
+}
+
+function regeneration(enemy){
+    if (enemy.mechanics?.regenPerTurn) {
+        const regenAmount = Math.min(enemy.mechanics.regenPerTurn, (enemy.endurance * 5) - enemyLife - physicalDamageDealt);
+        enemyLife += regenAmount;
+        if (regenAmount > 0) {
+            addCombatMessage(`Troll regenerates ${regenAmount} HP!`, 'enemy-stat');
+        }
+    }
 }
 
 async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
@@ -47,18 +76,15 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
     let enemyLife = enemy.endurance * 5;
     updateEnemyHealthBar(enemy,enemyLife);
     startCombatAnimation(enemy);
-    let physicalDamage = calculatePhysicalDamage(effectiveStats);
-    let lifesteal = calculateLifesteal();
+    let physicalDamageDealt = calculatePhysicalDamage(enemyLife, enemy, effectiveStats);
+    let lifestealDamageDealt = calculateLifesteal(enemy,enemyLife);
 
     addCombatMessage(`Engaging ${enemy.name} (${enemy.endurance*5} HP)`, 'player-stat');
     updateHealthBar(null);
 
-    let dodgeAvailable = game.selectedPath === 'vengeance';
-    let lastDodgeTime = 0;
     while (enemyLife > 0 && game.wielder.currentLife > 0 && !isAnyModalOpen()) {
         roundCount++;
         updateEnemyHealthBar(enemy,enemyLife);
-
         document.getElementById('combat-area').classList.add('combat-active');
 
         // Boss 3: Tenth attack multiplier
@@ -67,12 +93,8 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
             attackMultiplier *= enemy.mechanics.tenthAttackMultiplier;
             addCombatMessage("CRITICAL STRIKE! Damage x10 this round!", 'warning');
         }
-        const physicalDamageAfterDefense = Math.max(physicalDamage * attackMultiplier - enemy.defense, 0);
-        const physicalDamageDealt = Math.min(physicalDamageAfterDefense, enemyLife);
 
-        const lifestealDamageDealt = enemy.mechanics?.lifestealImmune ? 0 : Math.min(lifesteal, enemyLife);
         enemyLife -= physicalDamageDealt + lifestealDamageDealt;
-
         const totalDamageDealt = physicalDamageDealt + lifestealDamageDealt;
         game.wielder.currentLife = Math.min(effectiveStats.endurance * 5, game.wielder.currentLife + lifestealDamageDealt);
 
@@ -80,24 +102,13 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
             `Dealt ${totalDamageDealt.toFixed(1)} damage (Physical: ${physicalDamageDealt.toFixed(1)}, Lifesteal: ${lifestealDamageDealt.toFixed(1)}). Enemy HP: ${enemyLife.toFixed(2)}`,
             'damage'
         );
-        // Enemy attack with dodge mechanic
-        let enemyDamage = Math.max(enemy.strength * 2 - Math.floor(game.wielder.currentStats.swordfighting), 1);
-        if (game.dodgeActive) {
-            addCombatMessage("Attack dodged!", 'player-stat');
-            enemyDamage = 0;
-            game.dodgeActive = false;
-        }
 
+        const enemyDamage = calculateEnemyDamage(enemy);
         game.wielder.currentLife -= enemyDamage;
 
         addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(effectiveStats.swordfighting)}) Player HP left: ${game.wielder.currentLife.toFixed(1)}`, 'damage');        updateHealthBar(null);
-        if (enemy.mechanics?.regenPerTurn) {
-            const regenAmount = Math.min(enemy.mechanics.regenPerTurn, (enemy.endurance * 5) - enemyLife - physicalDamageDealt);
-            enemyLife += regenAmount;
-            if (regenAmount > 0) {
-                addCombatMessage(`Troll regenerates ${regenAmount} HP!`, 'enemy-stat');
-            }
-        }
+        regeneration(enemy);
+
         if (game.wielder.currentLife <= 0) {
             defeatWielder();
         }else{
