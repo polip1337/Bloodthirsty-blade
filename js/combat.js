@@ -1,3 +1,69 @@
+async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
+    isEligibleForCombat();
+    combatInitialization();
+
+    const effectiveStats = getEffectiveStats();
+    const enemy = specialEnemy || gameData.zones[zoneIndex].enemies[enemyIndex];
+
+    startAchievementTracker();
+    updateBackgroudImage(zoneIndex);
+
+    let enemyLife = enemy.endurance * 5;
+    updateEnemyHealthBar(enemy,enemyLife);
+    startCombatAnimation(enemy);
+    let physicalDamageDealt = calculatePhysicalDamage(enemyLife, enemy, effectiveStats);
+    let lifestealDamageDealt = calculateLifesteal(enemy,enemyLife);
+
+    addCombatMessage(`Engaging ${enemy.name} (${enemy.endurance*5} HP)`, 'player-stat');
+    updateHealthBar(null);
+
+    while (enemyLife > 0 && game.wielder.currentLife > 0 && !isAnyModalOpen()) {
+        roundCount++;
+        document.getElementById('combat-area').classList.add('combat-active');
+        const enemyDamage = calculateEnemyDamage(enemy);
+        game.wielder.currentLife -= enemyDamage * calculateCriticalMultiplier(enemy);
+        game.wielder.currentLife = Math.min(effectiveStats.endurance * 5, game.wielder.currentLife + lifestealDamageDealt);
+        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(effectiveStats.swordfighting)}) Player HP left: ${game.wielder.currentLife.toFixed(1)}`, 'damage');        updateHealthBar(null);
+
+        updateEnemyHealthBar(enemy,enemyLife);
+        enemyLife -= physicalDamageDealt + lifestealDamageDealt;
+        trollRegeneration(enemy);
+        const totalDamageDealt = physicalDamageDealt + lifestealDamageDealt;
+        addCombatMessage(
+            `Dealt ${totalDamageDealt.toFixed(1)} damage (Physical: ${physicalDamageDealt.toFixed(1)}, Lifesteal: ${lifestealDamageDealt.toFixed(1)}). Enemy HP: ${enemyLife.toFixed(2)}`,
+            'damage'
+        );
+        if (game.wielder.currentLife <= 0) {
+            defeatWielder();
+        }else{
+            game.statistics.currentHighestDamageTaken = enemy.strength * 2;
+        }
+        updateEnemyHealthBar(enemy,enemyLife);
+        updateWielderHealth();
+        await new Promise(resolve => setTimeout(resolve, 900));
+        document.getElementById('combat-area').classList.remove('combat-active');
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+    }
+    if (enemyLife <= 0) {
+        endCombat(true);
+        updateEnemyHealthBar(enemy,0);
+        defeatEnemy(enemy, zoneIndex);
+        achievementTracker(enemy,roundCount);
+        energyPeakTracker();
+    } else {
+        endCombat(false);
+    }
+    if (isAnyModalOpen()) {
+        addCombatMessage('Combat paused due to open menu.', 'player-stat');
+        game.isFighting = false;
+        return;
+    }
+    updateWielderStats();
+    updateButtonStates();
+    updateEnergyAndKills();
+}
 function isEligibleForCombat() {
     if (game.isFighting) return; // Prevent new combat if one is active
     if (game.currentAction && game.currentAction !== 'autoFighting') return;
@@ -53,7 +119,7 @@ function dodgeMechanic(enemyDamage){
 return enemyDamage;
 }
 
-function regeneration(enemy){
+function trollRegeneration(enemy){
     if (enemy.mechanics?.regenPerTurn) {
         const regenAmount = Math.min(enemy.mechanics.regenPerTurn, (enemy.endurance * 5) - enemyLife - physicalDamageDealt);
         enemyLife += regenAmount;
@@ -63,82 +129,14 @@ function regeneration(enemy){
     }
 }
 
-async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
-    isEligibleForCombat();
-    combatInitialization();
-
-    const effectiveStats = getEffectiveStats();
-    const enemy = specialEnemy || gameData.zones[zoneIndex].enemies[enemyIndex];
-
-    startAchievementTracker();
-    updateBackgroudImage(zoneIndex);
-
-    let enemyLife = enemy.endurance * 5;
-    updateEnemyHealthBar(enemy,enemyLife);
-    startCombatAnimation(enemy);
-    let physicalDamageDealt = calculatePhysicalDamage(enemyLife, enemy, effectiveStats);
-    let lifestealDamageDealt = calculateLifesteal(enemy,enemyLife);
-
-    addCombatMessage(`Engaging ${enemy.name} (${enemy.endurance*5} HP)`, 'player-stat');
-    updateHealthBar(null);
-
-    while (enemyLife > 0 && game.wielder.currentLife > 0 && !isAnyModalOpen()) {
-        roundCount++;
-        updateEnemyHealthBar(enemy,enemyLife);
-        document.getElementById('combat-area').classList.add('combat-active');
-
-        // Boss 3: Tenth attack multiplier
-        let attackMultiplier = 1;
-        if (enemy.mechanics?.tenthAttackMultiplier && roundCount % 10 === 0) {
-            attackMultiplier *= enemy.mechanics.tenthAttackMultiplier;
-            addCombatMessage("CRITICAL STRIKE! Damage x10 this round!", 'warning');
-        }
-
-        enemyLife -= physicalDamageDealt + lifestealDamageDealt;
-        const totalDamageDealt = physicalDamageDealt + lifestealDamageDealt;
-        game.wielder.currentLife = Math.min(effectiveStats.endurance * 5, game.wielder.currentLife + lifestealDamageDealt);
-
-        addCombatMessage(
-            `Dealt ${totalDamageDealt.toFixed(1)} damage (Physical: ${physicalDamageDealt.toFixed(1)}, Lifesteal: ${lifestealDamageDealt.toFixed(1)}). Enemy HP: ${enemyLife.toFixed(2)}`,
-            'damage'
-        );
-
-        const enemyDamage = calculateEnemyDamage(enemy);
-        game.wielder.currentLife -= enemyDamage;
-
-        addCombatMessage(`Took ${enemyDamage} damage (Base: ${enemy.strength*2}, Defense: ${Math.floor(effectiveStats.swordfighting)}) Player HP left: ${game.wielder.currentLife.toFixed(1)}`, 'damage');        updateHealthBar(null);
-        regeneration(enemy);
-
-        if (game.wielder.currentLife <= 0) {
-            defeatWielder();
-        }else{
-            game.statistics.currentHighestDamageTaken = enemy.strength * 2;
-        }
-        updateEnemyHealthBar(enemy,enemyLife);
-        updateWielderHealth();
-        await new Promise(resolve => setTimeout(resolve, 900));
-        document.getElementById('combat-area').classList.remove('combat-active');
-
-        await new Promise(resolve => setTimeout(resolve, 100));
-
+function calculateCriticalMultiplier(enemy){
+    // Boss 3: Tenth attack multiplier
+    let attackMultiplier = 1;
+    if (enemy.mechanics?.tenthAttackMultiplier && roundCount % 10 === 0) {
+        attackMultiplier *= enemy.mechanics.tenthAttackMultiplier;
+        addCombatMessage("CRITICAL STRIKE! Damage x10 this round!", 'warning');
     }
-    if (enemyLife <= 0) {
-        endCombat(true);
-        updateEnemyHealthBar(enemy,0);
-        defeatEnemy(enemy, zoneIndex);
-        achievementTracker(enemy,roundCount);
-        energyPeakTracker();
-    } else {
-        endCombat(false);
-    }
-    if (isAnyModalOpen()) {
-        addCombatMessage('Combat paused due to open menu.', 'player-stat');
-        game.isFighting = false;
-        return;
-    }
-    updateWielderStats();
-    updateButtonStates();
-    updateEnergyAndKills();
+    return attackMultiplier;
 }
 
 function defeatWielder(){
