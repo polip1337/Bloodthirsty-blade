@@ -30,6 +30,10 @@ async function initGame() {
         }
         updateWielderStats();
         saveGame();
+        if (game.unlockedZones.includes(4) && !game.selectedPath) {
+           showPathSelectionModal();
+       }
+
         }, 5000);
 
 }

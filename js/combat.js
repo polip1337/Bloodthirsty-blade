@@ -90,11 +90,11 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
         }else{
             game.statistics.currentHighestDamageTaken = enemy.strength * 2;
         }
-        updateEnemyHealthBar(enemy,enemyLife);
-        updateWielderHealth();
+
         await new Promise(resolve => setTimeout(resolve, 900));
         document.getElementById('combat-area').classList.remove('combat-active');
-
+        updateEnemyHealthBar(enemy,enemyLife);
+        updateWielderHealth();
         await new Promise(resolve => setTimeout(resolve, 100));
 
     }
@@ -103,7 +103,9 @@ async function attackEnemy(zoneIndex, enemyIndex,specialEnemy = null) {
         updateEnemyHealthBar(enemy,0);
         defeatEnemy(enemy, zoneIndex);
         achievementTracker(enemy,roundCount);
+        updateEnergyAndKills();
         energyPeakTracker();
+
     } else {
         endCombat(false);
     }

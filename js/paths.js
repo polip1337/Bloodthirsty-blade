@@ -29,7 +29,11 @@
             addCombatMessage(`New tier${tiersUnlocked - oldTiers > 1 ? 's' : ''} unlocked for ${pathData.name}! Choose your reward in the Paths tab.`, 'player-stat');
             updatePathsTab();
         }
-        if(tiersUnlocked == 5 && !game.completedPaths.includes(path)) game.completedPaths.push(path);
+        if(tiersUnlocked == 5 && !game.completedPaths.includes(path)){
+
+         game.completedPaths.push(path);
+         game.selectedPath=null;
+        }
 
     }
 
